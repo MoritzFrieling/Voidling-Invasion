@@ -375,6 +375,8 @@
       boostCooldown: 0,
       boostMax: 4.8,
       boostTime: 0,
+      jumpBrake: 0,
+      jumpFlash: 0,
       rocketCooldown: 0,
       rocketMax: 6.8,
       rocketCharge: 0,
@@ -1144,7 +1146,8 @@
     player.rocketCooldown = Math.max(0, player.rocketCooldown - dt);
     player.invulnerable = Math.max(0, player.invulnerable - dt);
     player.collisionTimer = Math.max(0, player.collisionTimer - dt);
-    player.boostTime = Math.max(0, player.boostTime - dt);
+    player.jumpBrake = Math.max(0, player.jumpBrake - dt);
+    player.jumpFlash = Math.max(0, player.jumpFlash - dt);
 
     let dx = 0;
     let dy = 0;
@@ -1163,13 +1166,13 @@
     }
 
     const precision = input.keys.has('ShiftLeft') || input.keys.has('ShiftRight');
-    const acceleration = player.acceleration * (precision ? .52 : 1);
+    const acceleration = player.acceleration * (precision ? .52 : player.jumpBrake > 0 ? .62 : 1);
     player.vx += dx * acceleration * dt;
     player.vy += dy * acceleration * dt;
-    const drag = Math.pow(magnitude ? .12 : .035, dt);
+    const drag = Math.pow(magnitude ? player.jumpBrake > 0 ? .08 : .12 : player.jumpBrake > 0 ? .02 : .035, dt);
     player.vx *= drag;
     player.vy *= drag;
-    const maxSpeed = player.speed * (player.boostTime > 0 ? 2.85 : precision ? .48 : 1);
+    const maxSpeed = player.speed * (player.jumpBrake > 0 ? .58 : precision ? .48 : 1);
     const speed = Math.hypot(player.vx, player.vy);
     if (speed > maxSpeed) {
       player.vx = (player.vx / speed) * maxSpeed;
@@ -1406,22 +1409,29 @@
     const length = Math.hypot(dx, dy) || 1;
     dx /= length;
     dy /= length;
-    player.vx = dx * 910;
-    player.vy = dy * 910;
-    player.boostTime = .24;
+    const startX = player.x;
+    const startY = player.y;
+    const jumpDistance = 410;
+    player.x = clamp(player.x + dx * jumpDistance, 45, WORLD.width - 45);
+    player.y = clamp(player.y + dy * jumpDistance, 45, WORLD.height - 45);
+    player.vx = dx * player.speed * .46;
+    player.vy = dy * player.speed * .46;
+    player.jumpBrake = 1.35;
+    player.jumpFlash = .42;
     player.boostCooldown = player.boostMax;
-    player.invulnerable = .28;
-    for (let i = 0; i < 18; i += 1) {
-      addParticle(player.x - dx * 18, player.y - dy * 18, {
-        vx: -dx * rand(160, 430) + rand(-90, 90),
-        vy: -dy * rand(160, 430) + rand(-90, 90),
+    player.invulnerable = .48;
+    for (let i = 0; i < 34; i += 1) {
+      const distance = rand(0, jumpDistance);
+      addParticle(startX + dx * distance + rand(-12, 12), startY + dy * distance + rand(-12, 12), {
+        vx: -dx * rand(80, 240) + rand(-70, 70),
+        vy: -dy * rand(80, 240) + rand(-70, 70),
         color: i % 3 ? COLORS.cyan : '#ffffff',
-        life: rand(.22, .6),
-        size: rand(1, 4),
+        life: rand(.28, .72),
+        size: rand(1, 3.8),
       });
     }
     camera.shake = Math.max(camera.shake, 7);
-    audio.tone(70, .32, 'sawtooth', .07, 380);
+    audio.tone(70, .42, 'sawtooth', .08, 520);
     if (tutorialMode && tutorialIndex === 3) advanceTutorial();
   }
 
@@ -1882,7 +1892,7 @@
     { id: 'speed', tier: 'speedTier', icon: '»', name: 'Vector Thrusters', description: 'Flight speed and acceleration improve.', detail: 'SPEED +14%', apply: () => { player.speed *= 1.14; player.acceleration *= 1.1; player.speedTier += 1; } },
     { id: 'hull', tier: 'hullTier', icon: '⬡', name: 'Reactive Plating', description: 'Increase maximum hull and repair damage.', detail: 'MAX HULL +25', apply: () => { player.maxHp += 25; player.hp = Math.min(player.maxHp, player.hp + 35); player.hullTier += 1; } },
     { id: 'rocket', tier: 'rocketTier', icon: '▲', name: 'Siege Warhead', description: 'Heavy rockets deal more blast damage.', detail: 'ROCKET +32%', apply: () => { player.rocketDamage *= 1.32; player.rocketTier += 1; } },
-    { id: 'cooling', tier: 'coolingTier', icon: '❄', name: 'Cryo Manifold', description: 'Rocket and boost systems reload faster.', detail: 'COOLDOWNS -16%', apply: () => { player.rocketMax *= .84; player.boostMax *= .84; player.coolingTier += 1; } },
+    { id: 'cooling', tier: 'coolingTier', icon: '❄', name: 'Cryo Manifold', description: 'Rocket and void jump systems reload faster.', detail: 'COOLDOWNS -16%', apply: () => { player.rocketMax *= .84; player.boostMax *= .84; player.coolingTier += 1; } },
     { id: 'salvage', icon: 'XP', name: 'Salvage Matrix', description: 'Void ore yields more experience.', detail: 'RESOURCE XP +28%', apply: () => { player.salvage *= 1.28; } },
     { id: 'multi', icon: 'III', name: 'Splitfire Array', description: 'Add a tightly grouped blaster shot.', detail: 'MAX 3 SHOTS', apply: () => { player.multiShot = Math.min(3, player.multiShot + 1); } },
     { id: 'gate', icon: 'AEG', name: 'Gate Capacitor', description: 'Send a recovered charge to Earth.', detail: 'GATE SHIELD +1', apply: () => { gateShields = Math.min(5, gateShields + 1); } },
@@ -2019,7 +2029,7 @@
     { title: 'TAKE THE CONTROLS', text: 'Use W, A, S, and D to move through the sector.' },
     { title: 'TEST THE BLASTER', text: 'Press the Up Arrow to fire forward, or hold the left mouse button to aim and fire.' },
     { title: 'SALVAGE VOID ORE', text: 'Shoot the nearby ore cluster. Destroyed resources give XP for upgrades.' },
-    { title: 'PUNCH THE ENGINES', text: 'Press Q to boost. The drive recharges after every burst.' },
+    { title: 'PUNCH THE VOID', text: 'Press Q or right-click to make a Void Jump. The drive recharges after every jump.' },
     { title: 'ARM THE WARHEAD', text: 'Press F. Heavy rockets charge briefly, then deal large blast damage.' },
     { title: 'DEFEND THE GATE', text: 'Enemies follow the glowing corridor. Stop them before the Earth Gate loses every shield.' },
   ];
@@ -2535,6 +2545,16 @@
     ctx.beginPath(); ctx.moveTo(-13, -5); ctx.lineTo(-25, 0); ctx.lineTo(-13, 5); ctx.closePath(); ctx.fill();
     ctx.restore();
 
+    if (player.jumpFlash > 0) {
+      ctx.save();
+      ctx.globalAlpha = clamp(player.jumpFlash / .42, 0, 1) * .72;
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = 2;
+      ctx.setLineDash([5, 8]);
+      ctx.beginPath(); ctx.arc(player.x, player.y, 30 + (1 - player.jumpFlash / .42) * 28, 0, Math.PI * 2); ctx.stroke();
+      ctx.restore();
+    }
+
     if (player.rocketCharge > 0) {
       const progress = 1 - player.rocketCharge / .62;
       ctx.save();
@@ -2778,6 +2798,11 @@
   }
 
   function pointerDown(event) {
+    if (event.button === 2) {
+      event.preventDefault();
+      if (mode === 'playing') { audio.init(); triggerBoost(); }
+      return;
+    }
     if (event.button !== 0 || mode !== 'playing') return;
     input.pointerDown = true;
     audio.init();
