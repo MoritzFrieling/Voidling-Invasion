@@ -2747,7 +2747,7 @@
     if (event.code === 'Enter') {
       if (ui.authOverlay.classList.contains('active') || ui.leaderboardOverlay.classList.contains('active')) return;
       if (mode === 'menu') requirePilot(() => startGame(false));
-      else if (mode === 'ended') startGame(false);
+      else if (mode === 'ended') startGame(false, currentLevel);
       else if (mode === 'briefing') showNextIntel();
       else if (mode === 'cutscene') activateWave();
       else if (mode === 'sector') enterNextSector();
@@ -2794,9 +2794,9 @@
     document.getElementById('pauseButton').addEventListener('click', () => togglePause(true));
     document.getElementById('resumeButton').addEventListener('click', () => togglePause(false));
     document.getElementById('pauseSettingsButton').addEventListener('click', () => openSettings('paused'));
-    document.getElementById('restartButton').addEventListener('click', () => startGame(false));
+    document.getElementById('restartButton').addEventListener('click', () => startGame(false, currentLevel));
     document.getElementById('quitButton').addEventListener('click', showTitle);
-    document.getElementById('playAgainButton').addEventListener('click', () => startGame(false));
+    document.getElementById('playAgainButton').addEventListener('click', () => startGame(false, currentLevel));
     document.getElementById('endQuitButton').addEventListener('click', showTitle);
     document.getElementById('closeSettings').addEventListener('click', closeSettings);
     document.getElementById('intelContinue').addEventListener('click', showNextIntel);
