@@ -24,7 +24,7 @@
 
   const LEVELS = [
     {
-      name: 'OUTER PERIMETER', short: 'SECTOR 01', stages: 10, boss: 'bossOmega',
+      name: 'OUTER PERIMETER', short: 'SECTOR 01', stages: 6, boss: 'bossOmega',
       next: 'The route ahead has split. Hostiles are regrouping around twin approach corridors.',
       paths: [createPath([
         { x: -120, y: 380 }, { x: 360, y: 430 }, { x: 690, y: 770 }, { x: 1110, y: 690 },
@@ -34,7 +34,7 @@
       wormholes: [],
     },
     {
-      name: 'TWIN RIFT', short: 'SECTOR 02', stages: 12, boss: 'bossCarrier',
+      name: 'TWIN RIFT', short: 'SECTOR 02', stages: 7, boss: 'bossCarrier',
       next: 'A shattered approach lies ahead. Three lanes and unstable wormholes converge on Earth.',
       paths: [
         createPath([{ x: -120, y: 310 }, { x: 440, y: 330 }, { x: 900, y: 600 }, { x: 1380, y: 520 }, { x: 1820, y: 820 }, { x: 2280, y: 760 }, { x: 2670, y: 900 }, { x: PORTAL.x, y: PORTAL.y }]),
@@ -43,7 +43,7 @@
       wormholes: [{ x: 1820, y: 820, pathId: 0, progress: .58 }, { x: 1710, y: 1220, pathId: 1, progress: .54 }],
     },
     {
-      name: 'SHATTERED APPROACH', short: 'SECTOR 03', stages: 14, boss: 'bossTitan',
+      name: 'SHATTERED APPROACH', short: 'SECTOR 03', stages: 8, boss: 'bossTitan',
       next: '',
       paths: [
         createPath([{ x: -120, y: 220 }, { x: 510, y: 280 }, { x: 980, y: 520 }, { x: 1500, y: 410 }, { x: 1990, y: 660 }, { x: 2510, y: 720 }, { x: PORTAL.x, y: PORTAL.y }]),
@@ -119,6 +119,8 @@
   let mode = 'menu';
   let settingsReturn = 'menu';
   let wave = 0;
+  let formation = 0;
+  let formationsInStage = 1;
   let score = 0;
   let kills = 0;
   let gateShields = 3;
@@ -370,6 +372,8 @@
     particles = [];
     floaters = [];
     wave = 0;
+    formation = 0;
+    formationsInStage = 1;
     currentLevel = clamp(levelIndex, 0, campaignState.highestUnlocked);
     activePaths = LEVELS[currentLevel].paths;
     score = 0;
@@ -506,25 +510,32 @@
       return;
     }
     wave += 1;
+    formation = 1;
+    formationsInStage = 2;
     waveClearTimer = 0;
+    prepareFormation();
+  }
+
+  function prepareFormation() {
+    const level = LEVELS[currentLevel];
     spawnQueue = [];
-    const regularCount = tutorialMode ? 5 : 7 + wave * 2 + currentLevel * 5;
+    const regularCount = tutorialMode ? 4 : 4 + wave + currentLevel * 2 + formation;
     const available = ['scout', 'raider'];
     if (wave >= 2) available.push('striker');
     if (wave >= 3) available.push('major');
     if (currentLevel >= 1 && wave >= 2) available.push('carrier');
-    if (currentLevel >= 1 && wave >= 4) available.push('sentinel');
+    if (currentLevel >= 2 && wave >= 2) available.push('sentinel');
     for (let i = 0; i < regularCount; i += 1) {
-      let type = available[(i * 7 + wave * 3) % available.length];
-      if (i === 0) type = 'scout';
-      if (i === 1) type = 'raider';
+      let type = available[(i * 7 + wave * 3 + formation * 2) % available.length];
+      if (wave === 1 && formation === 1 && i === 0) type = 'scout';
+      if (wave === 1 && formation === 1 && i === 1) type = 'raider';
       if (type === 'carrier' && i % 7 !== 4) type = 'raider';
       if (type === 'sentinel' && i % 6 !== 3) type = 'major';
-      const pathId = (i + wave) % level.paths.length;
+      const pathId = (i + wave + formation) % level.paths.length;
       let entryProgress = 0;
       let fromWormhole = false;
-      if (level.wormholes.length && wave >= 6 && i > 2 && i % 5 === 0) {
-        const wormhole = level.wormholes[(i + wave) % level.wormholes.length];
+      if (level.wormholes.length && wave >= 3 && i > 2 && i % 5 === 0) {
+        const wormhole = level.wormholes[(i + wave + formation) % level.wormholes.length];
         entryProgress = level.paths[wormhole.pathId].length * wormhole.progress;
         fromWormhole = true;
         spawnQueue.push({ type, pathId: wormhole.pathId, entryProgress, fromWormhole });
@@ -532,16 +543,22 @@
         spawnQueue.push({ type, pathId, entryProgress, fromWormhole });
       }
     }
-    const isBossStage = wave === level.stages;
-    if (isBossStage) spawnQueue.push({ type: level.boss, pathId: Math.floor(level.paths.length / 2), entryProgress: 0 });
+    const isBossFormation = wave === level.stages && formation === formationsInStage;
+    if (isBossFormation) spawnQueue.push({ type: level.boss, pathId: Math.floor(level.paths.length / 2), entryProgress: 0 });
 
-    const waveTypes = [...new Set(spawnQueue.map((entry) => entry.type).filter((type) => !ENEMY_TYPES[type].boss && type !== 'drone'))];
+    const waveTypes = [...new Set(spawnQueue.map((entry) => entry.type).filter((type) => !ENEMY_TYPES[type].boss && type !== 'interceptor'))];
     introQueue = tutorialMode ? [] : waveTypes.filter((type) => !seenEnemyTypes.has(type));
     introQueue.forEach((type) => seenEnemyTypes.add(type));
     pendingWaveStart = true;
-    if (isBossStage) showBossIntro(level.boss);
+    if (isBossFormation) showBossIntro(level.boss);
     else if (introQueue.length) showNextIntel();
     else activateWave();
+  }
+
+  function beginNextFormation() {
+    formation += 1;
+    waveClearTimer = 0;
+    prepareFormation();
   }
 
   const ENEMY_TYPES = {
@@ -549,7 +566,7 @@
     raider: { name: 'MARAUDER', role: 'BALANCED // ARMORED', description: 'Reliable frontline ship. Slower than a Dart, but it can absorb sustained blaster fire.', radius: 19, hp: 105, speed: 88, score: 170, xp: 16, color: '#ffb35c' },
     striker: { name: 'NEEDLE', role: 'EXTREME SPEED // FRAGILE', description: 'A tiny interceptor built entirely around speed. Its erratic lane changes make it hard to track.', radius: 10, hp: 48, speed: 178, score: 220, xp: 18, color: '#c885ff' },
     major: { name: 'SIEGEBREAKER', role: 'HEAVY HULL // MISSILES', description: 'A slow assault vessel that launches guided rockets at your ship. Keep moving.', radius: 32, hp: 390, speed: 58, score: 700, xp: 48, color: '#ff6f61', major: true },
-    drone: { name: 'CARRIER DRONE', role: 'SPAWNED // SWARM', description: 'A disposable escort launched by carrier vessels.', radius: 9, hp: 32, speed: 166, score: 65, xp: 5, color: '#ff9f88' },
+    interceptor: { name: 'CARRIER INTERCEPTOR', role: 'LAUNCHED // DESTRUCTIBLE', description: 'A light interceptor launched by carrier vessels. Blaster hits damage its hull and can destroy it before it reaches the gate.', radius: 10, hp: 46, speed: 164, score: 80, xp: 7, color: '#ff9f88', interceptor: true },
     carrier: { name: 'BROOD CARRIER', role: 'SPAWNER // HEAVY HULL', description: 'A mobile hangar that launches smaller fighters along the route. Destroy it before the swarm grows.', radius: 37, hp: 520, speed: 49, score: 920, xp: 60, color: '#f071c8', major: true, carrier: true },
     sentinel: { name: 'AEGIS SENTINEL', role: 'ROCKET-BREAK SHIELD', description: 'Its shield ignores light blaster fire. Break the barrier with a heavy rocket, then attack the hull.', radius: 29, hp: 310, shield: 170, speed: 67, score: 840, xp: 58, color: '#79a8ff', major: true, shielded: true },
     bossOmega: { name: 'DREADNOUGHT OMEGA', role: 'MISSILE COMMAND SHIP', description: 'The first invasion commander. It saturates the defense zone with guided warheads.', radius: 66, hp: 2850, speed: 34, score: 5400, xp: 260, color: '#ff506b', major: true, boss: true, bossSkill: 'rockets' },
@@ -564,9 +581,9 @@
     pendingWaveStart = false;
     announcementTimer = 2.2;
     spawnTimer = .8;
-    const bossStage = wave === LEVELS[currentLevel].stages;
-    showToast(bossStage ? 'COMMAND SHIP ENTERING THE VOIDLINE' : `STAGE ${String(wave).padStart(2, '0')} INBOUND`);
-    audio.tone(bossStage ? 82 : 128, .42, 'sawtooth', .08, bossStage ? -35 : 110);
+    const bossFormation = wave === LEVELS[currentLevel].stages && formation === formationsInStage;
+    showToast(bossFormation ? 'COMMAND SHIP ENTERING THE VOIDLINE' : `STAGE ${String(wave).padStart(2, '0')} // WAVE ${formation} OF ${formationsInStage}`);
+    audio.tone(bossFormation ? 82 : 128, .42, 'sawtooth', .08, bossFormation ? -35 : 110);
     ui.crosshair.style.opacity = '1';
   }
 
@@ -581,6 +598,7 @@
     ui.intelText.textContent = intel.description;
     ui.intelKicker.textContent = currentLevel === 0 && wave === 1 ? 'FIRST CONTACT // HOSTILE PROFILE' : 'NEW HOSTILE IDENTIFIED';
     ui.intelOverlay.querySelector('.intel-panel').dataset.enemy = type;
+    drawIntelShip(type);
     ui.intelOverlay.classList.add('active');
   }
 
@@ -628,6 +646,7 @@
       major: Boolean(blueprint.major),
       boss: Boolean(blueprint.boss),
       carrier: Boolean(blueprint.carrier),
+      interceptor: Boolean(blueprint.interceptor),
       shieldHp: (blueprint.shield || 0) * difficultyScale,
       maxShield: (blueprint.shield || 0) * difficultyScale,
       bossSkill: blueprint.bossSkill || '',
@@ -802,8 +821,11 @@
     } else if (!enemies.length && wave > 0) {
       waveClearTimer += dt;
       if (waveClearTimer > 2.8) {
-        if ((wave === 3 || wave === 6 || wave === 9 || wave === 12) && gateShields < 5) spawnPickup('shield');
-        beginWave();
+        if (formation < formationsInStage) beginNextFormation();
+        else {
+          if (wave % 2 === 0 && gateShields < 5) spawnPickup('shield');
+          beginWave();
+        }
       }
     }
 
@@ -1023,11 +1045,11 @@
         if (enemy.spawnTimer <= 0 && enemies.length < 90) {
           const count = enemy.boss ? 4 : 2;
           for (let i = 0; i < count; i += 1) {
-            spawnEnemy({ type: 'drone', pathId: enemy.pathId, entryProgress: Math.max(0, enemy.progress - 28 - i * 12) }, enemy);
+            spawnEnemy({ type: 'interceptor', pathId: enemy.pathId, entryProgress: Math.max(0, enemy.progress - 28 - i * 12) }, enemy);
           }
           enemy.spawnTimer = enemy.boss ? rand(2.4, 3.4) : rand(4.1, 5.8);
           burst(enemy.x, enemy.y, enemy.color, 10, 110);
-          showToast(enemy.boss ? 'CARRIER WING DEPLOYED' : 'BROOD CARRIER LAUNCHED DRONES');
+          showToast(enemy.boss ? 'CARRIER WING DEPLOYED' : 'BROOD CARRIER LAUNCHED INTERCEPTORS');
         }
       }
 
@@ -1240,6 +1262,7 @@
     }
     enemy.hp -= amount;
     enemy.hitFlash = .08;
+    if (enemy.interceptor) addFloater(enemy.x, enemy.y - enemy.radius, `${Math.max(1, Math.round(enemy.hp))} HULL`, enemy.color);
     addParticle(x, y, { vx: rand(-80, 80), vy: rand(-80, 80), color: enemy.color, life: .28, size: 2.2 });
     if (enemy.hp <= 0 && !enemy.dead) {
       enemy.dead = true;
@@ -1248,6 +1271,7 @@
       grantXp(enemy.xp);
       burst(enemy.x, enemy.y, enemy.color, enemy.boss ? 60 : enemy.major ? 30 : 14, enemy.boss ? 520 : 240);
       addFloater(enemy.x, enemy.y - enemy.radius, `+${enemy.score}`, enemy.boss ? COLORS.amber : COLORS.cyan);
+      if (enemy.interceptor) showToast('CARRIER INTERCEPTOR DESTROYED');
       camera.shake = Math.max(camera.shake, enemy.boss ? 22 : enemy.major ? 9 : 3.5);
       audio.tone(enemy.boss ? 48 : enemy.major ? 72 : 130, enemy.boss ? .75 : .16, 'sawtooth', enemy.boss ? .14 : .05, -35);
       if (enemy.major && Math.random() < .28) spawnPickupAt('repair', enemy.x, enemy.y);
@@ -1425,6 +1449,8 @@
     currentLevel += 1;
     activePaths = LEVELS[currentLevel].paths;
     wave = 0;
+    formation = 0;
+    formationsInStage = 1;
     spawnQueue = [];
     enemies = [];
     enemyRockets = [];
@@ -1820,6 +1846,64 @@
     ctx.restore();
   }
 
+  function traceEnemyHull(target, type, r) {
+    target.beginPath();
+    if (type === 'scout' || type === 'striker') {
+      target.moveTo(r, 0); target.lineTo(-r * .7, -r * .72); target.lineTo(-r * .35, 0); target.lineTo(-r * .7, r * .72);
+    } else if (type === 'interceptor') {
+      target.moveTo(r, 0); target.lineTo(0, -r * .62); target.lineTo(-r, 0); target.lineTo(0, r * .62);
+    } else if (type === 'raider') {
+      target.moveTo(r, 0); target.lineTo(r * .2, -r * .7); target.lineTo(-r, -r * .48); target.lineTo(-r * .62, 0); target.lineTo(-r, r * .48); target.lineTo(r * .2, r * .7);
+    } else if (type === 'carrier' || type === 'bossCarrier') {
+      target.moveTo(r, 0); target.lineTo(r * .35, -r * .6); target.lineTo(-r * .45, -r); target.lineTo(-r, -r * .3); target.lineTo(-r * .72, 0); target.lineTo(-r, r * .3); target.lineTo(-r * .45, r); target.lineTo(r * .35, r * .6);
+    } else if (type === 'sentinel' || type === 'bossTitan') {
+      for (let side = 0; side < 6; side += 1) {
+        const a = side / 6 * Math.PI * 2;
+        const px = Math.cos(a) * r;
+        const py = Math.sin(a) * r;
+        if (!side) target.moveTo(px, py); else target.lineTo(px, py);
+      }
+    } else {
+      target.moveTo(r, 0); target.lineTo(r * .52, -r * .7); target.lineTo(-r * .35, -r); target.lineTo(-r, -r * .45); target.lineTo(-r * .7, 0); target.lineTo(-r, r * .45); target.lineTo(-r * .35, r); target.lineTo(r * .52, r * .7);
+    }
+    target.closePath();
+  }
+
+  function drawIntelShip(type) {
+    const preview = ui.intelShip;
+    const previewCtx = preview.getContext('2d');
+    const blueprint = ENEMY_TYPES[type];
+    const r = clamp(blueprint.radius * 2.25, 45, 92);
+    previewCtx.clearRect(0, 0, preview.width, preview.height);
+    previewCtx.save();
+    previewCtx.translate(preview.width / 2, preview.height / 2);
+    previewCtx.shadowBlur = 26;
+    previewCtx.shadowColor = blueprint.color;
+    previewCtx.fillStyle = 'rgba(17,22,30,.98)';
+    previewCtx.strokeStyle = blueprint.color;
+    previewCtx.lineWidth = blueprint.major ? 4 : 3;
+    traceEnemyHull(previewCtx, type, r);
+    previewCtx.fill(); previewCtx.stroke();
+    previewCtx.shadowBlur = 10;
+    previewCtx.fillStyle = blueprint.color;
+    previewCtx.globalAlpha = .82;
+    previewCtx.fillRect(-r * .72, -r * .14, r * .62, r * .28);
+    previewCtx.globalAlpha = 1;
+    if (blueprint.major) {
+      previewCtx.strokeStyle = 'rgba(255,255,255,.48)';
+      previewCtx.beginPath(); previewCtx.arc(r * .12, 0, r * .33, 0, Math.PI * 2); previewCtx.stroke();
+      previewCtx.fillStyle = blueprint.color;
+      previewCtx.beginPath(); previewCtx.arc(r * .12, 0, r * .12, 0, Math.PI * 2); previewCtx.fill();
+    }
+    if (blueprint.shielded) {
+      previewCtx.strokeStyle = 'rgba(121,168,255,.9)';
+      previewCtx.setLineDash([10, 8]);
+      previewCtx.lineWidth = 3;
+      previewCtx.beginPath(); previewCtx.arc(0, 0, r + 17, 0, Math.PI * 2); previewCtx.stroke();
+    }
+    previewCtx.restore();
+  }
+
   function drawEnemy(enemy) {
     if (!isVisible(enemy, enemy.radius + 80)) return;
     ctx.save();
@@ -1831,26 +1915,7 @@
     ctx.fillStyle = enemy.hitFlash > 0 ? 'rgba(255,255,255,.55)' : 'rgba(17,22,30,.96)';
     ctx.lineWidth = enemy.boss ? 3 : enemy.major ? 2 : 1.4;
     const r = enemy.radius;
-    if (enemy.type === 'scout' || enemy.type === 'striker') {
-      ctx.beginPath(); ctx.moveTo(r, 0); ctx.lineTo(-r * .7, -r * .72); ctx.lineTo(-r * .35, 0); ctx.lineTo(-r * .7, r * .72); ctx.closePath();
-    } else if (enemy.type === 'drone') {
-      ctx.beginPath(); ctx.moveTo(r, 0); ctx.lineTo(0, -r * .62); ctx.lineTo(-r, 0); ctx.lineTo(0, r * .62); ctx.closePath();
-    } else if (enemy.type === 'raider') {
-      ctx.beginPath(); ctx.moveTo(r, 0); ctx.lineTo(r * .2, -r * .7); ctx.lineTo(-r, -r * .48); ctx.lineTo(-r * .62, 0); ctx.lineTo(-r, r * .48); ctx.lineTo(r * .2, r * .7); ctx.closePath();
-    } else if (enemy.type === 'carrier' || enemy.type === 'bossCarrier') {
-      ctx.beginPath(); ctx.moveTo(r, 0); ctx.lineTo(r * .35, -r * .6); ctx.lineTo(-r * .45, -r); ctx.lineTo(-r, -r * .3); ctx.lineTo(-r * .72, 0); ctx.lineTo(-r, r * .3); ctx.lineTo(-r * .45, r); ctx.lineTo(r * .35, r * .6); ctx.closePath();
-    } else if (enemy.type === 'sentinel' || enemy.type === 'bossTitan') {
-      ctx.beginPath();
-      for (let side = 0; side < 6; side += 1) {
-        const a = side / 6 * Math.PI * 2;
-        const px = Math.cos(a) * r;
-        const py = Math.sin(a) * r;
-        if (!side) ctx.moveTo(px, py); else ctx.lineTo(px, py);
-      }
-      ctx.closePath();
-    } else {
-      ctx.beginPath(); ctx.moveTo(r, 0); ctx.lineTo(r * .52, -r * .7); ctx.lineTo(-r * .35, -r); ctx.lineTo(-r, -r * .45); ctx.lineTo(-r * .7, 0); ctx.lineTo(-r, r * .45); ctx.lineTo(-r * .35, r); ctx.lineTo(r * .52, r * .7); ctx.closePath();
-    }
+    traceEnemyHull(ctx, enemy.type, r);
     ctx.fill(); ctx.stroke();
     ctx.fillStyle = enemy.color;
     ctx.globalAlpha = .8;
@@ -1875,7 +1940,7 @@
       ctx.beginPath(); ctx.arc(0, 0, enemy.radius + 10, 0, Math.PI * 2); ctx.stroke();
       ctx.restore();
     }
-    if (enemy.major || enemy.hp < enemy.maxHp) drawHealthBar(enemy.x, enemy.y - enemy.radius - 13, enemy.boss ? 110 : enemy.major ? 72 : 38, enemy.hp / enemy.maxHp, enemy.color);
+    if (enemy.major || enemy.interceptor || enemy.hp < enemy.maxHp) drawHealthBar(enemy.x, enemy.y - enemy.radius - 13, enemy.boss ? 110 : enemy.major ? 72 : 38, enemy.hp / enemy.maxHp, enemy.color);
     if (enemy.boss) {
       ctx.save();
       ctx.fillStyle = COLORS.coral;
@@ -2054,7 +2119,9 @@
     const level = LEVELS[currentLevel];
     ui.sectorText.textContent = `${level.short} // ${level.name}`;
     ui.waveText.textContent = `STAGE ${wave ? String(wave).padStart(2, '0') : '—'} / ${level.stages}`;
-    ui.waveState.textContent = spawnQueue.length || enemies.length ? `${spawnQueue.length + enemies.length} HOSTILES` : wave ? 'SECTOR CLEAR' : 'STANDBY';
+    ui.waveState.textContent = spawnQueue.length || enemies.length
+      ? `WAVE ${formation}/${formationsInStage} · ${spawnQueue.length + enemies.length} HOSTILES`
+      : wave ? `WAVE ${formation}/${formationsInStage} CLEAR` : 'STANDBY';
     ui.scoreText.textContent = formatScore(score);
     ui.bestText.textContent = formatScore(Math.max(highScore, score));
     const healthRatio = clamp(player.hp / player.maxHp, 0, 1);
