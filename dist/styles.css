@@ -166,6 +166,12 @@ kbd { min-width: 32px; padding: 6px 7px; color: var(--cyan-soft); border: 1px so
 .ability-card span { color: var(--cyan); font: 700 .52rem var(--mono); letter-spacing: .08em; }
 .ability-card .cooldown { position: absolute; inset: auto 0 0; height: 3px; width: 0; background: var(--cyan); box-shadow: 0 0 10px currentColor; }
 .ability-card.cooling span { color: var(--amber); }
+.upgrade-readout { position: absolute; z-index: 8; right: 18px; bottom: 84px; width: 178px; padding: 10px; border: 1px solid rgba(142,214,214,.18); background: rgba(3,12,18,.78); backdrop-filter: blur(7px); pointer-events: none; }
+.upgrade-readout > .eyebrow { display: block; margin: 0 0 7px; color: var(--muted); font-size: .48rem; letter-spacing: .14em; }
+.upgrade-tier-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; }
+.upgrade-tier { min-height: 34px; display: grid; grid-template-columns: 18px 1fr; align-items: center; padding: 4px 5px; border: 1px solid rgba(142,214,214,.12); background: rgba(109,247,232,.035); }
+.upgrade-tier i { color: var(--cyan); font: normal 700 .8rem var(--mono); text-align: center; text-shadow: 0 0 8px rgba(109,247,232,.35); }
+.upgrade-tier b { color: #b9cdcb; font: 700 .52rem var(--mono); text-align: right; }
 
 .status-toast { position: absolute; z-index: 9; left: 50%; top: 25%; translate: -50% -50%; opacity: 0; padding: 9px 16px; border: 1px solid var(--line-bright); background: rgba(4, 16, 23, .86); color: var(--cyan-soft); font: 700 .72rem var(--mono); letter-spacing: .12em; transition: opacity .22s, transform .22s; transform: translateY(8px); pointer-events: none; }
 .status-toast.visible { opacity: 1; transform: translateY(0); }
@@ -217,6 +223,11 @@ button { border: 0; }
 .utility-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; margin-top: 8px; }
 .utility-actions button { height: 40px; border: 1px solid var(--line); background: rgba(4,15,22,.82); color: var(--muted); font-size: .68rem; letter-spacing: .12em; cursor: pointer; }
 .utility-actions button:hover { color: var(--cyan); border-color: var(--line-bright); }
+.acknowledgements { position: absolute; z-index: 2; left: 50%; bottom: 13px; translate: -50% 0; width: min(900px, calc(100% - 36px)); color: #627b7c; text-align: center; font: 600 .55rem var(--mono); letter-spacing: .06em; }
+.acknowledgements span { color: #7e9998; letter-spacing: .16em; }
+.acknowledgements p { display: inline; margin: 0 0 0 9px; }
+.acknowledgements a { color: #8fb4b2; text-decoration-color: rgba(109,247,232,.32); text-underline-offset: 3px; }
+.acknowledgements a:hover { color: var(--cyan); }
 
 .panel-overlay { place-items: center; padding: 24px; background: rgba(1, 6, 10, .8); }
 .panel { position: relative; width: min(900px, calc(100vw - 34px)); padding: clamp(26px, 4vw, 48px); border: 1px solid var(--line-bright); border-top: 3px solid var(--cyan); background: var(--panel-strong); box-shadow: 0 24px 90px rgba(0,0,0,.48); clip-path: polygon(0 0, calc(100% - 24px) 0, 100% 24px, 100% 100%, 0 100%); }
@@ -297,12 +308,14 @@ button { border: 0; }
   .settings-grid { grid-template-columns: 1fr; gap: 28px; max-height: 70vh; overflow-y: auto; }
   .intel-panel { grid-template-columns: 1fr; }.intel-ship { width: 190px; }.intel-copy { text-align: center; }.intel-copy .main-button { margin-inline: auto; }
   .level-grid { grid-template-columns: 1fr; max-height: 64vh; overflow-y: auto; }.level-card { min-height: 165px; }
+  .acknowledgements { font-size: .5rem; }.acknowledgements span { display: none; }
 }
 
 @media (max-width: 650px) {
   .topbar { grid-template-columns: 1fr auto; min-height: 66px; padding: 10px 14px; }.round-readout { display: none; }.score-readout div:first-child { display: none; }
   .vitals { top: 76px; left: 12px; width: 255px; }.minimap-wrap { top: 76px; right: 12px; width: 142px; }.minimap-wrap canvas { width: 140px !important; height: 84px !important; }
   .ability-dock { width: calc(100% - 20px); bottom: 10px; }.ability-card { flex: 1; min-width: 0; padding: 7px; height: 50px; }.ability-card div span { display: none; }.ability-card kbd { min-width: 28px; }
+  .upgrade-readout { display: none; }
   .upgrade-grid { grid-template-columns: 1fr; max-height: 58vh; overflow-y: auto; }.upgrade-choice { min-height: 130px; }.upgrade-choice .upgrade-icon { margin-bottom: 14px; }
   .start-overlay { padding-inline: 24px; }.intro { margin: 28px 0 24px; }.menu-actions { display: grid; }.main-button, .secondary-button { width: 100%; }
 }

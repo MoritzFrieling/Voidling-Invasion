@@ -23,6 +23,10 @@ Serve the `dist` directory with any static web server, then open `index.html` in
 
 Progress and settings are stored locally in the browser.
 
+## Acknowledgements
+
+Gameplay was heavily inspired by Bloons Tower Defense, Kingdom Rush, and [SkyRush](https://marth1703.github.io/GameStudio/Skyrush/index.html), created by a friend of the developer.
+
 ## Publish on GitHub Pages
 
 The repository includes a GitHub Actions workflow that publishes the contents of `dist` whenever `main` is pushed. In the GitHub repository, open **Settings → Pages** and set **Source** to **GitHub Actions**. The next push to `main` (or a manual run from the Actions tab) deploys the game.

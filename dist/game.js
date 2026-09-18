@@ -84,6 +84,7 @@
     'intelRole', 'intelText', 'intelShip', 'bossOverlay', 'bossKicker', 'bossTitle', 'bossText',
     'sectorOverlay', 'sectorTitle', 'sectorCopy',
     'levelSelectOverlay', 'levelChoices',
+    'speedTierText', 'damageTierText', 'rateTierText', 'hullTierText', 'rocketTierText', 'coolingTierText',
   ].forEach((id) => { ui[id] = document.getElementById(id); });
 
   const settings = {
@@ -286,8 +287,8 @@
       radius: 18,
       hp: 100,
       maxHp: 100,
-      speed: 355,
-      acceleration: 980,
+      speed: 310,
+      acceleration: 860,
       fireRate: 5.2,
       shotTimer: 0,
       damage: 18,
@@ -308,6 +309,12 @@
       multiShot: 1,
       salvage: 1,
       credits: 40,
+      speedTier: 1,
+      damageTier: 1,
+      rateTier: 1,
+      hullTier: 1,
+      rocketTier: 1,
+      coolingTier: 1,
       collisionTimer: 0,
     };
   }
@@ -315,6 +322,7 @@
   const PROGRESS_KEYS = [
     'hp', 'maxHp', 'speed', 'acceleration', 'fireRate', 'damage', 'projectileSpeed', 'level', 'xp', 'xpNext',
     'boostMax', 'rocketMax', 'rocketDamage', 'multiShot', 'salvage', 'credits',
+    'speedTier', 'damageTier', 'rateTier', 'hullTier', 'rocketTier', 'coolingTier',
   ];
 
   function captureProgress(source = player, shields = gateShields) {
@@ -329,11 +337,13 @@
     if (levelIndex >= 1) {
       pilot.maxHp = 125; pilot.hp = 125; pilot.damage *= 1.45; pilot.fireRate *= 1.22; pilot.speed *= 1.12;
       pilot.rocketDamage *= 1.32; pilot.rocketMax *= .9; pilot.level = 6; pilot.xp = 0; pilot.xpNext = 240; pilot.credits = 160;
+      pilot.hullTier = 2; pilot.damageTier = 3; pilot.rateTier = 2; pilot.speedTier = 2; pilot.rocketTier = 2; pilot.coolingTier = 2;
       shields = 4;
     }
     if (levelIndex >= 2) {
       pilot.maxHp = 155; pilot.hp = 155; pilot.damage *= 1.32; pilot.fireRate *= 1.18; pilot.speed *= 1.1;
       pilot.rocketDamage *= 1.28; pilot.boostMax *= .86; pilot.multiShot = 2; pilot.level = 12; pilot.xpNext = 520; pilot.credits = 275;
+      pilot.hullTier = 3; pilot.damageTier = 4; pilot.rateTier = 3; pilot.speedTier = 3; pilot.rocketTier = 3; pilot.coolingTier = 3;
       shields = 4;
     }
     return captureProgress(pilot, shields);
@@ -341,9 +351,20 @@
 
   function applyCheckpoint(checkpoint) {
     if (!checkpoint) return;
+    const legacyCheckpoint = !Number.isFinite(Number(checkpoint.speedTier));
     for (const key of PROGRESS_KEYS) {
       const value = Number(checkpoint[key]);
       if (Number.isFinite(value)) player[key] = value;
+    }
+    if (legacyCheckpoint) {
+      player.speed *= 310 / 355;
+      player.acceleration *= 860 / 980;
+      player.speedTier = clamp(1 + Math.round(Math.log(Math.max(1, player.speed / 310)) / Math.log(1.14)), 1, 7);
+      player.damageTier = clamp(1 + Math.round(Math.log(Math.max(1, player.damage / 18)) / Math.log(1.24)), 1, 7);
+      player.rateTier = clamp(1 + Math.round(Math.log(Math.max(1, player.fireRate / 5.2)) / Math.log(1.2)), 1, 7);
+      player.hullTier = clamp(1 + Math.round(Math.max(0, player.maxHp - 100) / 25), 1, 7);
+      player.rocketTier = clamp(1 + Math.round(Math.log(Math.max(1, player.rocketDamage / 125)) / Math.log(1.32)), 1, 7);
+      player.coolingTier = clamp(1 + Math.round(Math.log(Math.min(1, player.rocketMax / 6.8)) / Math.log(.84)), 1, 7);
     }
     player.hp = Math.max(1, Math.min(player.maxHp, player.hp));
     gateShields = Math.max(1, Math.min(5, Number(checkpoint.gateShields) || 3));
@@ -879,7 +900,7 @@
       const targetAngle = Math.atan2(assistTarget.y - player.y, assistTarget.x - player.x);
       angle += angleDelta(angle, targetAngle) * .72;
     }
-    const spread = player.multiShot === 1 ? [0] : player.multiShot === 2 ? [-.045, .045] : [-.075, 0, .075];
+    const spread = player.multiShot === 1 ? [0] : player.multiShot === 2 ? [-.028, .028] : [-.052, 0, .052];
     spread.forEach((offset) => {
       const shotAngle = angle + offset;
       bullets.push({
@@ -1363,12 +1384,12 @@
   }
 
   const UPGRADES = [
-    { id: 'damage', icon: 'DMG', name: 'Overcharged Bolts', description: 'Blaster damage increases by 24%.', detail: 'DAMAGE +24%', apply: () => { player.damage *= 1.24; } },
-    { id: 'rate', icon: 'RPM', name: 'Flux Repeater', description: 'Blaster cycles 20% faster.', detail: 'FIRE RATE +20%', apply: () => { player.fireRate *= 1.2; } },
-    { id: 'speed', icon: 'VEC', name: 'Vector Thrusters', description: 'Flight speed and acceleration improve.', detail: 'SPEED +14%', apply: () => { player.speed *= 1.14; player.acceleration *= 1.1; } },
-    { id: 'hull', icon: 'HP', name: 'Reactive Plating', description: 'Increase maximum hull and repair damage.', detail: 'MAX HULL +25', apply: () => { player.maxHp += 25; player.hp = Math.min(player.maxHp, player.hp + 35); } },
-    { id: 'rocket', icon: 'RKT', name: 'Siege Warhead', description: 'Heavy rockets deal more blast damage.', detail: 'ROCKET +32%', apply: () => { player.rocketDamage *= 1.32; } },
-    { id: 'cooling', icon: 'CD', name: 'Cryo Manifold', description: 'Rocket and boost systems reload faster.', detail: 'COOLDOWNS -16%', apply: () => { player.rocketMax *= .84; player.boostMax *= .84; } },
+    { id: 'damage', tier: 'damageTier', icon: '◆', name: 'Overcharged Bolts', description: 'Blaster damage increases by 24%.', detail: 'DAMAGE +24%', apply: () => { player.damage *= 1.24; player.damageTier += 1; } },
+    { id: 'rate', tier: 'rateTier', icon: '≋', name: 'Flux Repeater', description: 'Blaster cycles 20% faster.', detail: 'FIRE RATE +20%', apply: () => { player.fireRate *= 1.2; player.rateTier += 1; } },
+    { id: 'speed', tier: 'speedTier', icon: '»', name: 'Vector Thrusters', description: 'Flight speed and acceleration improve.', detail: 'SPEED +14%', apply: () => { player.speed *= 1.14; player.acceleration *= 1.1; player.speedTier += 1; } },
+    { id: 'hull', tier: 'hullTier', icon: '⬡', name: 'Reactive Plating', description: 'Increase maximum hull and repair damage.', detail: 'MAX HULL +25', apply: () => { player.maxHp += 25; player.hp = Math.min(player.maxHp, player.hp + 35); player.hullTier += 1; } },
+    { id: 'rocket', tier: 'rocketTier', icon: '▲', name: 'Siege Warhead', description: 'Heavy rockets deal more blast damage.', detail: 'ROCKET +32%', apply: () => { player.rocketDamage *= 1.32; player.rocketTier += 1; } },
+    { id: 'cooling', tier: 'coolingTier', icon: '❄', name: 'Cryo Manifold', description: 'Rocket and boost systems reload faster.', detail: 'COOLDOWNS -16%', apply: () => { player.rocketMax *= .84; player.boostMax *= .84; player.coolingTier += 1; } },
     { id: 'salvage', icon: 'XP', name: 'Salvage Matrix', description: 'Void ore yields more experience.', detail: 'RESOURCE XP +28%', apply: () => { player.salvage *= 1.28; } },
     { id: 'multi', icon: 'III', name: 'Splitfire Array', description: 'Add a tightly grouped blaster shot.', detail: 'MAX 3 SHOTS', apply: () => { player.multiShot = Math.min(3, player.multiShot + 1); } },
     { id: 'gate', icon: 'AEG', name: 'Gate Capacitor', description: 'Send a recovered charge to Earth.', detail: 'GATE SHIELD +1', apply: () => { gateShields = Math.min(5, gateShields + 1); } },
@@ -1378,7 +1399,7 @@
     mode = 'upgrade';
     ui.crosshair.style.opacity = '0';
     ui.lockReadout.classList.remove('active');
-    const pool = [...UPGRADES].filter((upgrade) => upgrade.id !== 'multi' || player.multiShot < 3);
+    const pool = [...UPGRADES].filter((upgrade) => (!upgrade.tier || player[upgrade.tier] < 7) && (upgrade.id !== 'multi' || player.multiShot < 3));
     const choices = [];
     while (choices.length < 3 && pool.length) choices.push(pool.splice((Math.random() * pool.length) | 0, 1)[0]);
     ui.upgradeChoices.replaceChildren();
@@ -1709,12 +1730,14 @@
     ctx.translate(PORTAL.x, PORTAL.y);
     const pulse = 1 + Math.sin(elapsed * 2.2) * .025;
     ctx.scale(pulse, pulse);
-    const glow = ctx.createRadialGradient(0, 0, 12, 0, 0, 124);
-    glow.addColorStop(0, 'rgba(109,247,232,.24)');
-    glow.addColorStop(.62, 'rgba(32,114,126,.08)');
+    const glow = ctx.createRadialGradient(0, 0, 12, 0, 0, 132);
+    glow.addColorStop(0, 'rgba(81,190,225,.3)');
+    glow.addColorStop(.62, 'rgba(32,114,126,.1)');
     glow.addColorStop(1, 'rgba(0,0,0,0)');
     ctx.fillStyle = glow;
-    ctx.beginPath(); ctx.arc(0, 0, 124, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(0, 0, 132, 0, Math.PI * 2); ctx.fill();
+
+    ctx.save();
     ctx.rotate(elapsed * .16);
     for (let ring = 0; ring < 3; ring += 1) {
       ctx.strokeStyle = ring === 1 ? 'rgba(255,179,92,.62)' : 'rgba(109,247,232,.62)';
@@ -1723,15 +1746,42 @@
       ctx.beginPath(); ctx.arc(0, 0, 60 + ring * 19, ring * .7, Math.PI * 2 + ring * .7); ctx.stroke();
       ctx.rotate(-elapsed * .35 * (ring + 1));
     }
+    ctx.restore();
     ctx.setLineDash([]);
-    ctx.fillStyle = 'rgba(109,247,232,.08)';
-    ctx.strokeStyle = COLORS.cyan;
+
+    ctx.save();
+    ctx.beginPath(); ctx.arc(0, 0, 39, 0, Math.PI * 2); ctx.clip();
+    const ocean = ctx.createRadialGradient(-13, -16, 3, 6, 8, 50);
+    ocean.addColorStop(0, '#48c8dc');
+    ocean.addColorStop(.48, '#157ea1');
+    ocean.addColorStop(1, '#062d50');
+    ctx.fillStyle = ocean;
+    ctx.fillRect(-44, -44, 88, 88);
+    ctx.fillStyle = '#62c58d';
+    ctx.beginPath();
+    ctx.moveTo(-32, -13); ctx.bezierCurveTo(-24, -26, -11, -28, -5, -18); ctx.bezierCurveTo(1, -10, -7, -4, -2, 3); ctx.bezierCurveTo(-10, 8, -21, 3, -29, 9); ctx.bezierCurveTo(-35, 2, -38, -6, -32, -13); ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(12, -25); ctx.bezierCurveTo(27, -20, 37, -8, 31, 1); ctx.bezierCurveTo(25, 4, 22, 14, 11, 13); ctx.bezierCurveTo(5, 5, 5, -5, -2, -10); ctx.bezierCurveTo(3, -19, 6, -23, 12, -25); ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(9, 20); ctx.bezierCurveTo(18, 15, 30, 20, 29, 29); ctx.bezierCurveTo(18, 36, 10, 32, 5, 27); ctx.closePath(); ctx.fill();
+    const night = ctx.createLinearGradient(-34, -24, 37, 28);
+    night.addColorStop(.35, 'rgba(1,8,20,0)');
+    night.addColorStop(.72, 'rgba(1,8,20,.38)');
+    night.addColorStop(1, 'rgba(1,8,20,.78)');
+    ctx.fillStyle = night;
+    ctx.fillRect(-44, -44, 88, 88);
+    ctx.restore();
+
+    ctx.strokeStyle = '#9cfff4';
     ctx.lineWidth = 2;
-    ctx.beginPath(); ctx.arc(0, 0, 46, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+    ctx.shadowBlur = 14;
+    ctx.shadowColor = COLORS.cyan;
+    ctx.beginPath(); ctx.arc(0, 0, 40, 0, Math.PI * 2); ctx.stroke();
+    ctx.shadowBlur = 0;
     ctx.fillStyle = COLORS.pale;
-    ctx.font = '700 12px "Space Mono", monospace';
+    ctx.font = '700 10px "Space Mono", monospace';
     ctx.textAlign = 'center';
-    ctx.fillText('EARTH GATE', 0, 5);
+    ctx.fillText('EARTH GATE', 0, 57);
     ctx.restore();
   }
 
@@ -2132,6 +2182,12 @@
     ui.xpBar.style.transform = `scaleX(${clamp(player.xp / player.xpNext, 0, 1)})`;
     ui.xpText.textContent = `${Math.floor(player.xp)} / ${player.xpNext}`;
     ui.creditText.textContent = String(player.credits).padStart(3, '0');
+    ui.speedTierText.textContent = `${player.speedTier}/7`;
+    ui.damageTierText.textContent = `${player.damageTier}/7`;
+    ui.rateTierText.textContent = `${player.rateTier}/7`;
+    ui.hullTierText.textContent = `${player.hullTier}/7`;
+    ui.rocketTierText.textContent = `${player.rocketTier}/7`;
+    ui.coolingTierText.textContent = `${player.coolingTier}/7`;
     ui.shieldPips.innerHTML = Array.from({ length: 5 }, (_, index) => `<i class="${index >= gateShields ? 'empty' : ''}"></i>`).join('');
     ui.shieldPips.setAttribute('aria-label', `${gateShields} portal shields`);
 
