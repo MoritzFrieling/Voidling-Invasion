@@ -1074,11 +1074,12 @@
     const roll = Math.random();
     const size = roll < .5 ? rand(14, 25) : roll < .86 ? rand(26, 42) : rand(43, 62);
     const crystal = Math.random() < .2;
-    const maxHp = size * size * .145 * (crystal ? 1.22 : 1);
+    const stageScale = 1 + Math.max(0, wave - 1) * .13;
+    const maxHp = size * size * .115 * (crystal ? 1.18 : 1) * stageScale;
     resources.push({
       x, y, radius: size, hp: maxHp, maxHp, rotation: rand(0, 6.28), spin: rand(-.28, .28),
-      sides: 5 + ((Math.random() * 3) | 0), crystal, xpValue: Math.round(size * (crystal ? 1.55 : .9)),
-      creditValue: Math.round(size * (crystal ? 1.38 : .8)), collisionTimer: 0, dead: false,
+      sides: 5 + ((Math.random() * 3) | 0), crystal, xpValue: Math.round(size * (crystal ? 1.25 : .72) * stageScale),
+      creditValue: Math.round(size * (crystal ? 1.1 : .64) * stageScale), collisionTimer: 0, dead: false,
     });
   }
 
