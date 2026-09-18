@@ -32,7 +32,7 @@
         </div>
 
         <div class="round-readout">
-          <span class="eyebrow">SECTOR DEFENSE</span>
+          <span class="eyebrow" id="sectorText">SECTOR DEFENSE</span>
           <strong id="waveText">WAVE —</strong>
           <span id="waveState">STANDBY</span>
         </div>
@@ -59,6 +59,7 @@
           <span>EARTH GATE</span>
           <div id="shieldPips" class="shield-pips" aria-label="3 portal shields"></div>
         </div>
+        <div class="credit-row"><span>SALVAGE CREDITS</span><strong id="creditText">000</strong></div>
       </section>
 
       <aside class="minimap-wrap" aria-label="Sector minimap">
@@ -68,6 +69,8 @@
       </aside>
 
       <div class="crosshair" id="crosshair" aria-hidden="true"><i></i></div>
+      <div class="portal-warning" id="portalWarning" role="alert"><i></i><span>GATE PROXIMITY ALERT</span></div>
+      <div class="lock-readout" id="lockReadout"><i></i><span>TARGET LOCKED</span></div>
 
       <section class="ability-dock" aria-label="Weapons and abilities">
         <div class="ability-card primary">
@@ -85,6 +88,11 @@
           <div><strong>VOID BOOST</strong><span id="boostState">READY</span></div>
           <i class="cooldown" id="boostCooldown"></i>
         </div>
+        <button class="ability-card station-ability" id="stationButton" type="button">
+          <kbd>B</kbd>
+          <div><strong>DEFENSE STATION</strong><span id="stationState">120 ◈ TO BUILD</span></div>
+          <i class="cooldown"></i>
+        </button>
       </section>
 
       <div class="status-toast" id="toast" role="status" aria-live="polite"></div>
@@ -94,7 +102,7 @@
           <div class="start-main">
             <p class="kicker">EARTH DEFENSE NETWORK // FRONTIER 7</p>
             <h1 id="gameTitle">VOIDLINE<br /><em>INVASION</em></h1>
-            <p class="intro">The corridor is open. Intercept the fleet, salvage void ore, and keep the last gate to Earth alive.</p>
+            <p class="intro">Three sectors stand between the invasion fleet and Earth. Intercept every formation, salvage void ore, and keep the last gate alive.</p>
             <div class="menu-actions">
               <button class="main-button" id="startButton" type="button"><span>BEGIN DEFENSE</span><b>ENTER</b></button>
               <button class="secondary-button" id="tutorialButton" type="button"><span>TRAINING RUN</span><b>T</b></button>
@@ -114,6 +122,7 @@
               <div class="brief-row"><kbd>↑ / CLICK</kbd><span>Fire blaster</span></div>
               <div class="brief-row"><kbd>F</kbd><span>Charge heavy rocket</span></div>
               <div class="brief-row"><kbd>Q</kbd><span>Boost — recharges</span></div>
+              <div class="brief-row"><kbd>B</kbd><span>Build / upgrade station</span></div>
               <div class="brief-row"><kbd>SHIFT</kbd><span>Precision flight</span></div>
             </div>
             <div class="utility-actions">
@@ -157,11 +166,45 @@
                 <span><kbd>LMB</kbd><b>Aim & fire</b></span>
                 <span><kbd>F</kbd><b>Heavy rocket</b></span>
                 <span><kbd>Q</kbd><b>Void boost</b></span>
+                <span><kbd>B</kbd><b>Build / upgrade station</b></span>
                 <span><kbd>SHIFT</kbd><b>Precision flight</b></span>
                 <span><kbd>ESC</kbd><b>Pause</b></span>
               </div>
             </div>
           </div>
+        </div>
+      </section>
+
+      <section class="overlay panel-overlay intel-overlay" id="intelOverlay" aria-labelledby="intelTitle">
+        <div class="panel intel-panel">
+          <div class="intel-ship" id="intelShip" aria-hidden="true"><i></i><i></i><i></i></div>
+          <div class="intel-copy">
+            <p class="kicker" id="intelKicker">NEW HOSTILE IDENTIFIED</p>
+            <h2 id="intelTitle">DART FIGHTER</h2>
+            <p class="intel-role" id="intelRole">FAST // LIGHT HULL</p>
+            <p class="panel-copy" id="intelText">Quick attack craft with very little armor. Track early and destroy before it slips through.</p>
+            <button class="main-button" id="intelContinue" type="button"><span>ACKNOWLEDGE</span><b>ENTER</b></button>
+          </div>
+        </div>
+      </section>
+
+      <section class="overlay boss-overlay" id="bossOverlay" aria-labelledby="bossTitle">
+        <div class="boss-vignette">
+          <p class="kicker" id="bossKicker">COMMAND SIGNATURE DETECTED</p>
+          <h2 id="bossTitle">DREADNOUGHT OMEGA</h2>
+          <p id="bossText">MISSILE COMMAND SHIP</p>
+          <div class="boss-scan" aria-hidden="true"><i></i><b></b></div>
+          <button class="ghost-button" id="skipBossIntro" type="button">ENGAGE NOW</button>
+        </div>
+      </section>
+
+      <section class="overlay panel-overlay" id="sectorOverlay" aria-labelledby="sectorTitle">
+        <div class="panel sector-panel">
+          <p class="kicker">SECTOR SECURED</p>
+          <h2 id="sectorTitle">OUTER PERIMETER</h2>
+          <p class="panel-copy" id="sectorCopy">The route ahead has split. Hostiles are regrouping around twin approach corridors.</p>
+          <div class="sector-reward"><span>FIELD REPAIR</span><strong>+35% HULL</strong><span>GATE SUPPORT</span><strong>+1 SHIELD</strong></div>
+          <button class="main-button" id="nextSectorButton" type="button"><span>ENTER NEXT SECTOR</span><b>ENTER</b></button>
         </div>
       </section>
 
@@ -181,7 +224,7 @@
           <p class="panel-copy" id="endCopy">The invasion fleet breached the last defense corridor.</p>
           <div class="result-grid">
             <span><small>SCORE</small><strong id="finalScore">0</strong></span>
-            <span><small>WAVE</small><strong id="finalWave">0</strong></span>
+            <span><small>PROGRESS</small><strong id="finalWave">0</strong></span>
             <span><small>HOSTILES</small><strong id="finalKills">0</strong></span>
           </div>
           <div class="stack-actions">
