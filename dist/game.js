@@ -1289,6 +1289,23 @@
     return best;
   }
 
+  function acquireMissileLock(angle, cone = .2, range = 680) {
+    let best = null;
+    let bestScore = Infinity;
+    for (const missile of enemyRockets) {
+      if (missile.dead) continue;
+      const dx = missile.x - player.x;
+      const dy = missile.y - player.y;
+      const distance = Math.hypot(dx, dy);
+      if (distance > range) continue;
+      const delta = Math.abs(angleDelta(angle, Math.atan2(dy, dx)));
+      if (delta > cone) continue;
+      const scoreValue = delta * 820 + distance * .22;
+      if (scoreValue < bestScore) { best = missile; bestScore = scoreValue; }
+    }
+    return best;
+  }
+
   function isPointerAiming() {
     return input.pointerDown || performance.now() - input.lastPointerAt < 900;
   }
@@ -1315,7 +1332,7 @@
   function fireBlaster(angle) {
     if (player.shotTimer > 0) return;
     player.shotTimer = 1 / player.fireRate;
-    const assistTarget = acquireLock(angle, .22, 880);
+    const assistTarget = acquireMissileLock(angle) || acquireLock(angle, .22, 880);
     if (assistTarget) {
       const targetAngle = Math.atan2(assistTarget.y - player.y, assistTarget.x - player.x);
       angle += angleDelta(angle, targetAngle) * .72;
@@ -1448,6 +1465,7 @@
       rocket.x += rocket.vx * dt;
       rocket.y += rocket.vy * dt;
       rocket.life -= dt;
+      rocket.hitFlash = Math.max(0, rocket.hitFlash - dt);
       if (rocket.life <= 0) rocket.dead = true;
       if (Math.random() < .55) addParticle(rocket.x, rocket.y, { vx: -rocket.vx * .1, vy: -rocket.vy * .1, color: COLORS.coral, life: .25, size: 2 });
     });
@@ -1510,6 +1528,7 @@
 
   function fireEnemyRocket(enemy, offset = 0) {
     const angle = Math.atan2(player.y - enemy.y, player.x - enemy.x) + offset;
+    const hull = enemy.boss ? 52 : 30;
     enemyRockets.push({
       x: enemy.x + Math.cos(angle) * enemy.radius,
       y: enemy.y + Math.sin(angle) * enemy.radius,
@@ -1517,6 +1536,9 @@
       speed: enemy.boss ? 260 : 220,
       damage: enemy.boss ? 26 : 18,
       radius: enemy.boss ? 9 : 7,
+      hp: hull,
+      maxHp: hull,
+      hitFlash: 0,
       life: 5.5,
       dead: false,
     });
@@ -1622,7 +1644,18 @@
   function handleCollisions() {
     for (const bullet of bullets) {
       if (bullet.dead) continue;
+      for (const missile of enemyRockets) {
+        if (missile.dead) continue;
+        const radius = bullet.radius + missile.radius + 2;
+        if (distanceSq(bullet, missile) <= radius * radius) {
+          bullet.dead = true;
+          damageEnemyRocket(missile, bullet.damage, bullet.x, bullet.y);
+          break;
+        }
+      }
+      if (bullet.dead) continue;
       for (const enemy of enemies) {
+        if (enemy.dead) continue;
         const radius = bullet.radius + enemy.radius;
         if (distanceSq(bullet, enemy) <= radius * radius) {
           bullet.dead = true;
@@ -1644,6 +1677,7 @@
     for (const rocket of rockets) {
       if (rocket.dead) continue;
       const target = enemies.find((enemy) => distanceSq(rocket, enemy) <= (rocket.radius + enemy.radius) ** 2)
+        || enemyRockets.find((missile) => !missile.dead && distanceSq(rocket, missile) <= (rocket.radius + missile.radius) ** 2)
         || resources.find((rock) => distanceSq(rocket, rock) <= (rocket.radius + rock.radius) ** 2);
       if (target) {
         rocket.dead = true;
@@ -1730,6 +1764,23 @@
     }
   }
 
+  function damageEnemyRocket(rocket, amount, x, y) {
+    if (rocket.dead) return;
+    rocket.hp -= amount;
+    rocket.hitFlash = .09;
+    addParticle(x, y, { vx: rand(-90, 90), vy: rand(-90, 90), color: COLORS.coral, life: .25, size: 2.2 });
+    if (rocket.hp <= 0) {
+      rocket.dead = true;
+      burst(rocket.x, rocket.y, COLORS.coral, 11, 190);
+      addFloater(rocket.x, rocket.y - 13, 'MISSILE INTERCEPTED', COLORS.cyan);
+      camera.shake = Math.max(camera.shake, 2.5);
+      audio.tone(190, .1, 'square', .035, -70);
+    } else {
+      addFloater(rocket.x, rocket.y - 11, `${Math.ceil(rocket.hp)} HULL`, COLORS.coral);
+      audio.tone(520, .035, 'square', .018, -80);
+    }
+  }
+
   function damageResource(rock, amount, x, y) {
     rock.hp -= amount;
     addParticle(x, y, { vx: rand(-65, 65), vy: rand(-65, 65), color: rock.crystal ? COLORS.purple : COLORS.cyan, life: .34, size: 2 });
@@ -1756,6 +1807,11 @@
     for (const rock of resources) {
       const distance = Math.hypot(rock.x - x, rock.y - y);
       if (distance < radius + rock.radius) damageResource(rock, damage * .7, rock.x, rock.y);
+    }
+    for (const missile of enemyRockets) {
+      if (missile.dead) continue;
+      const distance = Math.hypot(missile.x - x, missile.y - y);
+      if (distance < radius + missile.radius) damageEnemyRocket(missile, damage, missile.x, missile.y);
     }
     burst(x, y, COLORS.amber, 35, 390);
     camera.shake = Math.max(camera.shake, 14);
@@ -2487,11 +2543,12 @@
     ctx.save();
     ctx.translate(rocket.x, rocket.y);
     ctx.rotate(rocket.angle);
-    ctx.fillStyle = COLORS.coral;
+    ctx.fillStyle = rocket.hitFlash > 0 ? '#ffffff' : COLORS.coral;
     ctx.shadowBlur = 12;
     ctx.shadowColor = COLORS.coral;
     ctx.beginPath(); ctx.moveTo(10, 0); ctx.lineTo(-7, -4); ctx.lineTo(-7, 4); ctx.closePath(); ctx.fill();
     ctx.restore();
+    if (rocket.hp < rocket.maxHp) drawHealthBar(rocket.x, rocket.y - rocket.radius - 8, 22, rocket.hp / rocket.maxHp, COLORS.coral);
   }
 
   function drawParticle(particle) {
