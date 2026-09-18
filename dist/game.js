@@ -390,6 +390,17 @@
     };
   }
 
+  const XP_CURVE_VERSION = 2;
+
+  function sectorXpStart(levelIndex) {
+    return 60 + Math.max(0, levelIndex) * 35;
+  }
+
+  function resetSectorXp(levelIndex) {
+    player.xp = 0;
+    player.xpNext = sectorXpStart(levelIndex);
+  }
+
   const PROGRESS_KEYS = [
     'hp', 'maxHp', 'speed', 'acceleration', 'fireRate', 'damage', 'projectileSpeed', 'level', 'xp', 'xpNext',
     'boostMax', 'rocketMax', 'rocketDamage', 'multiShot', 'salvage', 'credits',
@@ -397,7 +408,7 @@
   ];
 
   function captureProgress(source = player, shields = gateShields) {
-    const checkpoint = { gateShields: shields };
+    const checkpoint = { gateShields: shields, xpCurveVersion: XP_CURVE_VERSION };
     for (const key of PROGRESS_KEYS) checkpoint[key] = source[key];
     return checkpoint;
   }
@@ -407,13 +418,13 @@
     let shields = 3;
     if (levelIndex >= 1) {
       pilot.maxHp = 125; pilot.hp = 125; pilot.damage *= 1.45; pilot.fireRate *= 1.22; pilot.speed *= 1.12;
-      pilot.rocketDamage *= 1.32; pilot.rocketMax *= .9; pilot.level = 6; pilot.xp = 0; pilot.xpNext = 240; pilot.credits = 160;
+      pilot.rocketDamage *= 1.32; pilot.rocketMax *= .9; pilot.level = 6; pilot.xp = 0; pilot.xpNext = sectorXpStart(1); pilot.credits = 160;
       pilot.hullTier = 2; pilot.damageTier = 3; pilot.rateTier = 2; pilot.speedTier = 2; pilot.rocketTier = 2; pilot.coolingTier = 2;
       shields = 4;
     }
     if (levelIndex >= 2) {
       pilot.maxHp = 155; pilot.hp = 155; pilot.damage *= 1.32; pilot.fireRate *= 1.18; pilot.speed *= 1.1;
-      pilot.rocketDamage *= 1.28; pilot.boostMax *= .86; pilot.multiShot = 2; pilot.level = 12; pilot.xpNext = 520; pilot.credits = 275;
+      pilot.rocketDamage *= 1.28; pilot.boostMax *= .86; pilot.multiShot = 2; pilot.level = 12; pilot.xpNext = sectorXpStart(2); pilot.credits = 275;
       pilot.hullTier = 3; pilot.damageTier = 4; pilot.rateTier = 3; pilot.speedTier = 3; pilot.rocketTier = 3; pilot.coolingTier = 3;
       shields = 4;
     }
@@ -446,6 +457,11 @@
     for (let index = 0; index <= campaignState.highestUnlocked; index += 1) {
       if (!campaignState.checkpoints[index]) {
         campaignState.checkpoints[index] = expectedCheckpoint(index);
+        changed = true;
+      } else if (Number(campaignState.checkpoints[index].xpCurveVersion) !== XP_CURVE_VERSION) {
+        campaignState.checkpoints[index].xp = 0;
+        campaignState.checkpoints[index].xpNext = sectorXpStart(index);
+        campaignState.checkpoints[index].xpCurveVersion = XP_CURVE_VERSION;
         changed = true;
       }
     }
@@ -1931,6 +1947,7 @@
     player.hp = Math.min(player.maxHp, player.hp + player.maxHp * .35);
     gateShields = Math.min(5, gateShields + 1);
     const nextLevel = currentLevel + 1;
+    resetSectorXp(nextLevel);
     campaignState.highestUnlocked = Math.max(campaignState.highestUnlocked, nextLevel);
     if (!campaignState.checkpoints[nextLevel]) campaignState.checkpoints[nextLevel] = captureProgress();
     saveCampaignState();
