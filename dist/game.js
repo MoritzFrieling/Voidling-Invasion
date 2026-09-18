@@ -954,7 +954,7 @@
     major: { name: 'SIEGEBREAKER', role: 'HEAVY HULL // MISSILES', description: 'A slow assault vessel that launches guided rockets at your ship. Keep moving.', radius: 32, hp: 390, speed: 58, score: 700, xp: 48, color: '#ff6f61', major: true },
     interceptor: { name: 'CARRIER INTERCEPTOR', role: 'LAUNCHED // DESTRUCTIBLE', description: 'A light interceptor launched by carrier vessels. Blaster hits damage its hull and can destroy it before it reaches the gate.', radius: 10, hp: 46, speed: 164, score: 80, xp: 7, color: '#ff9f88', interceptor: true },
     carrier: { name: 'BROOD CARRIER', role: 'SPAWNER // HEAVY HULL', description: 'A mobile hangar that launches smaller fighters along the route. Destroy it before the swarm grows.', radius: 37, hp: 520, speed: 49, score: 920, xp: 60, color: '#f071c8', major: true, carrier: true },
-    sentinel: { name: 'AEGIS SENTINEL', role: 'ROCKET-BREAK SHIELD', description: 'Light blasters cannot pierce its barrier. Heavy rockets damage it, but several may be needed depending on your rocket level.', radius: 29, hp: 310, shield: 128, speed: 67, score: 840, xp: 58, color: '#79a8ff', major: true, shielded: true },
+    sentinel: { name: 'AEGIS SENTINEL', role: 'ROCKET-BREAK SHIELD', description: 'Light blasters cannot pierce its barrier. Three heavy-rocket impacts collapse the barrier, regardless of rocket level.', radius: 29, hp: 310, shield: 0, shieldCharges: 3, speed: 62, score: 840, xp: 58, color: '#79a8ff', major: true, shielded: true },
     bossOmega: { name: 'DREADNOUGHT OMEGA', role: 'MISSILE COMMAND SHIP', description: 'The first invasion commander. It saturates the defense zone with guided warheads.', radius: 66, hp: 2850, speed: 34, score: 5400, xp: 260, color: '#ff506b', major: true, boss: true, bossSkill: 'rockets' },
     bossCarrier: { name: 'THE HOLLOW QUEEN', role: 'RIFT CARRIER // SWARM COMMAND', description: 'A vast carrier that continuously deploys escort wings through the twin rift.', radius: 74, hp: 4600, speed: 29, score: 7600, xp: 340, color: '#ef67d1', major: true, boss: true, carrier: true, bossSkill: 'swarm' },
     bossTitan: { name: 'AEGIS TITAN', role: 'PHASE SHIELD // FINAL COMMAND', description: 'The final gatebreaker. Heavy rockets are required; several may be needed to collapse each regenerating shield phase.', radius: 82, hp: 7200, shield: 900, speed: 26, score: 12000, xp: 500, color: '#6b8cff', major: true, boss: true, shielded: true, bossSkill: 'titan' },
@@ -1044,6 +1044,8 @@
       boss: Boolean(blueprint.boss),
       carrier: Boolean(blueprint.carrier),
       interceptor: Boolean(blueprint.interceptor),
+      shieldCharges: blueprint.shieldCharges || 0,
+      maxShieldCharges: blueprint.shieldCharges || 0,
       shieldHp: (blueprint.shield || 0) * difficultyScale,
       maxShield: (blueprint.shield || 0) * difficultyScale,
       bossSkill: blueprint.bossSkill || '',
@@ -1701,10 +1703,14 @@
           damageEnemy(enemy, Math.max(enemy.hp, rocket.damage), rocket.x, rocket.y, true);
         }
       }
+      for (const missile of enemyRockets) {
+        if (missile.dead) continue;
+        if (distanceSq(rocket, missile) <= (rocket.radius + missile.radius) ** 2) {
+          damageEnemyRocket(missile, rocket.damage, rocket.x, rocket.y);
+        }
+      }
       const target = enemies.find((enemy) => !enemy.dead && !enemy.interceptor
-          && distanceSq(rocket, enemy) <= (rocket.radius + enemy.radius) ** 2)
-        || enemyRockets.find((missile) => !missile.dead && distanceSq(rocket, missile) <= (rocket.radius + missile.radius) ** 2)
-        || resources.find((rock) => distanceSq(rocket, rock) <= (rocket.radius + rock.radius) ** 2);
+        && distanceSq(rocket, enemy) <= (rocket.radius + enemy.radius) ** 2);
       if (target) {
         rocket.dead = true;
         explodeRocket(rocket.x, rocket.y, rocket.damage);
@@ -1747,7 +1753,25 @@
   }
 
   function damageEnemy(enemy, amount, x, y, heavy = false) {
-    if (enemy.shieldHp > 0) {
+    if (enemy.shieldCharges > 0) {
+      enemy.shieldHitTimer = .16;
+      if (!heavy) {
+        if (Math.random() < .18) addFloater(enemy.x, enemy.y - enemy.radius, 'SHIELDED', '#79a8ff');
+        addParticle(x, y, { vx: rand(-60, 60), vy: rand(-60, 60), color: '#79a8ff', life: .34, size: 2.5 });
+        audio.tone(780, .045, 'sine', .022, -100);
+        return;
+      }
+      enemy.shieldCharges -= 1;
+      burst(x, y, '#79a8ff', 14, 160);
+      if (enemy.shieldCharges > 0) {
+        showToast(`${ENEMY_TYPES[enemy.type].name} // ${enemy.shieldCharges} SHIELD CHARGES REMAIN`);
+        addFloater(enemy.x, enemy.y - enemy.radius, `SHIELD ${enemy.shieldCharges}/${enemy.maxShieldCharges}`, '#9acbff');
+        return;
+      }
+      amount *= .72;
+      showToast(`${ENEMY_TYPES[enemy.type].name} // SHIELD COLLAPSED`);
+      addFloater(enemy.x, enemy.y - enemy.radius, 'SHIELD COLLAPSED', COLORS.amber);
+    } else if (enemy.shieldHp > 0) {
       enemy.shieldHitTimer = .16;
       if (!heavy) {
         if (enemy.shieldHitTimer <= .17 && Math.random() < .18) addFloater(enemy.x, enemy.y - enemy.radius, 'SHIELDED', '#79a8ff');
@@ -2485,17 +2509,24 @@
       ctx.beginPath(); ctx.arc(r * .12, 0, r * .33, 0, Math.PI * 2); ctx.stroke();
       ctx.fillStyle = enemy.color;
       ctx.beginPath(); ctx.arc(r * .12, 0, r * .12, 0, Math.PI * 2); ctx.fill();
+      ctx.strokeStyle = enemy.boss ? '#ffffff' : enemy.shielded ? '#79a8ff' : COLORS.amber;
+      ctx.lineWidth = enemy.boss ? 2.8 : 1.8;
+      ctx.globalAlpha = .82;
+      ctx.setLineDash(enemy.boss ? [10, 7] : [6, 6]);
+      ctx.beginPath(); ctx.arc(0, 0, r + (enemy.boss ? 9 : 6), 0, Math.PI * 2); ctx.stroke();
     }
     ctx.restore();
-    if (enemy.shieldHp > 0) {
+    if (enemy.shieldCharges > 0 || enemy.shieldHp > 0) {
       const shieldBarY = enemy.y - enemy.radius - (enemy.boss ? 34 : 24);
       const shieldBarWidth = enemy.boss ? 110 : 72;
-      drawHealthBar(enemy.x, shieldBarY, shieldBarWidth, enemy.shieldHp / enemy.maxShield, '#79a8ff');
+      const chargeShield = enemy.shieldCharges > 0;
+      const shieldRatio = chargeShield ? enemy.shieldCharges / enemy.maxShieldCharges : enemy.shieldHp / enemy.maxShield;
+      drawHealthBar(enemy.x, shieldBarY, shieldBarWidth, shieldRatio, '#79a8ff');
       ctx.save();
       ctx.fillStyle = '#9acbff';
       ctx.font = '700 8px "Space Mono", monospace';
       ctx.textAlign = 'center';
-      ctx.fillText(`SHIELD ${Math.ceil(enemy.shieldHp)}`, enemy.x, shieldBarY - 4);
+      ctx.fillText(chargeShield ? `SHIELD ${enemy.shieldCharges}/${enemy.maxShieldCharges}` : `SHIELD ${Math.ceil(enemy.shieldHp)}`, enemy.x, shieldBarY - 4);
       ctx.restore();
       ctx.save();
       ctx.translate(enemy.x, enemy.y);
@@ -2671,7 +2702,7 @@
       mctx.fillRect(rock.x * sx, rock.y * sy, 2, 2);
     }
     for (const enemy of enemies) {
-      mctx.fillStyle = enemy.boss ? '#ffffff' : COLORS.coral;
+      mctx.fillStyle = enemy.boss ? '#ffffff' : enemy.major ? enemy.shielded ? '#79a8ff' : COLORS.amber : COLORS.coral;
       const size = enemy.boss ? 5 : enemy.major ? 4 : 2.5;
       mctx.fillRect(enemy.x * sx - size / 2, enemy.y * sy - size / 2, size, size);
     }
