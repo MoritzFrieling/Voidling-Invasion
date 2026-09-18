@@ -17,11 +17,14 @@ Serve the `dist` directory with any static web server, then open `index.html` in
 - `F` — charge and launch a heavy rocket
 - `Q` — void boost
 - `B` — build a defense station; press again while landed nearby to upgrade it
+- `R` — call the next wave early after a fast, damage-free clear to earn bonus XP
 - `Shift` — precision flight
 - `Escape` — pause
 - `L` — open Level Select from the title screen
 
 Progress and settings are stored locally in the browser.
+
+When no recent mouse or trackpad aiming is detected, the ship automatically faces the nearest hostile within short range. Remaining stationary for too long builds a static signature that modestly accelerates hostiles and their missile locks; movement clears the pressure.
 
 ## Acknowledgements
 

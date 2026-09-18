@@ -85,6 +85,7 @@
     'sectorOverlay', 'sectorTitle', 'sectorCopy',
     'levelSelectOverlay', 'levelChoices',
     'speedTierText', 'damageTierText', 'rateTierText', 'hullTierText', 'rocketTierText', 'coolingTierText',
+    'staticWarning', 'waveCallButton',
   ].forEach((id) => { ui[id] = document.getElementById(id); });
 
   const settings = {
@@ -101,6 +102,7 @@
     mouseY: 0,
     aimWorldX: 0,
     aimWorldY: 0,
+    lastPointerAt: -Infinity,
   };
 
   const stars = Array.from({ length: 340 }, (_, i) => ({
@@ -126,6 +128,13 @@
   let kills = 0;
   let gateShields = 3;
   let waveClearTimer = 0;
+  let formationStartedAt = 0;
+  let formationParTime = 0;
+  let formationGateShields = 3;
+  let waveReady = false;
+  let waveCallEligible = false;
+  let stationaryTime = 0;
+  let staticPressure = 0;
   let announcementTimer = 0;
   let toastTimer = 0;
   let resourceTimer = 1;
@@ -403,6 +412,13 @@
     ensureCampaignCheckpoints();
     applyCheckpoint(campaignState.checkpoints[currentLevel] || expectedCheckpoint(currentLevel));
     waveClearTimer = 0;
+    formationStartedAt = 0;
+    formationParTime = 0;
+    formationGateShields = gateShields;
+    waveReady = false;
+    waveCallEligible = false;
+    stationaryTime = 0;
+    staticPressure = 0;
     resourceTimer = .7;
     repairTimer = 11;
     spawnTimer = 0;
@@ -414,6 +430,8 @@
     bossIntroTimer = 0;
     threatWarningCooldown = 0;
     lockedTarget = null;
+    ui.staticWarning.classList.remove('active');
+    setWaveCallAvailable(false);
     runFinished = false;
     gameClock = 0;
     camera.shake = 0;
@@ -496,6 +514,12 @@
     ui.startOverlay.classList.add('active');
   }
 
+  function setWaveCallAvailable(available) {
+    ui.waveCallButton.classList.toggle('active', available);
+    ui.waveCallButton.disabled = !available;
+    ui.waveCallButton.setAttribute('aria-hidden', String(!available));
+  }
+
   function togglePause(forcePause = null) {
     if (!['playing', 'paused'].includes(mode)) return;
     const shouldPause = forcePause === null ? mode === 'playing' : forcePause;
@@ -540,7 +564,7 @@
   function prepareFormation() {
     const level = LEVELS[currentLevel];
     spawnQueue = [];
-    const regularCount = tutorialMode ? 4 : 4 + wave + currentLevel * 2 + formation;
+    const regularCount = tutorialMode ? 4 : 4 + Math.ceil(wave * 1.15) + currentLevel * 2 + formation;
     const available = ['scout', 'raider'];
     if (wave >= 2) available.push('striker');
     if (wave >= 3) available.push('major');
@@ -601,11 +625,18 @@
     mode = 'playing';
     pendingWaveStart = false;
     announcementTimer = 2.2;
-    spawnTimer = .8;
+    spawnTimer = .55;
+    formationStartedAt = gameClock;
+    formationParTime = 18 + spawnQueue.length * 1.45 + currentLevel * 2.5;
+    formationGateShields = gateShields;
+    waveReady = false;
+    waveCallEligible = false;
+    setWaveCallAvailable(false);
     const bossFormation = wave === LEVELS[currentLevel].stages && formation === formationsInStage;
     showToast(bossFormation ? 'COMMAND SHIP ENTERING THE VOIDLINE' : `STAGE ${String(wave).padStart(2, '0')} // WAVE ${formation} OF ${formationsInStage}`);
     audio.tone(bossFormation ? 82 : 128, .42, 'sawtooth', .08, bossFormation ? -35 : 110);
     ui.crosshair.style.opacity = '1';
+    if (pendingLevelUps > 0) showUpgradeChoices();
   }
 
   function showNextIntel() {
@@ -644,9 +675,10 @@
     const progress = spec.entryProgress ?? parent?.progress ?? rand(-30, 12);
     const at = getPathPoint(progress, pathId);
     const campaignStage = LEVELS.slice(0, currentLevel).reduce((sum, level) => sum + level.stages, 0) + wave;
+    const rampStage = Math.max(0, campaignStage - 1);
     const hpVariance = rand(.86, 1.28);
     const speedVariance = rand(.86, 1.17);
-    const difficultyScale = 1 + campaignStage * .105 + currentLevel * .16;
+    const difficultyScale = 1.05 + rampStage * .125 + currentLevel * .16;
     const maxHp = blueprint.hp * difficultyScale * hpVariance;
     const enemy = {
       type,
@@ -660,7 +692,7 @@
       radius: blueprint.radius,
       hp: maxHp,
       maxHp,
-      speed: blueprint.speed * (1 + campaignStage * .016) * speedVariance,
+      speed: blueprint.speed * (1 + rampStage * .022 + currentLevel * .015) * speedVariance,
       score: blueprint.score,
       xp: blueprint.xp,
       color: blueprint.color,
@@ -783,7 +815,7 @@
       dy /= magnitude;
       player.lastMoveX = dx;
       player.lastMoveY = dy;
-      if (!input.pointerActive || !input.pointerDown) player.angle = Math.atan2(dy, dx);
+      if (!isPointerAiming()) player.angle = Math.atan2(dy, dx);
       if (tutorialMode && tutorialIndex === 0) advanceTutorial();
     }
 
@@ -802,6 +834,19 @@
     }
     player.x = clamp(player.x + player.vx * dt, 45, WORLD.width - 45);
     player.y = clamp(player.y + player.vy * dt, 45, WORLD.height - 45);
+
+    if (!magnitude && speed < 55) stationaryTime += dt;
+    else stationaryTime = Math.max(0, stationaryTime - dt * 2.4);
+    staticPressure = clamp((stationaryTime - 1.2) / 3.5, 0, 1);
+    ui.staticWarning.classList.toggle('active', staticPressure > .28 && enemies.length > 0);
+
+    if (!isPointerAiming()) {
+      const autoTarget = nearestEnemy(720);
+      if (autoTarget) {
+        const targetAngle = Math.atan2(autoTarget.y - player.y, autoTarget.x - player.x);
+        player.angle += clamp(angleDelta(player.angle, targetAngle), -6.5 * dt, 6.5 * dt);
+      }
+    }
 
     updateAimWorld();
     updateTargetLock();
@@ -834,20 +879,20 @@
     if (tutorialMode && wave === 0) beginWave();
 
     if (spawnQueue.length) {
-      spawnTimer -= dt;
+      spawnTimer -= dt * (1 + staticPressure * .25);
       if (spawnTimer <= 0) {
         spawnEnemy(spawnQueue.shift());
-        spawnTimer = Math.max(.2, .88 - wave * .035 - currentLevel * .08);
+        spawnTimer = Math.max(.18, .66 - wave * .025 - currentLevel * .05);
       }
     } else if (!enemies.length && wave > 0) {
-      waveClearTimer += dt;
-      if (waveClearTimer > 2.8) {
-        if (formation < formationsInStage) beginNextFormation();
-        else {
-          if (wave % 2 === 0 && gateShields < 5) spawnPickup('shield');
-          beginWave();
-        }
+      if (!waveReady) {
+        waveReady = true;
+        const clearTime = gameClock - formationStartedAt;
+        waveCallEligible = !tutorialMode && clearTime <= formationParTime && gateShields >= formationGateShields;
+        setWaveCallAvailable(waveCallEligible);
       }
+      waveClearTimer += dt;
+      if (waveClearTimer > 2) advanceAfterClear();
     }
 
     resourceTimer -= dt;
@@ -861,6 +906,26 @@
       repairTimer = rand(17, 25);
     }
     updatePortalThreat(dt);
+  }
+
+  function advanceAfterClear() {
+    if (!waveReady) return;
+    waveReady = false;
+    waveCallEligible = false;
+    setWaveCallAvailable(false);
+    if (formation < formationsInStage) beginNextFormation();
+    else {
+      if (wave % 2 === 0 && gateShields < 5) spawnPickup('shield');
+      beginWave();
+    }
+  }
+
+  function callNextWave() {
+    if (mode !== 'playing' || !waveReady || !waveCallEligible) return;
+    const bonus = Math.round((6 + wave * 2 + currentLevel * 3) * (1 + formation * .15));
+    grantXp(bonus, true);
+    showToast(`RAPID CLEAR // +${bonus} XP`);
+    advanceAfterClear();
   }
 
   function angleDelta(from, to) {
@@ -884,8 +949,23 @@
     return best;
   }
 
+  function isPointerAiming() {
+    return input.pointerDown || performance.now() - input.lastPointerAt < 900;
+  }
+
+  function nearestEnemy(range = 720) {
+    let nearest = null;
+    let best = range * range;
+    for (const enemy of enemies) {
+      if (enemy.dead) continue;
+      const d = distanceSq(player, enemy);
+      if (d < best) { best = d; nearest = enemy; }
+    }
+    return nearest;
+  }
+
   function updateTargetLock() {
-    const aimAngle = input.pointerActive
+    const aimAngle = isPointerAiming()
       ? Math.atan2(input.aimWorldY - player.y, input.aimWorldX - player.x)
       : player.angle;
     lockedTarget = acquireLock(aimAngle, .5, 1350);
@@ -1038,7 +1118,8 @@
 
   function updateEnemies(dt) {
     enemies.forEach((enemy) => {
-      enemy.progress += enemy.speed * dt;
+      const pressureMultiplier = 1 + staticPressure * .22;
+      enemy.progress += enemy.speed * dt * pressureMultiplier;
       enemy.wobble += dt * (enemy.type === 'striker' ? 3.3 : 1.7);
       enemy.hitFlash = Math.max(0, enemy.hitFlash - dt);
       enemy.shieldHitTimer = Math.max(0, enemy.shieldHitTimer - dt);
@@ -1049,7 +1130,7 @@
       enemy.angle = point.angle + Math.cos(enemy.wobble * .8) * .08;
 
       if (enemy.major) {
-        enemy.rocketTimer -= dt;
+        enemy.rocketTimer -= dt * (1 + staticPressure * .65);
         const playerDistance = Math.hypot(player.x - enemy.x, player.y - enemy.y);
         if (enemy.rocketTimer <= 0 && playerDistance < (enemy.boss ? 1200 : 820)) {
           fireEnemyRocket(enemy);
@@ -1372,7 +1453,7 @@
     pickups.push({ kind, x, y, radius: kind === 'shield' ? 20 : 17, life: 22, pulse: 0, dead: false });
   }
 
-  function grantXp(amount) {
+  function grantXp(amount, deferUpgrade = false) {
     player.xp += amount;
     while (player.xp >= player.xpNext) {
       player.xp -= player.xpNext;
@@ -1380,7 +1461,7 @@
       player.xpNext = Math.round(player.xpNext * 1.32 + 16);
       pendingLevelUps += 1;
     }
-    if (pendingLevelUps > 0 && mode === 'playing') showUpgradeChoices();
+    if (pendingLevelUps > 0 && mode === 'playing' && !deferUpgrade) showUpgradeChoices();
   }
 
   const UPGRADES = [
@@ -2220,13 +2301,14 @@
 
   function keyDown(event) {
     if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Space'].includes(event.code)) event.preventDefault();
-    if (event.repeat && ['KeyQ', 'KeyF', 'KeyB', 'Escape', 'Enter'].includes(event.code)) return;
+    if (event.repeat && ['KeyQ', 'KeyF', 'KeyB', 'KeyR', 'Escape', 'Enter'].includes(event.code)) return;
     input.keys.add(event.code);
     if (tutorialMode && tutorialIndex === 0 && ['KeyW', 'KeyA', 'KeyS', 'KeyD'].includes(event.code)) advanceTutorial();
     if (event.code === 'ArrowUp' && mode === 'playing') fireBlaster(player.angle);
     if (event.code === 'KeyQ') triggerBoost();
     if (event.code === 'KeyF') beginRocketCharge();
     if (event.code === 'KeyB') useStation();
+    if (event.code === 'KeyR') callNextWave();
     if (event.code === 'Escape') {
       if (mode === 'levelSelect') closeLevelSelect();
       else togglePause();
@@ -2254,6 +2336,7 @@
     input.mouseX = event.clientX - rect.left;
     input.mouseY = event.clientY - rect.top;
     input.pointerActive = true;
+    input.lastPointerAt = performance.now();
     ui.crosshair.style.left = `${input.mouseX}px`;
     ui.crosshair.style.top = `${input.mouseY}px`;
     updateAimWorld();
@@ -2288,6 +2371,7 @@
     document.getElementById('skipBossIntro').addEventListener('click', activateWave);
     document.getElementById('nextSectorButton').addEventListener('click', enterNextSector);
     document.getElementById('stationButton').addEventListener('click', useStation);
+    document.getElementById('waveCallButton').addEventListener('click', callNextWave);
     document.getElementById('skipTutorial').addEventListener('click', () => {
       tutorialMode = false;
       ui.tutorialCard.classList.remove('active');
