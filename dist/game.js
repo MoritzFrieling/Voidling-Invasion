@@ -2705,6 +2705,10 @@
   }
 
   function keyDown(event) {
+    const textEntry = event.target instanceof HTMLInputElement
+      || event.target instanceof HTMLTextAreaElement
+      || event.target.isContentEditable;
+    if (textEntry && !['Escape', 'Enter'].includes(event.code)) return;
     if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Space'].includes(event.code)) event.preventDefault();
     if (event.repeat && ['KeyQ', 'KeyF', 'KeyB', 'KeyR', 'Escape', 'Enter'].includes(event.code)) return;
     input.keys.add(event.code);
