@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta
+      name="description"
+      content="Voidline Invasion — patrol the voidline, upgrade your ship, and stop the invasion before it reaches Earth."
+    />
+    <meta name="theme-color" content="#050a10" />
+    <title>Voidline Invasion</title>
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23050a10'/%3E%3Cpath d='M13 15l19 37 19-37-19 11z' fill='none' stroke='%236df7e8' stroke-width='5' stroke-linejoin='round'/%3E%3Ccircle cx='32' cy='32' r='5' fill='%23ffb35c'/%3E%3C/svg%3E"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="game-shell" id="gameShell">
+      <canvas id="gameCanvas" aria-label="Voidline Invasion game world"></canvas>
+
+      <div class="scanlines" aria-hidden="true"></div>
+
+      <header class="topbar" aria-label="Game status">
+        <div class="brand-lockup">
+          <span class="brand-mark" aria-hidden="true"></span>
+          <div>
+            <strong>VOIDLINE</strong>
+            <span>INVASION</span>
+          </div>
+        </div>
+
+        <div class="round-readout">
+          <span class="eyebrow">SECTOR DEFENSE</span>
+          <strong id="waveText">WAVE —</strong>
+          <span id="waveState">STANDBY</span>
+        </div>
+
+        <div class="score-readout">
+          <div><span>SCORE</span><strong id="scoreText">000000</strong></div>
+          <div><span>BEST</span><strong id="bestText">000000</strong></div>
+          <button class="icon-button" id="pauseButton" type="button" aria-label="Pause game">Ⅱ</button>
+        </div>
+      </header>
+
+      <section class="vitals" aria-label="Ship status">
+        <div class="vital-row">
+          <span>HULL</span>
+          <div class="meter"><i id="healthBar"></i></div>
+          <strong id="healthText">100</strong>
+        </div>
+        <div class="vital-row xp-row">
+          <span>LVL <b id="levelText">1</b></span>
+          <div class="meter"><i id="xpBar"></i></div>
+          <strong id="xpText">0 / 60</strong>
+        </div>
+        <div class="gate-row">
+          <span>EARTH GATE</span>
+          <div id="shieldPips" class="shield-pips" aria-label="3 portal shields"></div>
+        </div>
+      </section>
+
+      <aside class="minimap-wrap" aria-label="Sector minimap">
+        <div class="minimap-head"><span>TACTICAL MAP</span><i>LIVE</i></div>
+        <canvas id="minimap" width="240" height="144"></canvas>
+        <div class="map-legend"><span><i class="you"></i>YOU</span><span><i class="hostile"></i>HOSTILE</span><span><i class="gate"></i>GATE</span></div>
+      </aside>
+
+      <div class="crosshair" id="crosshair" aria-hidden="true"><i></i></div>
+
+      <section class="ability-dock" aria-label="Weapons and abilities">
+        <div class="ability-card primary">
+          <kbd>↑</kbd>
+          <div><strong>BLASTER</strong><span>READY</span></div>
+          <i class="cooldown" id="blasterCooldown"></i>
+        </div>
+        <div class="ability-card">
+          <kbd>F</kbd>
+          <div><strong>HEAVY ROCKET</strong><span id="rocketState">READY</span></div>
+          <i class="cooldown" id="rocketCooldown"></i>
+        </div>
+        <div class="ability-card">
+          <kbd>Q</kbd>
+          <div><strong>VOID BOOST</strong><span id="boostState">READY</span></div>
+          <i class="cooldown" id="boostCooldown"></i>
+        </div>
+      </section>
+
+      <div class="status-toast" id="toast" role="status" aria-live="polite"></div>
+
+      <section class="overlay start-overlay active" id="startOverlay" aria-labelledby="gameTitle">
+        <div class="start-grid">
+          <div class="start-main">
+            <p class="kicker">EARTH DEFENSE NETWORK // FRONTIER 7</p>
+            <h1 id="gameTitle">VOIDLINE<br /><em>INVASION</em></h1>
+            <p class="intro">The corridor is open. Intercept the fleet, salvage void ore, and keep the last gate to Earth alive.</p>
+            <div class="menu-actions">
+              <button class="main-button" id="startButton" type="button"><span>BEGIN DEFENSE</span><b>ENTER</b></button>
+              <button class="secondary-button" id="tutorialButton" type="button"><span>TRAINING RUN</span><b>T</b></button>
+            </div>
+          </div>
+
+          <div class="start-side">
+            <div class="sector-graphic" aria-hidden="true">
+              <div class="orbit orbit-one"></div>
+              <div class="orbit orbit-two"></div>
+              <div class="earth"></div>
+              <div class="needle"></div>
+            </div>
+            <div class="briefing-card">
+              <span class="eyebrow">FLIGHT BRIEFING</span>
+              <div class="brief-row"><kbd>WASD</kbd><span>Fly freely</span></div>
+              <div class="brief-row"><kbd>↑ / CLICK</kbd><span>Fire blaster</span></div>
+              <div class="brief-row"><kbd>F</kbd><span>Charge heavy rocket</span></div>
+              <div class="brief-row"><kbd>Q</kbd><span>Boost — recharges</span></div>
+              <div class="brief-row"><kbd>SHIFT</kbd><span>Precision flight</span></div>
+            </div>
+            <div class="utility-actions">
+              <button id="controlsButton" type="button">CONTROLS</button>
+              <button id="settingsButton" type="button">SETTINGS</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="overlay panel-overlay" id="pauseOverlay" aria-labelledby="pauseTitle">
+        <div class="panel compact-panel">
+          <p class="kicker">FLIGHT SUSPENDED</p>
+          <h2 id="pauseTitle">PAUSED</h2>
+          <div class="stack-actions">
+            <button class="main-button" id="resumeButton" type="button"><span>RESUME</span><b>ESC</b></button>
+            <button class="secondary-button" id="pauseSettingsButton" type="button">SETTINGS & CONTROLS</button>
+            <button class="ghost-button" id="restartButton" type="button">RESTART RUN</button>
+            <button class="ghost-button" id="quitButton" type="button">QUIT TO TITLE</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="overlay panel-overlay" id="settingsOverlay" aria-labelledby="settingsTitle">
+        <div class="panel settings-panel">
+          <button class="close-button" id="closeSettings" type="button" aria-label="Close settings">×</button>
+          <p class="kicker">SHIP CONFIGURATION</p>
+          <h2 id="settingsTitle">SETTINGS</h2>
+          <div class="settings-grid">
+            <div>
+              <h3>AUDIO & DISPLAY</h3>
+              <label class="toggle-row"><span><b>MUSIC</b><small>Procedural deep-space score</small></span><input id="musicToggle" type="checkbox" checked /><i></i></label>
+              <label class="toggle-row"><span><b>SOUND FX</b><small>Weapons, impacts, alerts</small></span><input id="sfxToggle" type="checkbox" checked /><i></i></label>
+              <label class="toggle-row"><span><b>SCREEN SHAKE</b><small>Impact feedback</small></span><input id="shakeToggle" type="checkbox" checked /><i></i></label>
+            </div>
+            <div>
+              <h3>CONTROLS</h3>
+              <div class="control-table">
+                <span><kbd>W A S D</kbd><b>Flight vector</b></span>
+                <span><kbd>↑</kbd><b>Fire forward</b></span>
+                <span><kbd>LMB</kbd><b>Aim & fire</b></span>
+                <span><kbd>F</kbd><b>Heavy rocket</b></span>
+                <span><kbd>Q</kbd><b>Void boost</b></span>
+                <span><kbd>SHIFT</kbd><b>Precision flight</b></span>
+                <span><kbd>ESC</kbd><b>Pause</b></span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="overlay panel-overlay" id="upgradeOverlay" aria-labelledby="upgradeTitle">
+        <div class="panel upgrade-panel">
+          <p class="kicker">POWER SIGNATURE INCREASED</p>
+          <h2 id="upgradeTitle">CHOOSE AN UPGRADE</h2>
+          <p class="panel-copy">Your ship can safely integrate one recovered module.</p>
+          <div class="upgrade-grid" id="upgradeChoices"></div>
+        </div>
+      </section>
+
+      <section class="overlay panel-overlay" id="endOverlay" aria-labelledby="endTitle">
+        <div class="panel end-panel">
+          <p class="kicker" id="endKicker">SIGNAL LOST</p>
+          <h2 id="endTitle">THE GATE HAS FALLEN</h2>
+          <p class="panel-copy" id="endCopy">The invasion fleet breached the last defense corridor.</p>
+          <div class="result-grid">
+            <span><small>SCORE</small><strong id="finalScore">0</strong></span>
+            <span><small>WAVE</small><strong id="finalWave">0</strong></span>
+            <span><small>HOSTILES</small><strong id="finalKills">0</strong></span>
+          </div>
+          <div class="stack-actions">
+            <button class="main-button" id="playAgainButton" type="button"><span>FLY AGAIN</span><b>ENTER</b></button>
+            <button class="ghost-button" id="endQuitButton" type="button">RETURN TO TITLE</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="tutorial-card" id="tutorialCard" aria-live="polite">
+        <span class="eyebrow" id="tutorialStep">TRAINING // 01</span>
+        <h2 id="tutorialTitle">TAKE THE CONTROLS</h2>
+        <p id="tutorialText">Use W, A, S, and D to move through the sector.</p>
+        <div class="tutorial-progress" id="tutorialProgress"></div>
+        <button id="skipTutorial" type="button">SKIP TRAINING</button>
+      </section>
+
+      <div class="rotate-notice">For the best flight view, rotate your device to landscape.</div>
+    </main>
+
+    <script src="game.js"></script>
+  </body>
+</html>
