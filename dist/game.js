@@ -162,9 +162,10 @@
         highestUnlocked: Math.max(0, Math.min(LEVELS.length - 1, Number(saved.highestUnlocked) || 0)),
         checkpoints: saved.checkpoints && typeof saved.checkpoints === 'object' ? saved.checkpoints : {},
         completedCampaigns: Number(saved.completedCampaigns) || 0,
+        seenEnemyTypes: Array.isArray(saved.seenEnemyTypes) ? saved.seenEnemyTypes.filter((type) => typeof type === 'string') : [],
       };
     } catch {
-      return { highestUnlocked: 0, checkpoints: {}, completedCampaigns: 0 };
+      return { highestUnlocked: 0, checkpoints: {}, completedCampaigns: 0, seenEnemyTypes: [] };
     }
   }
 
@@ -424,7 +425,7 @@
     spawnTimer = 0;
     spawnQueue = [];
     pendingLevelUps = 0;
-    seenEnemyTypes = new Set();
+    seenEnemyTypes = new Set(campaignState.seenEnemyTypes || []);
     introQueue = [];
     pendingWaveStart = false;
     bossIntroTimer = 0;
@@ -593,7 +594,6 @@
 
     const waveTypes = [...new Set(spawnQueue.map((entry) => entry.type).filter((type) => !ENEMY_TYPES[type].boss && type !== 'interceptor'))];
     introQueue = tutorialMode ? [] : waveTypes.filter((type) => !seenEnemyTypes.has(type));
-    introQueue.forEach((type) => seenEnemyTypes.add(type));
     pendingWaveStart = true;
     if (isBossFormation) showBossIntro(level.boss);
     else if (introQueue.length) showNextIntel();
@@ -643,6 +643,9 @@
     if (!introQueue.length) { activateWave(); return; }
     const type = introQueue.shift();
     const intel = ENEMY_TYPES[type];
+    seenEnemyTypes.add(type);
+    campaignState.seenEnemyTypes = [...seenEnemyTypes];
+    saveCampaignState();
     mode = 'briefing';
     ui.crosshair.style.opacity = '0';
     ui.intelTitle.textContent = intel.name;
