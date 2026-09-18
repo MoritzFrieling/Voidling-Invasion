@@ -10,6 +10,12 @@ The browser integration is already configured for project `vwmqichhpmikufwqofpn`
 4. Keep the **Email** provider enabled, but disable **Confirm email**. The game uses an internal email-shaped identifier behind each username because Supabase password authentication does not natively support usernames. No player enters or receives email.
 5. In **Settings → API → Data API**, keep the Data API enabled. It is fine—and preferable—to leave automatic exposure/default privileges disabled: the migration grants only the exact table and function permissions the game needs.
 
+## Admin pilot
+
+The admin account is a normal permanent Supabase Auth account; its password is never stored in the repository. Run `supabase/migrations/002_voidline_admin.sql` once to add the admin flag column, create the account through the game's **CREATE ACCOUNT** flow with the username `admin` and the password you want to use, then run the same migration again to mark that account as admin.
+
+The admin pilot receives access to every level, but admin runs are excluded from the high-score table and their saved high score is forced to zero. Do not use a guest account named `admin`.
+
 The migration explicitly enables RLS on every game table. The **automatic RLS** project setting can remain enabled as additional protection for future tables.
 
 ## What gets stored
@@ -33,4 +39,3 @@ Passwords and sessions remain entirely inside Supabase Auth. They are never writ
 ## Moving to a self-hosted Supabase later
 
 Restore the managed database into the self-hosted instance, apply any missing migrations, then change only `SUPABASE_URL` and `SUPABASE_PUBLISHABLE_KEY` at the top of `dist/supabase-client.js`. Existing users will need to sign in again because the new instance uses different session-signing keys.
-

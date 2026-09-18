@@ -168,6 +168,10 @@
   let cloudSyncSuspended = false;
   let highScore = Number(localStorage.getItem(HIGH_SCORE_KEY) || 0);
 
+  function isAdminPilot() {
+    return Boolean(activePilot?.isAdmin && !activePilot.isGuest);
+  }
+
   function emptyCampaignState() {
     return { highestUnlocked: 0, checkpoints: {}, completedCampaigns: 0, seenEnemyTypes: [] };
   }
@@ -205,7 +209,7 @@
 
   function saveCampaignState(syncCloud = true, touchTimestamp = true) {
     localStorage.setItem(campaignKey(), JSON.stringify(campaignState));
-    localStorage.setItem(highScoreKey(), String(highScore));
+    localStorage.setItem(highScoreKey(), String(isAdminPilot() ? 0 : highScore));
     if (touchTimestamp) localStorage.setItem(localUpdatedKey(), new Date().toISOString());
     if (syncCloud) scheduleCloudSave();
   }
@@ -226,7 +230,7 @@
     cloudBusy = true;
     ui.pilotSyncState.textContent = 'SYNCHRONIZING…';
     try {
-      await window.VoidlineCloud.saveProgress(campaignState, highScore);
+      await window.VoidlineCloud.saveProgress(campaignState, isAdminPilot() ? 0 : highScore);
       ui.pilotSyncState.textContent = 'CLOUD SAVE CURRENT';
     } catch (error) {
       ui.pilotSyncState.textContent = 'OFFLINE · SAVED ON DEVICE';
@@ -455,7 +459,8 @@
     wave = 0;
     formation = 0;
     formationsInStage = 1;
-    currentLevel = clamp(levelIndex, 0, campaignState.highestUnlocked);
+    const highestSelectable = isAdminPilot() ? LEVELS.length - 1 : campaignState.highestUnlocked;
+    currentLevel = clamp(levelIndex, 0, highestSelectable);
     activePaths = LEVELS[currentLevel].paths;
     score = 0;
     kills = 0;
@@ -589,6 +594,11 @@
     }
 
     ensureCampaignCheckpoints();
+    if (isAdminPilot()) {
+      highScore = 0;
+      localStorage.setItem(highScoreKey(), '0');
+      saveCampaignState();
+    }
     ui.bestText.textContent = formatScore(highScore);
     if (mode === 'levelSelect') renderLevelSelect();
   }
@@ -808,8 +818,9 @@
     ensureCampaignCheckpoints();
     ui.levelChoices.replaceChildren();
     LEVELS.forEach((level, index) => {
-      const unlocked = index <= campaignState.highestUnlocked;
-      const completed = index < campaignState.highestUnlocked || (index === LEVELS.length - 1 && campaignState.completedCampaigns > 0);
+      const adminAccess = isAdminPilot();
+      const unlocked = adminAccess || index <= campaignState.highestUnlocked;
+      const completed = !adminAccess && (index < campaignState.highestUnlocked || (index === LEVELS.length - 1 && campaignState.completedCampaigns > 0));
       const checkpoint = campaignState.checkpoints[index] || expectedCheckpoint(index);
       const paths = level.paths.length === 1 ? '1 APPROACH' : `${level.paths.length} APPROACHES`;
       const card = document.createElement('button');
@@ -818,7 +829,7 @@
       card.dataset.index = String(index + 1).padStart(2, '0');
       card.disabled = !unlocked;
       card.innerHTML = `
-        <span class="level-status">${unlocked ? completed ? 'CLEARED' : 'UNLOCKED' : 'LOCKED'}</span>
+        <span class="level-status">${adminAccess ? 'ADMIN ACCESS' : unlocked ? completed ? 'CLEARED' : 'UNLOCKED' : 'LOCKED'}</span>
         <h3>${level.name}</h3>
         <p>${index === 0 ? 'Single-route frontier defense.' : index === 1 ? 'Twin routes and unstable rift entries.' : 'Three converging lanes and deep wormholes.'}</p>
         <footer><span>${level.stages} STAGES · ${paths}</span><span class="checkpoint-note">SHIP LVL ${checkpoint.level || 1} · ${checkpoint.credits || 0} ◈</span></footer>`;
@@ -1977,9 +1988,9 @@
     if (runFinished) return;
     runFinished = true;
     mode = 'ended';
-    highScore = Math.max(highScore, score);
+    highScore = isAdminPilot() ? 0 : Math.max(highScore, score);
     saveCampaignState();
-    if (activePilot && window.VoidlineCloud) {
+    if (activePilot && !isAdminPilot() && window.VoidlineCloud) {
       window.VoidlineCloud.submitScore({ score, level: currentLevel + 1, stage: wave, kills })
         .catch((error) => console.warn('Voidline leaderboard submit:', error));
     }
@@ -2659,7 +2670,7 @@
       ? `WAVE ${formation}/${formationsInStage} · ${spawnQueue.length + enemies.length} HOSTILES`
       : wave ? `WAVE ${formation}/${formationsInStage} CLEAR` : 'STANDBY';
     ui.scoreText.textContent = formatScore(score);
-    ui.bestText.textContent = formatScore(Math.max(highScore, score));
+    ui.bestText.textContent = formatScore(isAdminPilot() ? 0 : Math.max(highScore, score));
     const healthRatio = clamp(player.hp / player.maxHp, 0, 1);
     ui.healthBar.style.transform = `scaleX(${healthRatio})`;
     ui.healthBar.style.background = healthRatio < .3 ? COLORS.coral : COLORS.cyan;

@@ -59,7 +59,7 @@
     if (!user) return null;
     const { data, error } = await client
       .from('profiles')
-      .select('username, is_guest')
+      .select('username, is_guest, is_admin')
       .eq('user_id', user.id)
       .single();
     if (error) throw friendlyError(error);
@@ -67,6 +67,7 @@
       id: user.id,
       username: data.username,
       isGuest: Boolean(data.is_guest),
+      isAdmin: Boolean(data.is_admin),
     };
   }
 
@@ -217,7 +218,7 @@
 
   async function submitScore(result) {
     requireClient();
-    if (!pilot) return;
+    if (!pilot || pilot.isAdmin) return;
     const { error } = await client.rpc('submit_voidline_score', {
       p_score: Math.max(0, Math.floor(Number(result.score) || 0)),
       p_level: Math.max(1, Math.floor(Number(result.level) || 1)),

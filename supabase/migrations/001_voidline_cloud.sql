@@ -5,8 +5,11 @@ create table if not exists public.profiles (
   user_id uuid primary key references auth.users(id) on delete cascade,
   username text not null check (username ~ '^[a-z0-9_]{3,20}$'),
   is_guest boolean not null default true,
+  is_admin boolean not null default false,
   created_at timestamptz not null default now()
 );
+
+alter table public.profiles add column if not exists is_admin boolean not null default false;
 
 create unique index if not exists profiles_username_lower_key
   on public.profiles (lower(username));
@@ -58,14 +61,24 @@ drop policy if exists "pilots can create their save" on public.game_saves;
 create policy "pilots can create their save"
   on public.game_saves for insert
   to authenticated
-  with check ((select auth.uid()) = user_id);
+  with check (
+    (select auth.uid()) = user_id
+    and (high_score = 0 or not exists (
+      select 1 from public.profiles where user_id = (select auth.uid()) and is_admin
+    ))
+  );
 
 drop policy if exists "pilots can update their save" on public.game_saves;
 create policy "pilots can update their save"
   on public.game_saves for update
   to authenticated
   using ((select auth.uid()) = user_id)
-  with check ((select auth.uid()) = user_id);
+  with check (
+    (select auth.uid()) = user_id
+    and (high_score = 0 or not exists (
+      select 1 from public.profiles where user_id = (select auth.uid()) and is_admin
+    ))
+  );
 
 -- Profiles are created from trusted Auth data, not directly by the browser.
 create or replace function public.handle_voidline_auth_user()
@@ -110,6 +123,7 @@ declare
   pilot_id uuid := auth.uid();
 begin
   if pilot_id is null then raise exception 'Authentication required'; end if;
+  if exists (select 1 from public.profiles where user_id = pilot_id and is_admin) then return; end if;
   if p_score < 0 or p_score > 50000000 then raise exception 'Invalid score'; end if;
   if p_level < 1 or p_level > 20 then raise exception 'Invalid level'; end if;
   if p_stage < 0 or p_stage > 100 then raise exception 'Invalid stage'; end if;
@@ -250,4 +264,3 @@ grant execute on function public.submit_voidline_score(integer, integer, integer
 grant execute on function public.get_voidline_leaderboard(integer) to anon, authenticated;
 grant execute on function public.prepare_voidline_account_upgrade(uuid) to authenticated;
 grant execute on function public.claim_voidline_account_upgrade(uuid) to authenticated;
-
