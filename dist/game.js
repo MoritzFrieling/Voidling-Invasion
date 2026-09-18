@@ -156,6 +156,7 @@
   let bossIntroTimer = 0;
   let threatWarningCooldown = 0;
   let lockedTarget = null;
+  let lastRunLevel = 0;
   const CAMPAIGN_KEY = 'voidline-campaign-v1';
   const HIGH_SCORE_KEY = 'voidline-highscore';
   let activePilot = null;
@@ -499,6 +500,7 @@
   function startGame(withTutorial = false, levelIndex = 0) {
     audio.init();
     clearRun(withTutorial ? 0 : levelIndex);
+    lastRunLevel = currentLevel;
     tutorialMode = withTutorial;
     tutorialIndex = 0;
     tutorialDelay = 0;
@@ -1987,6 +1989,7 @@
   function finishRun(victory, reason = '') {
     if (runFinished) return;
     runFinished = true;
+    lastRunLevel = currentLevel;
     mode = 'ended';
     highScore = isAdminPilot() ? 0 : Math.max(highScore, score);
     saveCampaignState();
@@ -2747,7 +2750,7 @@
     if (event.code === 'Enter') {
       if (ui.authOverlay.classList.contains('active') || ui.leaderboardOverlay.classList.contains('active')) return;
       if (mode === 'menu') requirePilot(() => startGame(false));
-      else if (mode === 'ended') startGame(false, currentLevel);
+      else if (mode === 'ended') startGame(false, lastRunLevel);
       else if (mode === 'briefing') showNextIntel();
       else if (mode === 'cutscene') activateWave();
       else if (mode === 'sector') enterNextSector();
@@ -2796,7 +2799,7 @@
     document.getElementById('pauseSettingsButton').addEventListener('click', () => openSettings('paused'));
     document.getElementById('restartButton').addEventListener('click', () => startGame(false, currentLevel));
     document.getElementById('quitButton').addEventListener('click', showTitle);
-    document.getElementById('playAgainButton').addEventListener('click', () => startGame(false, currentLevel));
+    document.getElementById('playAgainButton').addEventListener('click', () => startGame(false, lastRunLevel));
     document.getElementById('endQuitButton').addEventListener('click', showTitle);
     document.getElementById('closeSettings').addEventListener('click', closeSettings);
     document.getElementById('intelContinue').addEventListener('click', showNextIntel);
