@@ -361,8 +361,8 @@
       vy: 0,
       angle: 0,
       radius: 18,
-      hp: 100,
-      maxHp: 100,
+      hp: 75,
+      maxHp: 75,
       speed: 310,
       acceleration: 860,
       fireRate: 5.2,
@@ -397,7 +397,7 @@
     };
   }
 
-  const PROGRESSION_VERSION = 3;
+  const PROGRESSION_VERSION = 4;
 
   const PROGRESS_KEYS = [
     'hp', 'maxHp', 'speed', 'acceleration', 'fireRate', 'damage', 'projectileSpeed', 'level', 'xp', 'xpNext',
@@ -428,7 +428,7 @@
       player.speedTier = clamp(1 + Math.round(Math.log(Math.max(1, player.speed / 310)) / Math.log(1.14)), 1, 7);
       player.damageTier = clamp(1 + Math.round(Math.log(Math.max(1, player.damage / 18)) / Math.log(1.24)), 1, 7);
       player.rateTier = clamp(1 + Math.round(Math.log(Math.max(1, player.fireRate / 5.2)) / Math.log(1.2)), 1, 7);
-      player.hullTier = clamp(1 + Math.round(Math.max(0, player.maxHp - 100) / 25), 1, 7);
+      player.hullTier = clamp(1 + Math.round(Math.max(0, player.maxHp - 75) / 25), 1, 7);
       player.rocketTier = clamp(1 + Math.round(Math.log(Math.max(1, player.rocketDamage / 125)) / Math.log(1.32)), 1, 7);
       player.coolingTier = clamp(1 + Math.round(Math.log(Math.min(1, player.rocketMax / 6.8)) / Math.log(.84)), 1, 7);
     }
