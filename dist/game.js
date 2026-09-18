@@ -950,10 +950,10 @@
     major: { name: 'SIEGEBREAKER', role: 'HEAVY HULL // MISSILES', description: 'A slow assault vessel that launches guided rockets at your ship. Keep moving.', radius: 32, hp: 390, speed: 58, score: 700, xp: 48, color: '#ff6f61', major: true },
     interceptor: { name: 'CARRIER INTERCEPTOR', role: 'LAUNCHED // DESTRUCTIBLE', description: 'A light interceptor launched by carrier vessels. Blaster hits damage its hull and can destroy it before it reaches the gate.', radius: 10, hp: 46, speed: 164, score: 80, xp: 7, color: '#ff9f88', interceptor: true },
     carrier: { name: 'BROOD CARRIER', role: 'SPAWNER // HEAVY HULL', description: 'A mobile hangar that launches smaller fighters along the route. Destroy it before the swarm grows.', radius: 37, hp: 520, speed: 49, score: 920, xp: 60, color: '#f071c8', major: true, carrier: true },
-    sentinel: { name: 'AEGIS SENTINEL', role: 'ROCKET-BREAK SHIELD', description: 'Its shield ignores light blaster fire. Break the barrier with a heavy rocket, then attack the hull.', radius: 29, hp: 310, shield: 170, speed: 67, score: 840, xp: 58, color: '#79a8ff', major: true, shielded: true },
+    sentinel: { name: 'AEGIS SENTINEL', role: 'ROCKET-BREAK SHIELD', description: 'Light blasters cannot pierce its barrier. Heavy rockets damage it, but several may be needed depending on your rocket level.', radius: 29, hp: 310, shield: 170, speed: 67, score: 840, xp: 58, color: '#79a8ff', major: true, shielded: true },
     bossOmega: { name: 'DREADNOUGHT OMEGA', role: 'MISSILE COMMAND SHIP', description: 'The first invasion commander. It saturates the defense zone with guided warheads.', radius: 66, hp: 2850, speed: 34, score: 5400, xp: 260, color: '#ff506b', major: true, boss: true, bossSkill: 'rockets' },
     bossCarrier: { name: 'THE HOLLOW QUEEN', role: 'RIFT CARRIER // SWARM COMMAND', description: 'A vast carrier that continuously deploys escort wings through the twin rift.', radius: 74, hp: 4600, speed: 29, score: 7600, xp: 340, color: '#ef67d1', major: true, boss: true, carrier: true, bossSkill: 'swarm' },
-    bossTitan: { name: 'AEGIS TITAN', role: 'PHASE SHIELD // FINAL COMMAND', description: 'The final gatebreaker. Heavy rockets are required to collapse its regenerating shield.', radius: 82, hp: 7200, shield: 900, speed: 26, score: 12000, xp: 500, color: '#6b8cff', major: true, boss: true, shielded: true, bossSkill: 'titan' },
+    bossTitan: { name: 'AEGIS TITAN', role: 'PHASE SHIELD // FINAL COMMAND', description: 'The final gatebreaker. Heavy rockets are required; several may be needed to collapse each regenerating shield phase.', radius: 82, hp: 7200, shield: 900, speed: 26, score: 12000, xp: 500, color: '#6b8cff', major: true, boss: true, shielded: true, bossSkill: 'titan' },
   };
 
   function activateWave() {
@@ -2475,6 +2475,15 @@
     }
     ctx.restore();
     if (enemy.shieldHp > 0) {
+      const shieldBarY = enemy.y - enemy.radius - (enemy.boss ? 34 : 24);
+      const shieldBarWidth = enemy.boss ? 110 : 72;
+      drawHealthBar(enemy.x, shieldBarY, shieldBarWidth, enemy.shieldHp / enemy.maxShield, '#79a8ff');
+      ctx.save();
+      ctx.fillStyle = '#9acbff';
+      ctx.font = '700 8px "Space Mono", monospace';
+      ctx.textAlign = 'center';
+      ctx.fillText(`SHIELD ${Math.ceil(enemy.shieldHp)}`, enemy.x, shieldBarY - 4);
+      ctx.restore();
       ctx.save();
       ctx.translate(enemy.x, enemy.y);
       ctx.rotate(-elapsed * .65);
