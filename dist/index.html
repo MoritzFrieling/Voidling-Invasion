@@ -106,6 +106,7 @@
             <div class="menu-actions">
               <button class="main-button" id="startButton" type="button"><span>BEGIN DEFENSE</span><b>ENTER</b></button>
               <button class="secondary-button" id="tutorialButton" type="button"><span>TRAINING RUN</span><b>T</b></button>
+              <button class="secondary-button level-select-button" id="levelSelectButton" type="button"><span>LEVEL SELECT</span><b>L</b></button>
             </div>
           </div>
 
@@ -130,6 +131,16 @@
               <button id="settingsButton" type="button">SETTINGS</button>
             </div>
           </div>
+        </div>
+      </section>
+
+      <section class="overlay panel-overlay" id="levelSelectOverlay" aria-labelledby="levelSelectTitle">
+        <div class="panel level-select-panel">
+          <button class="close-button" id="closeLevelSelect" type="button" aria-label="Close level selection">×</button>
+          <p class="kicker">CAMPAIGN ARCHIVE</p>
+          <h2 id="levelSelectTitle">CHOOSE A SECTOR</h2>
+          <p class="panel-copy">Replaying a sector restores the ship and resources saved when that sector was first unlocked.</p>
+          <div class="level-grid" id="levelChoices"></div>
         </div>
       </section>
 

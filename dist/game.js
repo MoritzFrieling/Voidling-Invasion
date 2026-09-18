@@ -83,6 +83,7 @@
     'creditText', 'portalWarning', 'lockReadout', 'stationState', 'intelOverlay', 'intelKicker', 'intelTitle',
     'intelRole', 'intelText', 'intelShip', 'bossOverlay', 'bossKicker', 'bossTitle', 'bossText',
     'sectorOverlay', 'sectorTitle', 'sectorCopy',
+    'levelSelectOverlay', 'levelChoices',
   ].forEach((id) => { ui[id] = document.getElementById(id); });
 
   const settings = {
@@ -140,6 +141,26 @@
   let threatWarningCooldown = 0;
   let lockedTarget = null;
   let highScore = Number(localStorage.getItem('voidline-highscore') || 0);
+  const CAMPAIGN_KEY = 'voidline-campaign-v1';
+
+  function readCampaignState() {
+    try {
+      const saved = JSON.parse(localStorage.getItem(CAMPAIGN_KEY) || '{}');
+      return {
+        highestUnlocked: Math.max(0, Math.min(LEVELS.length - 1, Number(saved.highestUnlocked) || 0)),
+        checkpoints: saved.checkpoints && typeof saved.checkpoints === 'object' ? saved.checkpoints : {},
+        completedCampaigns: Number(saved.completedCampaigns) || 0,
+      };
+    } catch {
+      return { highestUnlocked: 0, checkpoints: {}, completedCampaigns: 0 };
+    }
+  }
+
+  let campaignState = readCampaignState();
+
+  function saveCampaignState() {
+    localStorage.setItem(CAMPAIGN_KEY, JSON.stringify(campaignState));
+  }
 
   const camera = { x: 0, y: 0, shake: 0, shakeX: 0, shakeY: 0 };
   let player;
@@ -289,7 +310,55 @@
     };
   }
 
-  function clearRun() {
+  const PROGRESS_KEYS = [
+    'hp', 'maxHp', 'speed', 'acceleration', 'fireRate', 'damage', 'projectileSpeed', 'level', 'xp', 'xpNext',
+    'boostMax', 'rocketMax', 'rocketDamage', 'multiShot', 'salvage', 'credits',
+  ];
+
+  function captureProgress(source = player, shields = gateShields) {
+    const checkpoint = { gateShields: shields };
+    for (const key of PROGRESS_KEYS) checkpoint[key] = source[key];
+    return checkpoint;
+  }
+
+  function expectedCheckpoint(levelIndex) {
+    const pilot = resetPlayer();
+    let shields = 3;
+    if (levelIndex >= 1) {
+      pilot.maxHp = 125; pilot.hp = 125; pilot.damage *= 1.45; pilot.fireRate *= 1.22; pilot.speed *= 1.12;
+      pilot.rocketDamage *= 1.32; pilot.rocketMax *= .9; pilot.level = 6; pilot.xp = 0; pilot.xpNext = 240; pilot.credits = 160;
+      shields = 4;
+    }
+    if (levelIndex >= 2) {
+      pilot.maxHp = 155; pilot.hp = 155; pilot.damage *= 1.32; pilot.fireRate *= 1.18; pilot.speed *= 1.1;
+      pilot.rocketDamage *= 1.28; pilot.boostMax *= .86; pilot.multiShot = 2; pilot.level = 12; pilot.xpNext = 520; pilot.credits = 275;
+      shields = 4;
+    }
+    return captureProgress(pilot, shields);
+  }
+
+  function applyCheckpoint(checkpoint) {
+    if (!checkpoint) return;
+    for (const key of PROGRESS_KEYS) {
+      const value = Number(checkpoint[key]);
+      if (Number.isFinite(value)) player[key] = value;
+    }
+    player.hp = Math.max(1, Math.min(player.maxHp, player.hp));
+    gateShields = Math.max(1, Math.min(5, Number(checkpoint.gateShields) || 3));
+  }
+
+  function ensureCampaignCheckpoints() {
+    let changed = false;
+    for (let index = 0; index <= campaignState.highestUnlocked; index += 1) {
+      if (!campaignState.checkpoints[index]) {
+        campaignState.checkpoints[index] = expectedCheckpoint(index);
+        changed = true;
+      }
+    }
+    if (changed) saveCampaignState();
+  }
+
+  function clearRun(levelIndex = 0) {
     player = resetPlayer();
     bullets = [];
     rockets = [];
@@ -301,11 +370,13 @@
     particles = [];
     floaters = [];
     wave = 0;
-    currentLevel = 0;
+    currentLevel = clamp(levelIndex, 0, campaignState.highestUnlocked);
     activePaths = LEVELS[currentLevel].paths;
     score = 0;
     kills = 0;
     gateShields = 3;
+    ensureCampaignCheckpoints();
+    applyCheckpoint(campaignState.checkpoints[currentLevel] || expectedCheckpoint(currentLevel));
     waveClearTimer = 0;
     resourceTimer = .7;
     repairTimer = 11;
@@ -326,9 +397,9 @@
     for (let i = 0; i < 7; i += 1) spawnResource(true);
   }
 
-  function startGame(withTutorial = false) {
+  function startGame(withTutorial = false, levelIndex = 0) {
     audio.init();
-    clearRun();
+    clearRun(withTutorial ? 0 : levelIndex);
     tutorialMode = withTutorial;
     tutorialIndex = 0;
     tutorialDelay = 0;
@@ -360,6 +431,44 @@
     ui.crosshair.style.opacity = '0';
     ui.portalWarning.classList.remove('active');
     ui.lockReadout.classList.remove('active');
+  }
+
+  function renderLevelSelect() {
+    campaignState = readCampaignState();
+    ensureCampaignCheckpoints();
+    ui.levelChoices.replaceChildren();
+    LEVELS.forEach((level, index) => {
+      const unlocked = index <= campaignState.highestUnlocked;
+      const completed = index < campaignState.highestUnlocked || (index === LEVELS.length - 1 && campaignState.completedCampaigns > 0);
+      const checkpoint = campaignState.checkpoints[index] || expectedCheckpoint(index);
+      const paths = level.paths.length === 1 ? '1 APPROACH' : `${level.paths.length} APPROACHES`;
+      const card = document.createElement('button');
+      card.type = 'button';
+      card.className = `level-card${unlocked ? '' : ' locked'}`;
+      card.dataset.index = String(index + 1).padStart(2, '0');
+      card.disabled = !unlocked;
+      card.innerHTML = `
+        <span class="level-status">${unlocked ? completed ? 'CLEARED' : 'UNLOCKED' : 'LOCKED'}</span>
+        <h3>${level.name}</h3>
+        <p>${index === 0 ? 'Single-route frontier defense.' : index === 1 ? 'Twin routes and unstable rift entries.' : 'Three converging lanes and deep wormholes.'}</p>
+        <footer><span>${level.stages} STAGES · ${paths}</span><span class="checkpoint-note">SHIP LVL ${checkpoint.level || 1} · ${checkpoint.credits || 0} ◈</span></footer>`;
+      if (unlocked) card.addEventListener('click', () => startGame(false, index));
+      ui.levelChoices.append(card);
+    });
+  }
+
+  function openLevelSelect() {
+    renderLevelSelect();
+    mode = 'levelSelect';
+    hideOverlays();
+    ui.levelSelectOverlay.classList.add('active');
+    ui.crosshair.style.opacity = '0';
+  }
+
+  function closeLevelSelect() {
+    mode = 'menu';
+    ui.levelSelectOverlay.classList.remove('active');
+    ui.startOverlay.classList.add('active');
   }
 
   function togglePause(forcePause = null) {
@@ -1291,9 +1400,18 @@
     lockedTarget = null;
     ui.lockReadout.classList.remove('active');
     if (currentLevel >= LEVELS.length - 1) {
+      campaignState.highestUnlocked = LEVELS.length - 1;
+      campaignState.completedCampaigns += 1;
+      saveCampaignState();
       finishRun(true);
       return;
     }
+    player.hp = Math.min(player.maxHp, player.hp + player.maxHp * .35);
+    gateShields = Math.min(5, gateShields + 1);
+    const nextLevel = currentLevel + 1;
+    campaignState.highestUnlocked = Math.max(campaignState.highestUnlocked, nextLevel);
+    if (!campaignState.checkpoints[nextLevel]) campaignState.checkpoints[nextLevel] = captureProgress();
+    saveCampaignState();
     mode = 'sector';
     ui.crosshair.style.opacity = '0';
     ui.sectorTitle.textContent = LEVELS[currentLevel].name;
@@ -1319,8 +1437,6 @@
     player.y = 1030;
     player.vx = 0;
     player.vy = 0;
-    player.hp = Math.min(player.maxHp, player.hp + player.maxHp * .35);
-    gateShields = Math.min(5, gateShields + 1);
     for (let i = 0; i < 9; i += 1) spawnResource(true);
     camera.x = clamp(player.x - screenWidth / 2, 0, WORLD.width - screenWidth);
     camera.y = clamp(player.y - screenHeight / 2, 0, WORLD.height - screenHeight);
@@ -1988,7 +2104,10 @@
     if (event.code === 'KeyQ') triggerBoost();
     if (event.code === 'KeyF') beginRocketCharge();
     if (event.code === 'KeyB') useStation();
-    if (event.code === 'Escape') togglePause();
+    if (event.code === 'Escape') {
+      if (mode === 'levelSelect') closeLevelSelect();
+      else togglePause();
+    }
     if (event.code === 'Enter') {
       if (mode === 'menu') startGame(false);
       else if (mode === 'ended') startGame(false);
@@ -1997,6 +2116,7 @@
       else if (mode === 'sector') enterNextSector();
     }
     if (event.code === 'KeyT' && mode === 'menu') startGame(true);
+    if (event.code === 'KeyL' && mode === 'menu') openLevelSelect();
     if (mode === 'upgrade' && ['Digit1', 'Digit2', 'Digit3'].includes(event.code)) {
       ui.upgradeChoices.children[Number(event.code.at(-1)) - 1]?.click();
     }
@@ -2029,6 +2149,8 @@
   function bindUi() {
     document.getElementById('startButton').addEventListener('click', () => startGame(false));
     document.getElementById('tutorialButton').addEventListener('click', () => startGame(true));
+    document.getElementById('levelSelectButton').addEventListener('click', openLevelSelect);
+    document.getElementById('closeLevelSelect').addEventListener('click', closeLevelSelect);
     document.getElementById('controlsButton').addEventListener('click', () => openSettings('menu'));
     document.getElementById('settingsButton').addEventListener('click', () => openSettings('menu'));
     document.getElementById('pauseButton').addEventListener('click', () => togglePause(true));

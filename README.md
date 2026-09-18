@@ -4,6 +4,8 @@ A dependency-free HTML5 Canvas arcade defense game. Pilot a combat ship through 
 
 The campaign contains 36 stages across one-, two-, and three-lane maps. Later sectors add wormhole entry points, drone carriers, rocket-break shields, friendly defense stations, and three distinct command-ship encounters.
 
+Completed sectors remain available from **Level Select** on the title screen. Each sector records a progression checkpoint when it is first unlocked; replaying or jumping to that sector restores that checkpoint's ship level, upgrades, hull, gate shields, and salvage credits, so upgrades earned in later sectors cannot overpower earlier runs.
+
 ## Run locally
 
 Serve the `dist` directory with any static web server, then open `index.html` in a modern browser.
@@ -17,5 +19,6 @@ Serve the `dist` directory with any static web server, then open `index.html` in
 - `B` — build a defense station; press again while landed nearby to upgrade it
 - `Shift` — precision flight
 - `Escape` — pause
+- `L` — open Level Select from the title screen
 
 Progress and settings are stored locally in the browser.
