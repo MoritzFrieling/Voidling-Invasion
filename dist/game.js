@@ -1262,11 +1262,11 @@
     return ((to - from + Math.PI * 3) % (Math.PI * 2)) - Math.PI;
   }
 
-  function acquireLock(angle, cone = .42, range = 1250) {
+  function acquireLock(angle, cone = .42, range = 1250, includeInterceptors = true) {
     let best = null;
     let bestScore = Infinity;
     for (const enemy of enemies) {
-      if (enemy.dead) continue;
+      if (enemy.dead || (!includeInterceptors && enemy.interceptor)) continue;
       const dx = enemy.x - player.x;
       const dy = enemy.y - player.y;
       const distance = Math.hypot(dx, dy);
@@ -1316,7 +1316,7 @@
     const aimAngle = isPointerAiming()
       ? Math.atan2(input.aimWorldY - player.y, input.aimWorldX - player.x)
       : player.angle;
-    lockedTarget = acquireLock(aimAngle, .5, 1350);
+    lockedTarget = acquireLock(aimAngle, .5, 1350, false);
     ui.lockReadout.classList.toggle('active', Boolean(lockedTarget));
   }
 
@@ -1595,11 +1595,13 @@
         if (station.fireTimer <= 0) {
           station.fireTimer = station.fireRate;
           const interceptorAssist = station.target.interceptor;
+          const lightShip = station.target.radius <= 14;
           const shotSpeed = interceptorAssist ? 790 : 720;
+          const damageMultiplier = interceptorAssist ? 2.15 : lightShip ? 1.8 : 1;
           bullets.push({
             x: station.x + Math.cos(station.angle) * 28, y: station.y + Math.sin(station.angle) * 28,
             vx: Math.cos(station.angle) * shotSpeed, vy: Math.sin(station.angle) * shotSpeed, radius: 3.8,
-            damage: station.damage, target: station.target, turnRate: interceptorAssist ? 6.2 : 2.3, source: 'station', life: 1.5, dead: false,
+            damage: station.damage * damageMultiplier, target: station.target, turnRate: interceptorAssist ? 6.2 : 2.3, source: 'station', life: 1.5, dead: false,
           });
           audio.tone(250 + station.level * 40, .045, 'square', .018, 90);
         }
@@ -1669,7 +1671,14 @@
 
     for (const rocket of rockets) {
       if (rocket.dead) continue;
-      const target = enemies.find((enemy) => distanceSq(rocket, enemy) <= (rocket.radius + enemy.radius) ** 2)
+      for (const enemy of enemies) {
+        if (enemy.dead || !enemy.interceptor) continue;
+        if (distanceSq(rocket, enemy) <= (rocket.radius + enemy.radius) ** 2) {
+          damageEnemy(enemy, Math.max(enemy.hp, rocket.damage), rocket.x, rocket.y, true);
+        }
+      }
+      const target = enemies.find((enemy) => !enemy.dead && !enemy.interceptor
+          && distanceSq(rocket, enemy) <= (rocket.radius + enemy.radius) ** 2)
         || enemyRockets.find((missile) => !missile.dead && distanceSq(rocket, missile) <= (rocket.radius + missile.radius) ** 2)
         || resources.find((rock) => distanceSq(rocket, rock) <= (rocket.radius + rock.radius) ** 2);
       if (target) {
