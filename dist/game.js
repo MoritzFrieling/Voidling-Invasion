@@ -1212,7 +1212,8 @@
       spawnTimer -= dt * (1 + staticPressure * .25);
       if (spawnTimer <= 0) {
         spawnEnemy(spawnQueue.shift());
-        spawnTimer = Math.max(.18, .66 - wave * .025 - currentLevel * .05);
+        const openingBuffer = wave <= 2 ? .12 : 0;
+        spawnTimer = Math.max(.34, .78 + currentLevel * .12 - wave * .018 + openingBuffer);
       }
     } else if (!enemies.length && wave > 0) {
       if (!waveReady) {
