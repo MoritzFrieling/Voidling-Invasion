@@ -86,6 +86,10 @@
     'levelSelectOverlay', 'levelChoices',
     'speedTierText', 'damageTierText', 'rateTierText', 'hullTierText', 'rocketTierText', 'coolingTierText',
     'staticWarning', 'waveCallButton',
+    'authOverlay', 'authTitle', 'authCopy', 'authTabs', 'authForm', 'authUsername', 'authPassword',
+    'authPasswordConfirm', 'authPasswordConfirmLabel', 'authHint', 'authMessage', 'authSubmit',
+    'pilotSummary', 'pilotType', 'pilotName', 'pilotSyncState', 'protectProgressButton', 'pilotButton',
+    'pilotButtonText', 'leaderboardOverlay', 'leaderboardList',
   ].forEach((id) => { ui[id] = document.getElementById(id); });
 
   const settings = {
@@ -152,27 +156,84 @@
   let bossIntroTimer = 0;
   let threatWarningCooldown = 0;
   let lockedTarget = null;
-  let highScore = Number(localStorage.getItem('voidline-highscore') || 0);
   const CAMPAIGN_KEY = 'voidline-campaign-v1';
+  const HIGH_SCORE_KEY = 'voidline-highscore';
+  let activePilot = null;
+  let activePilotId = null;
+  let pendingPilotAction = null;
+  let authMode = 'signin';
+  let accountReturnMode = 'menu';
+  let cloudSaveTimer = 0;
+  let cloudBusy = false;
+  let cloudSyncSuspended = false;
+  let highScore = Number(localStorage.getItem(HIGH_SCORE_KEY) || 0);
 
-  function readCampaignState() {
+  function emptyCampaignState() {
+    return { highestUnlocked: 0, checkpoints: {}, completedCampaigns: 0, seenEnemyTypes: [] };
+  }
+
+  function campaignKey(userId = activePilotId) {
+    return userId ? `${CAMPAIGN_KEY}:${userId}` : CAMPAIGN_KEY;
+  }
+
+  function highScoreKey(userId = activePilotId) {
+    return userId ? `${HIGH_SCORE_KEY}:${userId}` : HIGH_SCORE_KEY;
+  }
+
+  function localUpdatedKey(userId = activePilotId) {
+    return userId ? `voidline-local-updated:${userId}` : 'voidline-local-updated';
+  }
+
+  function normalizeCampaignState(saved) {
+    return {
+      highestUnlocked: Math.max(0, Math.min(LEVELS.length - 1, Number(saved?.highestUnlocked) || 0)),
+      checkpoints: saved?.checkpoints && typeof saved.checkpoints === 'object' ? saved.checkpoints : {},
+      completedCampaigns: Number(saved?.completedCampaigns) || 0,
+      seenEnemyTypes: Array.isArray(saved?.seenEnemyTypes) ? saved.seenEnemyTypes.filter((type) => typeof type === 'string') : [],
+    };
+  }
+
+  function readCampaignState(storageKey = campaignKey()) {
     try {
-      const saved = JSON.parse(localStorage.getItem(CAMPAIGN_KEY) || '{}');
-      return {
-        highestUnlocked: Math.max(0, Math.min(LEVELS.length - 1, Number(saved.highestUnlocked) || 0)),
-        checkpoints: saved.checkpoints && typeof saved.checkpoints === 'object' ? saved.checkpoints : {},
-        completedCampaigns: Number(saved.completedCampaigns) || 0,
-        seenEnemyTypes: Array.isArray(saved.seenEnemyTypes) ? saved.seenEnemyTypes.filter((type) => typeof type === 'string') : [],
-      };
+      return normalizeCampaignState(JSON.parse(localStorage.getItem(storageKey) || '{}'));
     } catch {
-      return { highestUnlocked: 0, checkpoints: {}, completedCampaigns: 0, seenEnemyTypes: [] };
+      return emptyCampaignState();
     }
   }
 
   let campaignState = readCampaignState();
 
-  function saveCampaignState() {
-    localStorage.setItem(CAMPAIGN_KEY, JSON.stringify(campaignState));
+  function saveCampaignState(syncCloud = true, touchTimestamp = true) {
+    localStorage.setItem(campaignKey(), JSON.stringify(campaignState));
+    localStorage.setItem(highScoreKey(), String(highScore));
+    if (touchTimestamp) localStorage.setItem(localUpdatedKey(), new Date().toISOString());
+    if (syncCloud) scheduleCloudSave();
+  }
+
+  function scheduleCloudSave() {
+    if (!activePilot || !window.VoidlineCloud || cloudSyncSuspended) return;
+    clearTimeout(cloudSaveTimer);
+    ui.pilotSyncState.textContent = 'CHANGES PENDING';
+    cloudSaveTimer = setTimeout(syncCloudProgress, 650);
+  }
+
+  async function syncCloudProgress() {
+    if (!activePilot || !window.VoidlineCloud || cloudSyncSuspended) return;
+    if (cloudBusy) {
+      cloudSaveTimer = setTimeout(syncCloudProgress, 650);
+      return;
+    }
+    cloudBusy = true;
+    ui.pilotSyncState.textContent = 'SYNCHRONIZING…';
+    try {
+      await window.VoidlineCloud.saveProgress(campaignState, highScore);
+      ui.pilotSyncState.textContent = 'CLOUD SAVE CURRENT';
+    } catch (error) {
+      ui.pilotSyncState.textContent = 'OFFLINE · SAVED ON DEVICE';
+      console.warn('Voidline cloud save:', error);
+    } finally {
+      cloudBusy = false;
+    }
   }
 
   const camera = { x: 0, y: 0, shake: 0, shakeX: 0, shakeY: 0 };
@@ -475,6 +536,282 @@
     ui.crosshair.style.opacity = '0';
     ui.portalWarning.classList.remove('active');
     ui.lockReadout.classList.remove('active');
+  }
+
+  function updatePilotUi() {
+    const connected = Boolean(activePilot);
+    ui.pilotButton.classList.toggle('connected', connected && !activePilot.isGuest);
+    ui.pilotButton.classList.toggle('guest', connected && activePilot.isGuest);
+    ui.pilotButtonText.textContent = connected ? activePilot.username : 'PILOT';
+    if (!connected) return;
+    ui.pilotType.textContent = activePilot.isGuest ? 'GUEST PILOT · DEVICE SESSION' : 'CLOUD PILOT · PERMANENT ACCOUNT';
+    ui.pilotName.textContent = activePilot.username;
+    ui.protectProgressButton.hidden = !activePilot.isGuest;
+  }
+
+  async function activatePilot(pilot) {
+    activePilot = pilot;
+    activePilotId = pilot?.id || null;
+    cloudSyncSuspended = false;
+    updatePilotUi();
+
+    if (!pilot) {
+      campaignState = emptyCampaignState();
+      highScore = 0;
+      ui.bestText.textContent = formatScore(0);
+      return;
+    }
+
+    const cachedCampaign = localStorage.getItem(campaignKey()) ? readCampaignState(campaignKey()) : null;
+    const cachedHighScore = Number(localStorage.getItem(highScoreKey()) || 0);
+    const cachedUpdatedAt = Date.parse(localStorage.getItem(localUpdatedKey()) || '') || 0;
+    let remote = null;
+    try {
+      remote = await window.VoidlineCloud.loadProgress();
+    } catch (error) {
+      cloudSyncSuspended = true;
+      ui.pilotSyncState.textContent = 'OFFLINE · USING DEVICE SAVE';
+      console.warn('Voidline cloud load:', error);
+    }
+
+    const remoteUpdatedAt = Date.parse(remote?.updated_at || '') || 0;
+    if (remote && remoteUpdatedAt >= cachedUpdatedAt) {
+      campaignState = normalizeCampaignState(remote.campaign);
+      highScore = Math.max(0, Number(remote.high_score) || 0);
+      saveCampaignState(false, false);
+      localStorage.setItem(localUpdatedKey(), remote.updated_at);
+      ui.pilotSyncState.textContent = 'CLOUD SAVE LOADED';
+    } else if (cachedCampaign) {
+      campaignState = cachedCampaign;
+      highScore = cachedHighScore;
+      ui.pilotSyncState.textContent = cloudSyncSuspended ? 'OFFLINE · SAVED ON DEVICE' : remote ? 'UPLOADING DEVICE SAVE…' : 'DEVICE SAVE LOADED';
+      scheduleCloudSave();
+    } else if (localStorage.getItem(CAMPAIGN_KEY) && !localStorage.getItem('voidline-legacy-cloud-claimed')) {
+      campaignState = readCampaignState(CAMPAIGN_KEY);
+      highScore = Number(localStorage.getItem(HIGH_SCORE_KEY) || 0);
+      localStorage.setItem('voidline-legacy-cloud-claimed', 'true');
+      saveCampaignState();
+      ui.pilotSyncState.textContent = 'IMPORTING EXISTING PROGRESS…';
+    } else {
+      campaignState = emptyCampaignState();
+      highScore = 0;
+      saveCampaignState();
+      ui.pilotSyncState.textContent = 'NEW CLOUD SAVE CREATED';
+    }
+
+    ensureCampaignCheckpoints();
+    ui.bestText.textContent = formatScore(highScore);
+    if (mode === 'levelSelect') renderLevelSelect();
+  }
+
+  function setAuthMode(nextMode) {
+    authMode = nextMode;
+    const signedIn = Boolean(activePilot) && nextMode === 'summary';
+    ui.authTabs.hidden = signedIn || nextMode === 'upgrade';
+    ui.authForm.hidden = signedIn;
+    ui.pilotSummary.hidden = !signedIn;
+    ui.authMessage.textContent = '';
+    ui.authMessage.classList.remove('success');
+    ui.authForm.classList.remove('busy');
+    ui.authUsername.readOnly = nextMode === 'upgrade';
+    ui.authUsername.value = nextMode === 'upgrade' ? activePilot?.username || '' : '';
+    ui.authPassword.value = '';
+    ui.authPasswordConfirm.value = '';
+
+    const needsPassword = nextMode !== 'guest';
+    document.getElementById('authPasswordLabel').hidden = !needsPassword;
+    ui.authPassword.required = needsPassword;
+    ui.authPasswordConfirmLabel.hidden = !['signup', 'upgrade'].includes(nextMode);
+    ui.authPasswordConfirm.required = ['signup', 'upgrade'].includes(nextMode);
+    document.querySelectorAll('#authTabs button').forEach((button) => button.classList.remove('active'));
+
+    if (nextMode === 'signin') {
+      document.getElementById('showSignIn').classList.add('active');
+      ui.authTitle.textContent = 'WELCOME BACK';
+      ui.authCopy.textContent = 'Sign in with your pilot username and password to restore cloud progress.';
+      ui.authHint.textContent = 'Your password is handled by Supabase Auth and is never stored in the game.';
+      ui.authSubmit.querySelector('span').textContent = 'SIGN IN';
+      ui.authPassword.autocomplete = 'current-password';
+    } else if (nextMode === 'signup') {
+      document.getElementById('showSignUp').classList.add('active');
+      ui.authTitle.textContent = 'CREATE PILOT';
+      ui.authCopy.textContent = 'Choose a unique callsign and password. No email address is required.';
+      ui.authHint.textContent = 'There is no password recovery without an email, so keep your password safe.';
+      ui.authSubmit.querySelector('span').textContent = 'CREATE ACCOUNT';
+      ui.authPassword.autocomplete = 'new-password';
+    } else if (nextMode === 'guest') {
+      document.getElementById('showGuest').classList.add('active');
+      ui.authTitle.textContent = 'GUEST FLIGHT';
+      ui.authCopy.textContent = 'Choose a unique callsign and enter immediately. You can protect the progress with a password later.';
+      ui.authHint.textContent = 'Guest progress stays with this browser session and cannot be recovered after signing out or clearing site data.';
+      ui.authSubmit.querySelector('span').textContent = 'CONTINUE AS GUEST';
+    } else if (nextMode === 'upgrade') {
+      ui.authTitle.textContent = 'PROTECT PROGRESS';
+      ui.authCopy.textContent = 'Add a password to keep this callsign, cloud save, and leaderboard record permanently.';
+      ui.authHint.textContent = 'Your guest progress will be transferred to the new permanent account.';
+      ui.authSubmit.querySelector('span').textContent = 'CREATE PERMANENT ACCOUNT';
+      ui.authPassword.autocomplete = 'new-password';
+    } else {
+      ui.authTitle.textContent = 'PILOT ACCOUNT';
+      ui.authCopy.textContent = activePilot?.isGuest
+        ? 'This guest session is saved to the cloud but cannot be recovered after sign-out.'
+        : 'Your campaign progress and best score synchronize through the pilot network.';
+    }
+  }
+
+  function openAccount(requestedMode = null) {
+    accountReturnMode = mode;
+    if (mode === 'playing') mode = 'paused';
+    hideOverlays();
+    ui.crosshair.style.opacity = '0';
+    setAuthMode(requestedMode || (activePilot ? 'summary' : 'signin'));
+    ui.authOverlay.classList.add('active');
+    if (!activePilot || requestedMode === 'upgrade') setTimeout(() => (requestedMode === 'upgrade' ? ui.authPassword : ui.authUsername).focus(), 30);
+  }
+
+  function closeAccount() {
+    ui.authOverlay.classList.remove('active');
+    if (['playing', 'paused'].includes(accountReturnMode)) {
+      mode = 'paused';
+      ui.pauseOverlay.classList.add('active');
+    } else {
+      mode = 'menu';
+      ui.startOverlay.classList.add('active');
+    }
+  }
+
+  function requirePilot(action) {
+    if (activePilot) {
+      action();
+      return;
+    }
+    pendingPilotAction = action;
+    openAccount('signin');
+  }
+
+  async function submitAuthForm(event) {
+    event.preventDefault();
+    if (!window.VoidlineCloud) {
+      ui.authMessage.textContent = 'The pilot network could not be loaded. Check your connection and refresh.';
+      return;
+    }
+    if (cloudBusy) return;
+    const username = ui.authUsername.value;
+    const password = ui.authPassword.value;
+    if (['signup', 'upgrade'].includes(authMode) && password !== ui.authPasswordConfirm.value) {
+      ui.authMessage.textContent = 'Passwords do not match.';
+      return;
+    }
+    cloudBusy = true;
+    ui.authForm.classList.add('busy');
+    ui.authMessage.textContent = 'CONTACTING PILOT NETWORK…';
+    try {
+      let pilot;
+      if (authMode === 'guest') pilot = await window.VoidlineCloud.playAsGuest(username);
+      else if (authMode === 'signin') pilot = await window.VoidlineCloud.signIn(username, password);
+      else if (authMode === 'upgrade') pilot = await window.VoidlineCloud.upgradeGuest(username, password);
+      else pilot = await window.VoidlineCloud.createAccount(username, password);
+      await activatePilot(pilot);
+      ui.authMessage.textContent = 'PILOT LINK ESTABLISHED';
+      ui.authMessage.classList.add('success');
+      const action = pendingPilotAction;
+      pendingPilotAction = null;
+      setTimeout(() => {
+        closeAccount();
+        if (action) action();
+      }, 260);
+    } catch (error) {
+      ui.authMessage.textContent = error.message || 'Pilot access failed.';
+    } finally {
+      cloudBusy = false;
+      ui.authForm.classList.remove('busy');
+    }
+  }
+
+  async function signOutPilot() {
+    if (!activePilot || cloudBusy) return;
+    if (activePilot.isGuest && !window.confirm('Signing out of a guest session makes it impossible to recover. Continue?')) return;
+    cloudBusy = true;
+    try {
+      await window.VoidlineCloud.signOut();
+      await activatePilot(null);
+      pendingPilotAction = null;
+      setAuthMode('signin');
+    } catch (error) {
+      ui.pilotSyncState.textContent = error.message || 'SIGN OUT FAILED';
+    } finally {
+      cloudBusy = false;
+    }
+  }
+
+  async function openLeaderboard() {
+    accountReturnMode = mode;
+    if (mode === 'playing') mode = 'paused';
+    hideOverlays();
+    ui.crosshair.style.opacity = '0';
+    ui.leaderboardOverlay.classList.add('active');
+    ui.leaderboardList.innerHTML = '<p class="leaderboard-empty">CONTACTING DEFENSE NETWORK…</p>';
+    try {
+      const entries = await window.VoidlineCloud.getLeaderboard(12);
+      ui.leaderboardList.replaceChildren();
+      if (!entries.length) {
+        ui.leaderboardList.innerHTML = '<p class="leaderboard-empty">NO COMBAT RECORDS YET · SET THE FIRST SCORE</p>';
+        return;
+      }
+      for (const entry of entries) {
+        const row = document.createElement('div');
+        row.className = 'leaderboard-row';
+        const rank = document.createElement('span');
+        rank.className = 'leaderboard-rank';
+        rank.textContent = `#${String(entry.rank).padStart(2, '0')}`;
+        const pilotCell = document.createElement('span');
+        pilotCell.className = 'leaderboard-pilot';
+        const name = document.createElement('strong');
+        name.textContent = entry.username;
+        const detail = document.createElement('small');
+        detail.textContent = `${entry.is_guest ? 'GUEST · ' : ''}SECTOR ${entry.level_reached} · STAGE ${entry.stage_reached} · ${entry.kills} KILLS`;
+        pilotCell.append(name, detail);
+        const value = document.createElement('span');
+        value.className = 'leaderboard-score';
+        value.textContent = formatScore(entry.score);
+        row.append(rank, pilotCell, value);
+        ui.leaderboardList.append(row);
+      }
+    } catch (error) {
+      ui.leaderboardList.innerHTML = '';
+      const message = document.createElement('p');
+      message.className = 'leaderboard-empty';
+      message.textContent = error.message || 'LEADERBOARD UNAVAILABLE';
+      ui.leaderboardList.append(message);
+    }
+  }
+
+  function closeLeaderboard() {
+    ui.leaderboardOverlay.classList.remove('active');
+    if (['playing', 'paused'].includes(accountReturnMode)) {
+      mode = 'paused';
+      ui.pauseOverlay.classList.add('active');
+    } else {
+      mode = 'menu';
+      ui.startOverlay.classList.add('active');
+    }
+  }
+
+  async function initializeCloud() {
+    try {
+      const pilot = await window.VoidlineCloud.init();
+      await activatePilot(pilot);
+      if (pilot && ui.authOverlay.classList.contains('active')) {
+        const action = pendingPilotAction;
+        pendingPilotAction = null;
+        closeAccount();
+        if (action) action();
+      }
+    } catch (error) {
+      ui.pilotButtonText.textContent = 'SETUP';
+      ui.pilotSyncState.textContent = 'CLOUD SETUP REQUIRED';
+      console.warn('Voidline pilot network:', error);
+    }
   }
 
   function renderLevelSelect() {
@@ -1581,7 +1918,11 @@
     runFinished = true;
     mode = 'ended';
     highScore = Math.max(highScore, score);
-    localStorage.setItem('voidline-highscore', String(highScore));
+    saveCampaignState();
+    if (activePilot && window.VoidlineCloud) {
+      window.VoidlineCloud.submitScore({ score, level: currentLevel + 1, stage: wave, kills })
+        .catch((error) => console.warn('Voidline leaderboard submit:', error));
+    }
     ui.crosshair.style.opacity = '0';
     ui.portalWarning.classList.remove('active');
     ui.lockReadout.classList.remove('active');
@@ -2313,18 +2654,21 @@
     if (event.code === 'KeyB') useStation();
     if (event.code === 'KeyR') callNextWave();
     if (event.code === 'Escape') {
-      if (mode === 'levelSelect') closeLevelSelect();
+      if (ui.authOverlay.classList.contains('active')) closeAccount();
+      else if (ui.leaderboardOverlay.classList.contains('active')) closeLeaderboard();
+      else if (mode === 'levelSelect') closeLevelSelect();
       else togglePause();
     }
     if (event.code === 'Enter') {
-      if (mode === 'menu') startGame(false);
+      if (ui.authOverlay.classList.contains('active') || ui.leaderboardOverlay.classList.contains('active')) return;
+      if (mode === 'menu') requirePilot(() => startGame(false));
       else if (mode === 'ended') startGame(false);
       else if (mode === 'briefing') showNextIntel();
       else if (mode === 'cutscene') activateWave();
       else if (mode === 'sector') enterNextSector();
     }
-    if (event.code === 'KeyT' && mode === 'menu') startGame(true);
-    if (event.code === 'KeyL' && mode === 'menu') openLevelSelect();
+    if (event.code === 'KeyT' && mode === 'menu') requirePilot(() => startGame(true));
+    if (event.code === 'KeyL' && mode === 'menu') requirePilot(openLevelSelect);
     if (mode === 'upgrade' && ['Digit1', 'Digit2', 'Digit3'].includes(event.code)) {
       ui.upgradeChoices.children[Number(event.code.at(-1)) - 1]?.click();
     }
@@ -2356,9 +2700,9 @@
   }
 
   function bindUi() {
-    document.getElementById('startButton').addEventListener('click', () => startGame(false));
-    document.getElementById('tutorialButton').addEventListener('click', () => startGame(true));
-    document.getElementById('levelSelectButton').addEventListener('click', openLevelSelect);
+    document.getElementById('startButton').addEventListener('click', () => requirePilot(() => startGame(false)));
+    document.getElementById('tutorialButton').addEventListener('click', () => requirePilot(() => startGame(true)));
+    document.getElementById('levelSelectButton').addEventListener('click', () => requirePilot(openLevelSelect));
     document.getElementById('closeLevelSelect').addEventListener('click', closeLevelSelect);
     document.getElementById('controlsButton').addEventListener('click', () => openSettings('menu'));
     document.getElementById('settingsButton').addEventListener('click', () => openSettings('menu'));
@@ -2375,6 +2719,17 @@
     document.getElementById('nextSectorButton').addEventListener('click', enterNextSector);
     document.getElementById('stationButton').addEventListener('click', useStation);
     document.getElementById('waveCallButton').addEventListener('click', callNextWave);
+    document.getElementById('pilotButton').addEventListener('click', () => openAccount());
+    document.getElementById('accountButton').addEventListener('click', () => openAccount());
+    document.getElementById('leaderboardButton').addEventListener('click', openLeaderboard);
+    document.getElementById('closeAuth').addEventListener('click', closeAccount);
+    document.getElementById('closeLeaderboard').addEventListener('click', closeLeaderboard);
+    document.getElementById('showSignIn').addEventListener('click', () => setAuthMode('signin'));
+    document.getElementById('showSignUp').addEventListener('click', () => setAuthMode('signup'));
+    document.getElementById('showGuest').addEventListener('click', () => setAuthMode('guest'));
+    document.getElementById('authForm').addEventListener('submit', submitAuthForm);
+    document.getElementById('protectProgressButton').addEventListener('click', () => setAuthMode('upgrade'));
+    document.getElementById('signOutButton').addEventListener('click', signOutPilot);
     document.getElementById('skipTutorial').addEventListener('click', () => {
       tutorialMode = false;
       ui.tutorialCard.classList.remove('active');
@@ -2423,11 +2778,18 @@
   canvas.addEventListener('contextmenu', (event) => event.preventDefault());
 
   bindUi();
+  setAuthMode('signin');
   resize();
   player = resetPlayer();
   camera.x = player.x - screenWidth / 2;
   camera.y = player.y - screenHeight / 2;
   ui.bestText.textContent = formatScore(highScore);
   syncUi();
+  if (window.VoidlineCloud) {
+    window.VoidlineCloud.onChange((pilot) => {
+      if (!pilot && activePilot) activatePilot(null);
+    });
+  }
+  initializeCloud();
   requestAnimationFrame(frame);
 })();

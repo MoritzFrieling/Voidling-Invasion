@@ -22,7 +22,9 @@ Serve the `dist` directory with any static web server, then open `index.html` in
 - `Escape` — pause
 - `L` — open Level Select from the title screen
 
-Progress and settings are stored locally in the browser.
+Progress is cached locally for immediate/offline play and synchronized to Supabase after the player signs in or starts a guest session. Password accounts can restore progress on another device; anonymous guest sessions can later be protected with a password. Settings remain local to each browser.
+
+The title screen also includes a cloud leaderboard. Each pilot contributes only their strongest run.
 
 When no recent mouse or trackpad aiming is detected, the ship automatically faces the nearest hostile within short range. Remaining stationary for too long builds a static signature that modestly accelerates hostiles and their missile locks; movement clears the pressure.
 
@@ -33,3 +35,7 @@ Gameplay was heavily inspired by Bloons Tower Defense, Kingdom Rush, and [SkyRus
 ## Publish on GitHub Pages
 
 The repository includes a GitHub Actions workflow that publishes the contents of `dist` whenever `main` is pushed. In the GitHub repository, open **Settings → Pages** and set **Source** to **GitHub Actions**. The next push to `main` (or a manual run from the Actions tab) deploys the game.
+
+## Supabase
+
+Before account access works, complete the one-time steps in [SUPABASE_SETUP.md](SUPABASE_SETUP.md). The repository contains the complete RLS-protected schema at `supabase/migrations/001_voidline_cloud.sql`.
