@@ -1074,11 +1074,11 @@
     const roll = Math.random();
     const size = roll < .5 ? rand(14, 25) : roll < .86 ? rand(26, 42) : rand(43, 62);
     const crystal = Math.random() < .2;
-    const maxHp = size * size * .115 * (crystal ? 1.18 : 1);
+    const maxHp = size * size * .145 * (crystal ? 1.22 : 1);
     resources.push({
       x, y, radius: size, hp: maxHp, maxHp, rotation: rand(0, 6.28), spin: rand(-.28, .28),
-      sides: 5 + ((Math.random() * 3) | 0), crystal, xpValue: Math.round(size * (crystal ? 1.25 : .72)),
-      creditValue: Math.round(size * (crystal ? 1.1 : .64)), collisionTimer: 0, dead: false,
+      sides: 5 + ((Math.random() * 3) | 0), crystal, xpValue: Math.round(size * (crystal ? 1.55 : .9)),
+      creditValue: Math.round(size * (crystal ? 1.38 : .8)), collisionTimer: 0, dead: false,
     });
   }
 
@@ -1271,8 +1271,9 @@
       const distance = Math.hypot(dx, dy);
       if (distance > range) continue;
       const delta = Math.abs(angleDelta(angle, Math.atan2(dy, dx)));
-      if (delta > cone) continue;
-      const scoreValue = delta * 900 + distance * .18 - (enemy.boss ? 120 : enemy.major ? 45 : 0);
+      const assistCone = enemy.interceptor ? Math.min(cone + .1, cone * 1.35) : cone;
+      if (delta > assistCone) continue;
+      const scoreValue = delta * 900 + distance * .18 - (enemy.interceptor ? 105 : enemy.boss ? 120 : enemy.major ? 45 : 0);
       if (scoreValue < bestScore) { best = enemy; bestScore = scoreValue; }
     }
     return best;
@@ -1337,7 +1338,7 @@
         radius: 3.4,
         damage: player.damage,
         target: assistTarget,
-        turnRate: 1.75,
+        turnRate: assistTarget?.interceptor ? 4.2 : 2.1,
         source: 'player',
         life: 1.15,
         dead: false,
@@ -1496,7 +1497,7 @@
           for (let i = 0; i < count; i += 1) {
             spawnEnemy({ type: 'interceptor', pathId: enemy.pathId, entryProgress: Math.max(0, enemy.progress - 28 - i * 12) }, enemy);
           }
-          enemy.spawnTimer = enemy.boss ? rand(2.4, 3.4) : rand(4.1, 5.8);
+          enemy.spawnTimer = enemy.bossSkill === 'swarm' ? rand(2.82, 4) : rand(4.1, 5.8);
           burst(enemy.x, enemy.y, enemy.color, 10, 110);
           showToast(enemy.boss ? 'CARRIER WING DEPLOYED' : 'BROOD CARRIER LAUNCHED INTERCEPTORS');
         }
@@ -1580,22 +1581,24 @@
   function updateStations(dt) {
     for (const station of stations) {
       station.fireTimer -= dt;
-      station.target = station.target && !station.target.dead && distanceSq(station, station.target) < station.range ** 2 ? station.target : null;
-      if (!station.target) {
-        let best = station.range ** 2;
-        for (const enemy of enemies) {
-          const d = distanceSq(station, enemy);
-          if (!enemy.dead && d < best) { best = d; station.target = enemy; }
-        }
+      station.target = null;
+      let bestScore = Infinity;
+      for (const enemy of enemies) {
+        const d = distanceSq(station, enemy);
+        if (enemy.dead || d >= station.range ** 2) continue;
+        const targetScore = d * (enemy.interceptor ? .45 : 1);
+        if (targetScore < bestScore) { bestScore = targetScore; station.target = enemy; }
       }
       if (station.target) {
         station.angle = Math.atan2(station.target.y - station.y, station.target.x - station.x);
         if (station.fireTimer <= 0) {
           station.fireTimer = station.fireRate;
+          const interceptorAssist = station.target.interceptor;
+          const shotSpeed = interceptorAssist ? 790 : 720;
           bullets.push({
             x: station.x + Math.cos(station.angle) * 28, y: station.y + Math.sin(station.angle) * 28,
-            vx: Math.cos(station.angle) * 720, vy: Math.sin(station.angle) * 720, radius: 3.8,
-            damage: station.damage, target: station.target, turnRate: 2.3, source: 'station', life: 1.5, dead: false,
+            vx: Math.cos(station.angle) * shotSpeed, vy: Math.sin(station.angle) * shotSpeed, radius: 3.8,
+            damage: station.damage, target: station.target, turnRate: interceptorAssist ? 6.2 : 2.3, source: 'station', life: 1.5, dead: false,
           });
           audio.tone(250 + station.level * 40, .045, 'square', .018, 90);
         }
