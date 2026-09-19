@@ -1,6 +1,7 @@
 (() => {
   'use strict';
 
+  // Shared canvas references, world geometry, routes, colors, and UI bindings.
   const canvas = document.querySelector('#gameCanvas');
   const ctx = canvas.getContext('2d', { alpha: false, desynchronized: true });
   const mapCanvas = document.querySelector('#minimap');
@@ -91,7 +92,7 @@
     'pilotSummary', 'pilotType', 'pilotName', 'pilotSyncState', 'protectProgressButton', 'pilotButton',
     'pilotButtonText', 'leaderboardOverlay', 'leaderboardList',
   ].forEach((id) => { ui[id] = document.getElementById(id); });
-
+  // Runtime state, local/cloud persistence, and audio services.
   const settings = {
     music: localStorage.getItem('voidline-music') !== 'false',
     sfx: localStorage.getItem('voidline-sfx') !== 'false',
@@ -101,7 +102,6 @@
   const input = {
     keys: new Set(),
     pointerDown: false,
-    pointerActive: false,
     mouseX: 0,
     mouseY: 0,
     aimWorldX: 0,
@@ -352,7 +352,7 @@
     canvas.height = Math.round(screenHeight * dpr);
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   }
-
+  // Player defaults, progression checkpoints, campaign setup, and pilot activation.
   function resetPlayer() {
     return {
       x: 860,
@@ -374,7 +374,6 @@
       xpNext: 60,
       boostCooldown: 0,
       boostMax: 4.8,
-      boostTime: 0,
       jumpBrake: 0,
       jumpFlash: 0,
       rocketCooldown: 0,
@@ -607,7 +606,7 @@
     ui.bestText.textContent = formatScore(highScore);
     if (mode === 'levelSelect') renderLevelSelect();
   }
-
+  // Account, leaderboard, settings, and level-select actions.
   function setAuthMode(nextMode) {
     authMode = nextMode;
     const signedIn = Boolean(activePilot) && nextMode === 'summary';
@@ -856,7 +855,7 @@
     ui.levelSelectOverlay.classList.remove('active');
     ui.startOverlay.classList.add('active');
   }
-
+  // Wave scheduling, enemy definitions, spawning, and resource creation.
   function setWaveCallAvailable(available) {
     ui.waveCallButton.classList.toggle('active', available);
     ui.waveCallButton.disabled = !available;
@@ -1116,7 +1115,7 @@
       dead: false,
     });
   }
-
+  // Per-frame simulation: movement, combat, collisions, stations, and damage.
   function update(dt) {
     elapsed += dt;
     if (toastTimer > 0) {
@@ -1921,7 +1920,7 @@
     }
     if (pendingLevelUps > 0 && mode === 'playing' && !deferUpgrade) showUpgradeChoices();
   }
-
+  // Upgrade choices, campaign completion, and tutorial flow.
   const UPGRADES = [
     { id: 'damage', tier: 'damageTier', icon: '◆', name: 'Overcharged Bolts', description: 'Blaster damage increases by 18%.', detail: 'DAMAGE +18%', apply: () => { player.damage *= 1.18; player.damageTier += 1; } },
     { id: 'rate', tier: 'rateTier', icon: '≋', name: 'Flux Repeater', description: 'Blaster cycles 14% faster.', detail: 'FIRE RATE +14%', apply: () => { player.fireRate *= 1.14; player.rateTier += 1; } },
@@ -2104,7 +2103,7 @@
       showToast('TRAINING COMPLETE // GOOD HUNTING');
     }
   }
-
+  // Canvas rendering, minimap, HUD synchronization, and visual effects.
   function addParticle(x, y, options = {}) {
     if (particles.length > 520) return;
     particles.push({
@@ -2784,7 +2783,7 @@
     }
     document.getElementById('stationButton').disabled = false;
   }
-
+  // Keyboard, pointer, UI event wiring, and the animation frame loop.
   function showToast(message) {
     ui.toast.textContent = message;
     ui.toast.classList.add('visible');
@@ -2834,7 +2833,6 @@
     const rect = canvas.getBoundingClientRect();
     input.mouseX = event.clientX - rect.left;
     input.mouseY = event.clientY - rect.top;
-    input.pointerActive = true;
     input.lastPointerAt = performance.now();
     ui.crosshair.style.left = `${input.mouseX}px`;
     ui.crosshair.style.top = `${input.mouseY}px`;
@@ -2923,7 +2921,7 @@
     draw();
     requestAnimationFrame(frame);
   }
-
+  // Browser event listeners and initial application boot.
   window.addEventListener('resize', resize);
   window.addEventListener('keydown', keyDown, { passive: false });
   window.addEventListener('keyup', keyUp);

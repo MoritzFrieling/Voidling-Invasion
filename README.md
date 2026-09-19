@@ -8,14 +8,18 @@ Completed sectors remain available from **Level Select** on the title screen. Ea
 
 ## Run locally
 
-Serve the `dist` directory with any static web server, then open `index.html` in a modern browser.
+Build the static site, then serve the generated `dist` directory with any static web server:
+
+```bash
+node scripts/build.mjs
+```
 
 ## Controls
 
 - `WASD` — flight vector
 - `Up Arrow` or left mouse — fire blaster
 - `F` — charge and launch a heavy rocket
-- `Q` — void boost
+- `Q` or right mouse — void jump
 - `B` — build a defense station; press again while landed nearby to upgrade it
 - `R` — call the next wave early after a fast, damage-free clear to earn bonus XP
 - `Shift` — precision flight
@@ -27,6 +31,10 @@ Progress is cached locally for immediate/offline play and synchronized to Supaba
 The title screen also includes a cloud leaderboard. Each pilot contributes only their strongest run.
 
 When no recent mouse or trackpad aiming is detected, the ship automatically faces the nearest hostile within short range. Remaining stationary for too long builds a static signature that modestly accelerates hostiles and their missile locks; movement clears the pressure.
+
+## Source layout
+
+The editable source lives in `src/`. JavaScript is split into ordered game modules under `src/js/game/`, with the Supabase adapter in `src/js/services/`. Styles are grouped under `src/css/`, while `src/index.html` contains the page shell. `scripts/build.mjs` assembles these source files into the deployable `dist/` bundle; edit `src/` and rebuild instead of editing generated files directly.
 
 ## Acknowledgements
 

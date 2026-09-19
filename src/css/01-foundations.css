@@ -1,0 +1,23 @@
+/* Design tokens and global foundations. */
+@import url('https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap');
+
+:root {
+  color-scheme: dark;
+  --void: #03070c;
+  --panel: rgba(6, 17, 25, 0.86);
+  --panel-strong: rgba(7, 21, 31, 0.96);
+  --line: rgba(142, 214, 214, 0.22);
+  --line-bright: rgba(164, 239, 233, 0.48);
+  --text: #e8f8f5;
+  --muted: #8ca9aa;
+  --cyan: #6df7e8;
+  --cyan-soft: #9ef5e7;
+  --amber: #ffb35c;
+  --coral: #ff6f61;
+  --purple: #a88cff;
+  --display: 'Chakra Petch', system-ui, sans-serif;
+  --mono: 'Space Mono', ui-monospace, monospace;
+}
+
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }

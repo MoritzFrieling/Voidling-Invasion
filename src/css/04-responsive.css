@@ -1,0 +1,29 @@
+
+/* Responsive layout and reduced-motion fallbacks. */
+@media (max-width: 900px) {
+  .minimap-wrap { width: 182px; }.minimap-wrap canvas { width: 180px !important; height: 108px !important; }.map-legend { display: none; }
+  .ability-card { min-width: 132px; }.ability-card div strong { font-size: .58rem; }
+  .start-grid { grid-template-columns: 1fr; }.start-side { display: none; }.intro { max-width: 560px; }
+  .settings-grid { grid-template-columns: 1fr; gap: 28px; max-height: 70vh; overflow-y: auto; }
+  .intel-panel { grid-template-columns: 1fr; }.intel-ship { width: 190px; }.intel-copy { text-align: center; }.intel-copy .main-button { margin-inline: auto; }
+  .level-grid { grid-template-columns: 1fr; max-height: 64vh; overflow-y: auto; }.level-card { min-height: 165px; }
+  .acknowledgements { font-size: .5rem; }.acknowledgements span { display: none; }
+}
+
+@media (max-width: 650px) {
+  .topbar { grid-template-columns: 1fr auto; min-height: 66px; padding: 10px 14px; }.round-readout { display: none; }.score-readout div:first-child { display: none; }
+  .vitals { top: 76px; left: 12px; width: 255px; }.minimap-wrap { top: 76px; right: 12px; width: 142px; }.minimap-wrap canvas { width: 140px !important; height: 84px !important; }
+  .ability-dock { width: calc(100% - 20px); bottom: 10px; }.ability-card { flex: 1; min-width: 0; padding: 7px; height: 50px; }.ability-card div span { display: none; }.ability-card kbd { min-width: 28px; }
+  .upgrade-readout { display: none; }
+  .pilot-chip { min-width: 40px; width: 40px; padding: 0; }.pilot-chip span { display: none; }
+  .static-warning { right: 12px; bottom: 72px; }.wave-call { bottom: 76px; }
+  .upgrade-grid { grid-template-columns: 1fr; max-height: 58vh; overflow-y: auto; }.upgrade-choice { min-height: 130px; }.upgrade-choice .upgrade-icon { margin-bottom: 14px; }
+  .start-overlay { padding-inline: 24px; }.intro { margin: 28px 0 24px; }.menu-actions { display: grid; }.main-button, .secondary-button { width: 100%; }
+  .auth-tabs { grid-template-columns: 1fr; }.auth-tabs button { min-height: 36px; }
+}
+
+@media (orientation: portrait) and (max-width: 600px) { .rotate-notice { display: grid; } }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; }
+}
