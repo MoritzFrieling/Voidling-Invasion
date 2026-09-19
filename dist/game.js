@@ -956,7 +956,7 @@
     raider: { name: 'MARAUDER', role: 'BALANCED // ARMORED', description: 'Reliable frontline ship. Slower than a Dart, but it can absorb sustained blaster fire.', radius: 19, hp: 105, speed: 88, score: 170, xp: 16, color: '#ffb35c' },
     striker: { name: 'NEEDLE', role: 'EXTREME SPEED // FRAGILE', description: 'A tiny interceptor built entirely around speed. Its erratic lane changes make it hard to track.', radius: 10, hp: 48, speed: 178, score: 220, xp: 18, color: '#c885ff' },
     major: { name: 'SIEGEBREAKER', role: 'HEAVY HULL // MISSILES', description: 'A slow assault vessel that launches guided rockets at your ship. Keep moving.', radius: 32, hp: 390, speed: 58, score: 700, xp: 48, color: '#ff6f61', major: true },
-    interceptor: { name: 'CARRIER INTERCEPTOR', role: 'LAUNCHED // DESTRUCTIBLE', description: 'A light interceptor launched by carrier vessels. Its fragile hull can be destroyed by focused blaster fire before it reaches the gate.', radius: 10, hp: 34, speed: 164, score: 80, xp: 7, color: '#ff9f88', interceptor: true },
+    interceptor: { name: 'CARRIER INTERCEPTOR', role: 'LAUNCHED // DESTRUCTIBLE', description: 'A light interceptor launched by carrier vessels. Its fragile hull can be destroyed by focused blaster fire before it reaches the gate.', radius: 10, hp: 28, speed: 148, score: 80, xp: 7, color: '#ff9f88', interceptor: true },
     carrier: { name: 'BROOD CARRIER', role: 'SPAWNER // HEAVY HULL', description: 'A mobile hangar that launches smaller fighters along the route. Destroy it before the swarm grows.', radius: 37, hp: 520, speed: 49, score: 920, xp: 60, color: '#f071c8', major: true, carrier: true },
     sentinel: { name: 'AEGIS SENTINEL', role: 'ROCKET-BREAK SHIELD', description: 'Light blasters cannot pierce its barrier. Two heavy-rocket impacts collapse the barrier, regardless of rocket level.', radius: 29, hp: 310, shield: 0, shieldCharges: 2, speed: 62, score: 840, xp: 58, color: '#79a8ff', major: true, shielded: true },
     bossOmega: { name: 'DREADNOUGHT OMEGA', role: 'MISSILE COMMAND SHIP', description: 'The first invasion commander. It saturates the defense zone with guided warheads.', radius: 66, hp: 2850, speed: 34, score: 5400, xp: 260, color: '#ff506b', major: true, boss: true, bossSkill: 'rockets' },
@@ -1300,7 +1300,11 @@
       const distance = Math.hypot(dx, dy);
       if (distance > range) continue;
       const delta = Math.abs(angleDelta(angle, Math.atan2(dy, dx)));
-      const assistCone = enemy.interceptor ? Math.min(cone + .1, cone * 1.35) : cone;
+      const assistCone = enemy.interceptor
+        ? Math.min(cone + .1, cone * 1.35)
+        : enemy.type === 'striker'
+          ? Math.min(cone + .08, cone * 1.45)
+          : cone;
       if (delta > assistCone) continue;
       const scoreValue = delta * 900 + distance * .18 - (enemy.interceptor ? 105 : enemy.boss ? 120 : enemy.major ? 45 : 0);
       if (scoreValue < bestScore) { best = enemy; bestScore = scoreValue; }
@@ -1351,10 +1355,10 @@
   function fireBlaster(angle) {
     if (player.shotTimer > 0) return;
     player.shotTimer = 1 / player.fireRate;
-    const assistTarget = acquireMissileLock(angle) || acquireLock(angle, .22, 880);
+    const assistTarget = acquireMissileLock(angle) || acquireLock(angle, .27, 920);
     if (assistTarget) {
       const targetAngle = Math.atan2(assistTarget.y - player.y, assistTarget.x - player.x);
-      angle += angleDelta(angle, targetAngle) * .72;
+      angle += angleDelta(angle, targetAngle) * .8;
     }
     const spread = player.multiShot === 1 ? [0] : player.multiShot === 2 ? [-.028, .028] : [-.052, 0, .052];
     spread.forEach((offset) => {
@@ -1367,7 +1371,7 @@
         radius: 3.4,
         damage: player.damage,
         target: assistTarget,
-        turnRate: assistTarget?.interceptor ? 4.2 : 2.1,
+        turnRate: assistTarget?.interceptor ? 4.2 : assistTarget?.type === 'striker' ? 3.8 : 2.4,
         source: 'player',
         life: 1.15,
         dead: false,
@@ -1569,7 +1573,7 @@
       if (enemy.carrier && !enemy.dead) {
         enemy.spawnTimer -= dt;
         if (enemy.spawnTimer <= 0 && enemies.length < 90) {
-          const count = enemy.boss ? 4 : 2;
+          const count = enemy.boss ? 3 : 1;
           for (let i = 0; i < count; i += 1) {
             spawnEnemy({ type: 'interceptor', pathId: enemy.pathId, entryProgress: Math.max(0, enemy.progress - 28 - i * 12) }, enemy);
           }

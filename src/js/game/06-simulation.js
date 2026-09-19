@@ -178,7 +178,11 @@
       const distance = Math.hypot(dx, dy);
       if (distance > range) continue;
       const delta = Math.abs(angleDelta(angle, Math.atan2(dy, dx)));
-      const assistCone = enemy.interceptor ? Math.min(cone + .1, cone * 1.35) : cone;
+      const assistCone = enemy.interceptor
+        ? Math.min(cone + .1, cone * 1.35)
+        : enemy.type === 'striker'
+          ? Math.min(cone + .08, cone * 1.45)
+          : cone;
       if (delta > assistCone) continue;
       const scoreValue = delta * 900 + distance * .18 - (enemy.interceptor ? 105 : enemy.boss ? 120 : enemy.major ? 45 : 0);
       if (scoreValue < bestScore) { best = enemy; bestScore = scoreValue; }
@@ -229,10 +233,10 @@
   function fireBlaster(angle) {
     if (player.shotTimer > 0) return;
     player.shotTimer = 1 / player.fireRate;
-    const assistTarget = acquireMissileLock(angle) || acquireLock(angle, .22, 880);
+    const assistTarget = acquireMissileLock(angle) || acquireLock(angle, .27, 920);
     if (assistTarget) {
       const targetAngle = Math.atan2(assistTarget.y - player.y, assistTarget.x - player.x);
-      angle += angleDelta(angle, targetAngle) * .72;
+      angle += angleDelta(angle, targetAngle) * .8;
     }
     const spread = player.multiShot === 1 ? [0] : player.multiShot === 2 ? [-.028, .028] : [-.052, 0, .052];
     spread.forEach((offset) => {
@@ -245,7 +249,7 @@
         radius: 3.4,
         damage: player.damage,
         target: assistTarget,
-        turnRate: assistTarget?.interceptor ? 4.2 : 2.1,
+        turnRate: assistTarget?.interceptor ? 4.2 : assistTarget?.type === 'striker' ? 3.8 : 2.4,
         source: 'player',
         life: 1.15,
         dead: false,
@@ -447,7 +451,7 @@
       if (enemy.carrier && !enemy.dead) {
         enemy.spawnTimer -= dt;
         if (enemy.spawnTimer <= 0 && enemies.length < 90) {
-          const count = enemy.boss ? 4 : 2;
+          const count = enemy.boss ? 3 : 1;
           for (let i = 0; i < count; i += 1) {
             spawnEnemy({ type: 'interceptor', pathId: enemy.pathId, entryProgress: Math.max(0, enemy.progress - 28 - i * 12) }, enemy);
           }
