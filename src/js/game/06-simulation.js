@@ -116,7 +116,8 @@
       if (spawnTimer <= 0) {
         spawnEnemy(spawnQueue.shift());
         const openingBuffer = wave <= 2 ? .12 : 0;
-        spawnTimer = Math.max(.34, .78 + currentLevel * .12 - wave * .018 + openingBuffer);
+        const sectorThreeSpacing = currentLevel === 2 ? 1.05 : 1;
+        spawnTimer = Math.max(.34, (.78 + currentLevel * .12 - wave * .018 + openingBuffer) * sectorThreeSpacing);
       }
     } else if (!enemies.length && wave > 0) {
       if (!waveReady) {
@@ -409,7 +410,7 @@
           for (let i = 0; i < count; i += 1) {
             spawnEnemy({ type: 'interceptor', pathId: enemy.pathId, entryProgress: Math.max(0, enemy.progress - 28 - i * 12) }, enemy);
           }
-          enemy.spawnTimer = enemy.bossSkill === 'swarm' ? rand(2.82, 4) : rand(4.1, 5.8);
+          enemy.spawnTimer = enemy.bossSkill === 'swarm' ? rand(3.1, 4.4) : rand(4.5, 6.3);
           burst(enemy.x, enemy.y, enemy.color, 10, 110);
           showToast(enemy.boss ? 'CARRIER WING DEPLOYED' : 'BROOD CARRIER LAUNCHED INTERCEPTORS');
         }
@@ -508,11 +509,11 @@
           const interceptorAssist = station.target.interceptor;
           const lightShip = station.target.radius <= 14;
           const shotSpeed = interceptorAssist ? 790 : 720;
-          const damageMultiplier = interceptorAssist ? 2.15 : lightShip ? 1.8 : 1;
+          const damageMultiplier = interceptorAssist ? 2.8 : lightShip ? 1.8 : 1;
           bullets.push({
             x: station.x + Math.cos(station.angle) * 28, y: station.y + Math.sin(station.angle) * 28,
             vx: Math.cos(station.angle) * shotSpeed, vy: Math.sin(station.angle) * shotSpeed, radius: 3.8,
-            damage: station.damage * damageMultiplier, target: station.target, turnRate: interceptorAssist ? 6.2 : 2.3, source: 'station', life: 1.5, dead: false,
+            damage: station.damage * damageMultiplier, target: station.target, turnRate: interceptorAssist ? 7.2 : 2.3, source: 'station', life: 1.5, dead: false,
           });
           audio.tone(250 + station.level * 40, .045, 'square', .018, 90);
         }

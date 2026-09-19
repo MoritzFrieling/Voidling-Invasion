@@ -952,7 +952,7 @@
     raider: { name: 'MARAUDER', role: 'BALANCED // ARMORED', description: 'Reliable frontline ship. Slower than a Dart, but it can absorb sustained blaster fire.', radius: 19, hp: 105, speed: 88, score: 170, xp: 16, color: '#ffb35c' },
     striker: { name: 'NEEDLE', role: 'EXTREME SPEED // FRAGILE', description: 'A tiny interceptor built entirely around speed. Its erratic lane changes make it hard to track.', radius: 10, hp: 48, speed: 178, score: 220, xp: 18, color: '#c885ff' },
     major: { name: 'SIEGEBREAKER', role: 'HEAVY HULL // MISSILES', description: 'A slow assault vessel that launches guided rockets at your ship. Keep moving.', radius: 32, hp: 390, speed: 58, score: 700, xp: 48, color: '#ff6f61', major: true },
-    interceptor: { name: 'CARRIER INTERCEPTOR', role: 'LAUNCHED // DESTRUCTIBLE', description: 'A light interceptor launched by carrier vessels. Blaster hits damage its hull and can destroy it before it reaches the gate.', radius: 10, hp: 46, speed: 164, score: 80, xp: 7, color: '#ff9f88', interceptor: true },
+    interceptor: { name: 'CARRIER INTERCEPTOR', role: 'LAUNCHED // DESTRUCTIBLE', description: 'A light interceptor launched by carrier vessels. Blaster hits damage its hull and can destroy it before it reaches the gate.', radius: 10, hp: 40, speed: 164, score: 80, xp: 7, color: '#ff9f88', interceptor: true },
     carrier: { name: 'BROOD CARRIER', role: 'SPAWNER // HEAVY HULL', description: 'A mobile hangar that launches smaller fighters along the route. Destroy it before the swarm grows.', radius: 37, hp: 520, speed: 49, score: 920, xp: 60, color: '#f071c8', major: true, carrier: true },
     sentinel: { name: 'AEGIS SENTINEL', role: 'ROCKET-BREAK SHIELD', description: 'Light blasters cannot pierce its barrier. Two heavy-rocket impacts collapse the barrier, regardless of rocket level.', radius: 29, hp: 310, shield: 0, shieldCharges: 2, speed: 62, score: 840, xp: 58, color: '#79a8ff', major: true, shielded: true },
     bossOmega: { name: 'DREADNOUGHT OMEGA', role: 'MISSILE COMMAND SHIP', description: 'The first invasion commander. It saturates the defense zone with guided warheads.', radius: 66, hp: 2850, speed: 34, score: 5400, xp: 260, color: '#ff506b', major: true, boss: true, bossSkill: 'rockets' },
@@ -1052,7 +1052,7 @@
       emergencyShieldUsed: false,
       bossSkill: blueprint.bossSkill || '',
       rocketTimer: rand(1.3, 3),
-      spawnTimer: rand(3.2, 5.4),
+      spawnTimer: blueprint.carrier ? rand(3.55, 5.95) : rand(3.2, 5.4),
       shieldHitTimer: 0,
       angle: 0,
       hitFlash: 0,
@@ -1233,7 +1233,8 @@
       if (spawnTimer <= 0) {
         spawnEnemy(spawnQueue.shift());
         const openingBuffer = wave <= 2 ? .12 : 0;
-        spawnTimer = Math.max(.34, .78 + currentLevel * .12 - wave * .018 + openingBuffer);
+        const sectorThreeSpacing = currentLevel === 2 ? 1.05 : 1;
+        spawnTimer = Math.max(.34, (.78 + currentLevel * .12 - wave * .018 + openingBuffer) * sectorThreeSpacing);
       }
     } else if (!enemies.length && wave > 0) {
       if (!waveReady) {
@@ -1526,7 +1527,7 @@
           for (let i = 0; i < count; i += 1) {
             spawnEnemy({ type: 'interceptor', pathId: enemy.pathId, entryProgress: Math.max(0, enemy.progress - 28 - i * 12) }, enemy);
           }
-          enemy.spawnTimer = enemy.bossSkill === 'swarm' ? rand(2.82, 4) : rand(4.1, 5.8);
+          enemy.spawnTimer = enemy.bossSkill === 'swarm' ? rand(3.1, 4.4) : rand(4.5, 6.3);
           burst(enemy.x, enemy.y, enemy.color, 10, 110);
           showToast(enemy.boss ? 'CARRIER WING DEPLOYED' : 'BROOD CARRIER LAUNCHED INTERCEPTORS');
         }
@@ -1625,11 +1626,11 @@
           const interceptorAssist = station.target.interceptor;
           const lightShip = station.target.radius <= 14;
           const shotSpeed = interceptorAssist ? 790 : 720;
-          const damageMultiplier = interceptorAssist ? 2.15 : lightShip ? 1.8 : 1;
+          const damageMultiplier = interceptorAssist ? 2.8 : lightShip ? 1.8 : 1;
           bullets.push({
             x: station.x + Math.cos(station.angle) * 28, y: station.y + Math.sin(station.angle) * 28,
             vx: Math.cos(station.angle) * shotSpeed, vy: Math.sin(station.angle) * shotSpeed, radius: 3.8,
-            damage: station.damage * damageMultiplier, target: station.target, turnRate: interceptorAssist ? 6.2 : 2.3, source: 'station', life: 1.5, dead: false,
+            damage: station.damage * damageMultiplier, target: station.target, turnRate: interceptorAssist ? 7.2 : 2.3, source: 'station', life: 1.5, dead: false,
           });
           audio.tone(250 + station.level * 40, .045, 'square', .018, 90);
         }
