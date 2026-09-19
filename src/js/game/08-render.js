@@ -105,12 +105,36 @@
     stations.forEach(drawStation);
     enemies.forEach(drawEnemy);
     drawTargetLock();
+    drawJumpDestination();
     bullets.forEach(drawBullet);
     rockets.forEach(drawRocket);
     enemyRockets.forEach(drawEnemyRocket);
     particles.forEach(drawParticle);
     drawPlayer();
     floaters.forEach(drawFloater);
+    ctx.restore();
+  }
+
+  function drawJumpDestination() {
+    if (!Number.isFinite(player.jumpDestinationX) || !Number.isFinite(player.jumpDestinationY)) return;
+    const pulse = 1 + Math.sin(elapsed * 5) * .12;
+    const ready = player.jumpDestinationCooldown <= 0;
+    ctx.save();
+    ctx.translate(player.jumpDestinationX, player.jumpDestinationY);
+    ctx.rotate(elapsed * .8);
+    ctx.globalAlpha = ready ? .9 : .42;
+    ctx.strokeStyle = ready ? COLORS.purple : '#6f748d';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.arc(0, 0, 17 * pulse, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(-25, 0); ctx.lineTo(-10, 0); ctx.moveTo(10, 0); ctx.lineTo(25, 0);
+    ctx.moveTo(0, -25); ctx.lineTo(0, -10); ctx.moveTo(0, 10); ctx.lineTo(0, 25);
+    ctx.stroke();
+    ctx.fillStyle = COLORS.purple;
+    ctx.globalAlpha *= .35;
+    ctx.beginPath(); ctx.arc(0, 0, 7 * pulse, 0, Math.PI * 2); ctx.fill();
     ctx.restore();
   }
 
@@ -665,7 +689,9 @@
 
     const boostProgress = 1 - player.boostCooldown / player.boostMax;
     ui.boostCooldown.style.width = `${clamp(boostProgress, 0, 1) * 100}%`;
-    ui.boostState.textContent = player.boostCooldown > 0 ? `${player.boostCooldown.toFixed(1)}S` : 'READY';
+    if (player.boostCooldown > 0) ui.boostState.textContent = `${player.boostCooldown.toFixed(1)}S`;
+    else if (player.jumpDestinationCooldown > 0) ui.boostState.textContent = `JUMP READY · T ${player.jumpDestinationCooldown.toFixed(1)}S`;
+    else ui.boostState.textContent = Number.isFinite(player.jumpDestinationX) ? 'JUMP READY · T REPLACE' : 'T PLACE DEST';
     ui.boostCooldown.closest('.ability-card').classList.toggle('cooling', player.boostCooldown > 0);
 
     const docked = nearestStation(110);

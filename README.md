@@ -19,7 +19,8 @@ node scripts/build.mjs
 - `WASD` — flight vector
 - `Up Arrow` or left mouse — fire blaster
 - `F` — charge and launch a heavy rocket
-- `Q` or right mouse — void jump
+- `T` — place or replace the single void-jump destination (short placement cooldown)
+- `Q` or right mouse — teleport to the placed void-jump destination
 - `B` — build a defense station; press again while landed nearby to upgrade it
 - `R` — call the next wave early after a fast, damage-free clear to earn bonus XP
 - `Shift` — precision flight

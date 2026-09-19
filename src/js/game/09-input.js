@@ -11,7 +11,7 @@
       || event.target.isContentEditable;
     if (textEntry && !['Escape', 'Enter'].includes(event.code)) return;
     if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Space'].includes(event.code)) event.preventDefault();
-    if (event.repeat && ['KeyQ', 'KeyF', 'KeyB', 'KeyR', 'Escape', 'Enter'].includes(event.code)) return;
+    if (event.repeat && ['KeyQ', 'KeyF', 'KeyB', 'KeyR', 'KeyT', 'Escape', 'Enter'].includes(event.code)) return;
     input.keys.add(event.code);
     if (tutorialMode && tutorialIndex === 0 && ['KeyW', 'KeyA', 'KeyS', 'KeyD'].includes(event.code)) advanceTutorial();
     if (event.code === 'ArrowUp' && mode === 'playing') fireBlaster(player.angle);
@@ -19,6 +19,7 @@
     if (event.code === 'KeyF') beginRocketCharge();
     if (event.code === 'KeyB') useStation();
     if (event.code === 'KeyR') callNextWave();
+    if (event.code === 'KeyT' && mode === 'playing') placeJumpDestination();
     if (event.code === 'Escape') {
       if (ui.authOverlay.classList.contains('active')) closeAccount();
       else if (ui.leaderboardOverlay.classList.contains('active')) closeLeaderboard();

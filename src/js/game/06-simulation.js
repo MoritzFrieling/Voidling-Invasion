@@ -30,6 +30,7 @@
   function updatePlayer(dt) {
     player.shotTimer = Math.max(0, player.shotTimer - dt);
     player.boostCooldown = Math.max(0, player.boostCooldown - dt);
+    player.jumpDestinationCooldown = Math.max(0, player.jumpDestinationCooldown - dt);
     player.rocketCooldown = Math.max(0, player.rocketCooldown - dt);
     player.invulnerable = Math.max(0, player.invulnerable - dt);
     player.collisionTimer = Math.max(0, player.collisionTimer - dt);
@@ -285,23 +286,63 @@
     camera.shake = Math.max(camera.shake, 6);
   }
 
+  function placeJumpDestination() {
+    if (mode !== 'playing' || player.jumpDestinationCooldown > 0) return;
+    let targetX;
+    let targetY;
+    if (isPointerAiming()) {
+      targetX = input.aimWorldX;
+      targetY = input.aimWorldY;
+    } else {
+      let dx = 0;
+      let dy = 0;
+      if (input.keys.has('KeyA')) dx -= 1;
+      if (input.keys.has('KeyD')) dx += 1;
+      if (input.keys.has('KeyW')) dy -= 1;
+      if (input.keys.has('KeyS')) dy += 1;
+      if (!dx && !dy) { dx = Math.cos(player.angle); dy = Math.sin(player.angle); }
+      const length = Math.hypot(dx, dy) || 1;
+      targetX = player.x + (dx / length) * 410;
+      targetY = player.y + (dy / length) * 410;
+    }
+    player.jumpDestinationX = clamp(targetX, 70, WORLD.width - 70);
+    player.jumpDestinationY = clamp(targetY, 70, WORLD.height - 70);
+    player.jumpDestinationCooldown = player.jumpDestinationMax;
+    burst(player.jumpDestinationX, player.jumpDestinationY, COLORS.purple, 12, 120);
+    showToast('VOID DESTINATION SET');
+    audio.tone(340, .16, 'sine', .07, 520);
+  }
+
   function triggerBoost() {
     if (mode !== 'playing' || player.boostCooldown > 0) return;
-    let dx = 0;
-    let dy = 0;
-    if (input.keys.has('KeyA')) dx -= 1;
-    if (input.keys.has('KeyD')) dx += 1;
-    if (input.keys.has('KeyW')) dy -= 1;
-    if (input.keys.has('KeyS')) dy += 1;
-    if (!dx && !dy) { dx = Math.cos(player.angle); dy = Math.sin(player.angle); }
-    const length = Math.hypot(dx, dy) || 1;
-    dx /= length;
-    dy /= length;
     const startX = player.x;
     const startY = player.y;
-    const jumpDistance = 410;
-    player.x = clamp(player.x + dx * jumpDistance, 45, WORLD.width - 45);
-    player.y = clamp(player.y + dy * jumpDistance, 45, WORLD.height - 45);
+    let targetX = player.jumpDestinationX;
+    let targetY = player.jumpDestinationY;
+    if (!Number.isFinite(targetX) || !Number.isFinite(targetY)) {
+      let dx = 0;
+      let dy = 0;
+      if (input.keys.has('KeyA')) dx -= 1;
+      if (input.keys.has('KeyD')) dx += 1;
+      if (input.keys.has('KeyW')) dy -= 1;
+      if (input.keys.has('KeyS')) dy += 1;
+      if (!dx && !dy) { dx = Math.cos(player.angle); dy = Math.sin(player.angle); }
+      const length = Math.hypot(dx, dy) || 1;
+      targetX = clamp(player.x + (dx / length) * 410, 45, WORLD.width - 45);
+      targetY = clamp(player.y + (dy / length) * 410, 45, WORLD.height - 45);
+      showToast('JUMPED AHEAD // PRESS T TO SET A DESTINATION');
+    } else {
+      targetX = clamp(targetX, 45, WORLD.width - 45);
+      targetY = clamp(targetY, 45, WORLD.height - 45);
+    }
+    const travelX = targetX - startX;
+    const travelY = targetY - startY;
+    const travelLength = Math.hypot(travelX, travelY);
+    const dx = travelLength > 1 ? travelX / travelLength : Math.cos(player.angle);
+    const dy = travelLength > 1 ? travelY / travelLength : Math.sin(player.angle);
+    const jumpDistance = Math.max(1, travelLength);
+    player.x = targetX;
+    player.y = targetY;
     player.vx = dx * player.speed * .46;
     player.vy = dy * player.speed * .46;
     player.jumpBrake = 1.35;

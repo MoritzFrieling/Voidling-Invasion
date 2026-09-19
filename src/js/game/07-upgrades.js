@@ -143,7 +143,7 @@
     { title: 'TAKE THE CONTROLS', text: 'Use W, A, S, and D to move through the sector.' },
     { title: 'TEST THE BLASTER', text: 'Press the Up Arrow to fire forward, or hold the left mouse button to aim and fire.' },
     { title: 'SALVAGE VOID ORE', text: 'Shoot the nearby ore cluster. Destroyed resources give XP for upgrades.' },
-    { title: 'PUNCH THE VOID', text: 'Press Q or right-click to make a Void Jump. The drive recharges after every jump.' },
+    { title: 'PUNCH THE VOID', text: 'Press T to place a jump destination, then Q or right-click to teleport there. T has its own short recharge.' },
     { title: 'ARM THE WARHEAD', text: 'Press F. Heavy rockets charge briefly, then deal large blast damage.' },
     { title: 'DEFEND THE GATE', text: 'Enemies follow the glowing corridor. Stop them before the Earth Gate loses every shield.' },
   ];

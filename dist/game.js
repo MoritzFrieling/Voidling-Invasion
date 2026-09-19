@@ -374,6 +374,10 @@
       xpNext: 60,
       boostCooldown: 0,
       boostMax: 4.8,
+      jumpDestinationX: null,
+      jumpDestinationY: null,
+      jumpDestinationCooldown: 0,
+      jumpDestinationMax: 1.6,
       jumpBrake: 0,
       jumpFlash: 0,
       rocketCooldown: 0,
@@ -952,7 +956,7 @@
     raider: { name: 'MARAUDER', role: 'BALANCED // ARMORED', description: 'Reliable frontline ship. Slower than a Dart, but it can absorb sustained blaster fire.', radius: 19, hp: 105, speed: 88, score: 170, xp: 16, color: '#ffb35c' },
     striker: { name: 'NEEDLE', role: 'EXTREME SPEED // FRAGILE', description: 'A tiny interceptor built entirely around speed. Its erratic lane changes make it hard to track.', radius: 10, hp: 48, speed: 178, score: 220, xp: 18, color: '#c885ff' },
     major: { name: 'SIEGEBREAKER', role: 'HEAVY HULL // MISSILES', description: 'A slow assault vessel that launches guided rockets at your ship. Keep moving.', radius: 32, hp: 390, speed: 58, score: 700, xp: 48, color: '#ff6f61', major: true },
-    interceptor: { name: 'CARRIER INTERCEPTOR', role: 'LAUNCHED // DESTRUCTIBLE', description: 'A light interceptor launched by carrier vessels. Blaster hits damage its hull and can destroy it before it reaches the gate.', radius: 10, hp: 40, speed: 164, score: 80, xp: 7, color: '#ff9f88', interceptor: true },
+    interceptor: { name: 'CARRIER INTERCEPTOR', role: 'LAUNCHED // DESTRUCTIBLE', description: 'A light interceptor launched by carrier vessels. Its fragile hull can be destroyed by focused blaster fire before it reaches the gate.', radius: 10, hp: 34, speed: 164, score: 80, xp: 7, color: '#ff9f88', interceptor: true },
     carrier: { name: 'BROOD CARRIER', role: 'SPAWNER // HEAVY HULL', description: 'A mobile hangar that launches smaller fighters along the route. Destroy it before the swarm grows.', radius: 37, hp: 520, speed: 49, score: 920, xp: 60, color: '#f071c8', major: true, carrier: true },
     sentinel: { name: 'AEGIS SENTINEL', role: 'ROCKET-BREAK SHIELD', description: 'Light blasters cannot pierce its barrier. Two heavy-rocket impacts collapse the barrier, regardless of rocket level.', radius: 29, hp: 310, shield: 0, shieldCharges: 2, speed: 62, score: 840, xp: 58, color: '#79a8ff', major: true, shielded: true },
     bossOmega: { name: 'DREADNOUGHT OMEGA', role: 'MISSILE COMMAND SHIP', description: 'The first invasion commander. It saturates the defense zone with guided warheads.', radius: 66, hp: 2850, speed: 34, score: 5400, xp: 260, color: '#ff506b', major: true, boss: true, bossSkill: 'rockets' },
@@ -1148,6 +1152,7 @@
   function updatePlayer(dt) {
     player.shotTimer = Math.max(0, player.shotTimer - dt);
     player.boostCooldown = Math.max(0, player.boostCooldown - dt);
+    player.jumpDestinationCooldown = Math.max(0, player.jumpDestinationCooldown - dt);
     player.rocketCooldown = Math.max(0, player.rocketCooldown - dt);
     player.invulnerable = Math.max(0, player.invulnerable - dt);
     player.collisionTimer = Math.max(0, player.collisionTimer - dt);
@@ -1403,23 +1408,63 @@
     camera.shake = Math.max(camera.shake, 6);
   }
 
+  function placeJumpDestination() {
+    if (mode !== 'playing' || player.jumpDestinationCooldown > 0) return;
+    let targetX;
+    let targetY;
+    if (isPointerAiming()) {
+      targetX = input.aimWorldX;
+      targetY = input.aimWorldY;
+    } else {
+      let dx = 0;
+      let dy = 0;
+      if (input.keys.has('KeyA')) dx -= 1;
+      if (input.keys.has('KeyD')) dx += 1;
+      if (input.keys.has('KeyW')) dy -= 1;
+      if (input.keys.has('KeyS')) dy += 1;
+      if (!dx && !dy) { dx = Math.cos(player.angle); dy = Math.sin(player.angle); }
+      const length = Math.hypot(dx, dy) || 1;
+      targetX = player.x + (dx / length) * 410;
+      targetY = player.y + (dy / length) * 410;
+    }
+    player.jumpDestinationX = clamp(targetX, 70, WORLD.width - 70);
+    player.jumpDestinationY = clamp(targetY, 70, WORLD.height - 70);
+    player.jumpDestinationCooldown = player.jumpDestinationMax;
+    burst(player.jumpDestinationX, player.jumpDestinationY, COLORS.purple, 12, 120);
+    showToast('VOID DESTINATION SET');
+    audio.tone(340, .16, 'sine', .07, 520);
+  }
+
   function triggerBoost() {
     if (mode !== 'playing' || player.boostCooldown > 0) return;
-    let dx = 0;
-    let dy = 0;
-    if (input.keys.has('KeyA')) dx -= 1;
-    if (input.keys.has('KeyD')) dx += 1;
-    if (input.keys.has('KeyW')) dy -= 1;
-    if (input.keys.has('KeyS')) dy += 1;
-    if (!dx && !dy) { dx = Math.cos(player.angle); dy = Math.sin(player.angle); }
-    const length = Math.hypot(dx, dy) || 1;
-    dx /= length;
-    dy /= length;
     const startX = player.x;
     const startY = player.y;
-    const jumpDistance = 410;
-    player.x = clamp(player.x + dx * jumpDistance, 45, WORLD.width - 45);
-    player.y = clamp(player.y + dy * jumpDistance, 45, WORLD.height - 45);
+    let targetX = player.jumpDestinationX;
+    let targetY = player.jumpDestinationY;
+    if (!Number.isFinite(targetX) || !Number.isFinite(targetY)) {
+      let dx = 0;
+      let dy = 0;
+      if (input.keys.has('KeyA')) dx -= 1;
+      if (input.keys.has('KeyD')) dx += 1;
+      if (input.keys.has('KeyW')) dy -= 1;
+      if (input.keys.has('KeyS')) dy += 1;
+      if (!dx && !dy) { dx = Math.cos(player.angle); dy = Math.sin(player.angle); }
+      const length = Math.hypot(dx, dy) || 1;
+      targetX = clamp(player.x + (dx / length) * 410, 45, WORLD.width - 45);
+      targetY = clamp(player.y + (dy / length) * 410, 45, WORLD.height - 45);
+      showToast('JUMPED AHEAD // PRESS T TO SET A DESTINATION');
+    } else {
+      targetX = clamp(targetX, 45, WORLD.width - 45);
+      targetY = clamp(targetY, 45, WORLD.height - 45);
+    }
+    const travelX = targetX - startX;
+    const travelY = targetY - startY;
+    const travelLength = Math.hypot(travelX, travelY);
+    const dx = travelLength > 1 ? travelX / travelLength : Math.cos(player.angle);
+    const dy = travelLength > 1 ? travelY / travelLength : Math.sin(player.angle);
+    const jumpDistance = Math.max(1, travelLength);
+    player.x = targetX;
+    player.y = targetY;
     player.vx = dx * player.speed * .46;
     player.vy = dy * player.speed * .46;
     player.jumpBrake = 1.35;
@@ -2076,7 +2121,7 @@
     { title: 'TAKE THE CONTROLS', text: 'Use W, A, S, and D to move through the sector.' },
     { title: 'TEST THE BLASTER', text: 'Press the Up Arrow to fire forward, or hold the left mouse button to aim and fire.' },
     { title: 'SALVAGE VOID ORE', text: 'Shoot the nearby ore cluster. Destroyed resources give XP for upgrades.' },
-    { title: 'PUNCH THE VOID', text: 'Press Q or right-click to make a Void Jump. The drive recharges after every jump.' },
+    { title: 'PUNCH THE VOID', text: 'Press T to place a jump destination, then Q or right-click to teleport there. T has its own short recharge.' },
     { title: 'ARM THE WARHEAD', text: 'Press F. Heavy rockets charge briefly, then deal large blast damage.' },
     { title: 'DEFEND THE GATE', text: 'Enemies follow the glowing corridor. Stop them before the Earth Gate loses every shield.' },
   ];
@@ -2221,12 +2266,36 @@
     stations.forEach(drawStation);
     enemies.forEach(drawEnemy);
     drawTargetLock();
+    drawJumpDestination();
     bullets.forEach(drawBullet);
     rockets.forEach(drawRocket);
     enemyRockets.forEach(drawEnemyRocket);
     particles.forEach(drawParticle);
     drawPlayer();
     floaters.forEach(drawFloater);
+    ctx.restore();
+  }
+
+  function drawJumpDestination() {
+    if (!Number.isFinite(player.jumpDestinationX) || !Number.isFinite(player.jumpDestinationY)) return;
+    const pulse = 1 + Math.sin(elapsed * 5) * .12;
+    const ready = player.jumpDestinationCooldown <= 0;
+    ctx.save();
+    ctx.translate(player.jumpDestinationX, player.jumpDestinationY);
+    ctx.rotate(elapsed * .8);
+    ctx.globalAlpha = ready ? .9 : .42;
+    ctx.strokeStyle = ready ? COLORS.purple : '#6f748d';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.arc(0, 0, 17 * pulse, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(-25, 0); ctx.lineTo(-10, 0); ctx.moveTo(10, 0); ctx.lineTo(25, 0);
+    ctx.moveTo(0, -25); ctx.lineTo(0, -10); ctx.moveTo(0, 10); ctx.lineTo(0, 25);
+    ctx.stroke();
+    ctx.fillStyle = COLORS.purple;
+    ctx.globalAlpha *= .35;
+    ctx.beginPath(); ctx.arc(0, 0, 7 * pulse, 0, Math.PI * 2); ctx.fill();
     ctx.restore();
   }
 
@@ -2781,7 +2850,9 @@
 
     const boostProgress = 1 - player.boostCooldown / player.boostMax;
     ui.boostCooldown.style.width = `${clamp(boostProgress, 0, 1) * 100}%`;
-    ui.boostState.textContent = player.boostCooldown > 0 ? `${player.boostCooldown.toFixed(1)}S` : 'READY';
+    if (player.boostCooldown > 0) ui.boostState.textContent = `${player.boostCooldown.toFixed(1)}S`;
+    else if (player.jumpDestinationCooldown > 0) ui.boostState.textContent = `JUMP READY · T ${player.jumpDestinationCooldown.toFixed(1)}S`;
+    else ui.boostState.textContent = Number.isFinite(player.jumpDestinationX) ? 'JUMP READY · T REPLACE' : 'T PLACE DEST';
     ui.boostCooldown.closest('.ability-card').classList.toggle('cooling', player.boostCooldown > 0);
 
     const docked = nearestStation(110);
@@ -2807,7 +2878,7 @@
       || event.target.isContentEditable;
     if (textEntry && !['Escape', 'Enter'].includes(event.code)) return;
     if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Space'].includes(event.code)) event.preventDefault();
-    if (event.repeat && ['KeyQ', 'KeyF', 'KeyB', 'KeyR', 'Escape', 'Enter'].includes(event.code)) return;
+    if (event.repeat && ['KeyQ', 'KeyF', 'KeyB', 'KeyR', 'KeyT', 'Escape', 'Enter'].includes(event.code)) return;
     input.keys.add(event.code);
     if (tutorialMode && tutorialIndex === 0 && ['KeyW', 'KeyA', 'KeyS', 'KeyD'].includes(event.code)) advanceTutorial();
     if (event.code === 'ArrowUp' && mode === 'playing') fireBlaster(player.angle);
@@ -2815,6 +2886,7 @@
     if (event.code === 'KeyF') beginRocketCharge();
     if (event.code === 'KeyB') useStation();
     if (event.code === 'KeyR') callNextWave();
+    if (event.code === 'KeyT' && mode === 'playing') placeJumpDestination();
     if (event.code === 'Escape') {
       if (ui.authOverlay.classList.contains('active')) closeAccount();
       else if (ui.leaderboardOverlay.classList.contains('active')) closeLeaderboard();
