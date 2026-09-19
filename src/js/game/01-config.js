@@ -86,6 +86,6 @@
     'staticWarning', 'waveCallButton',
     'authOverlay', 'authTitle', 'authCopy', 'authTabs', 'authForm', 'authUsername', 'authPassword',
     'authPasswordConfirm', 'authPasswordConfirmLabel', 'authHint', 'authMessage', 'authSubmit',
-    'pilotSummary', 'pilotType', 'pilotName', 'pilotSyncState', 'protectProgressButton', 'pilotButton',
-    'pilotButtonText', 'leaderboardOverlay', 'leaderboardList',
+    'pilotSummary', 'pilotType', 'pilotName', 'pilotSyncState', 'protectProgressButton', 'adminButton',
+    'publicUsername', 'publicUsernameHint', 'leaderboardOverlay', 'leaderboardList',
   ].forEach((id) => { ui[id] = document.getElementById(id); });

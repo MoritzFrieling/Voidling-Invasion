@@ -90,8 +90,7 @@
     document.getElementById('nextSectorButton').addEventListener('click', enterNextSector);
     document.getElementById('stationButton').addEventListener('click', useStation);
     document.getElementById('waveCallButton').addEventListener('click', callNextWave);
-    document.getElementById('pilotButton').addEventListener('click', () => openAccount());
-    document.getElementById('accountButton').addEventListener('click', () => openAccount());
+    document.getElementById('adminButton').addEventListener('click', () => openAccount(isAdminPilot() ? 'summary' : 'signin', true));
     document.getElementById('leaderboardButton').addEventListener('click', openLeaderboard);
     document.getElementById('closeAuth').addEventListener('click', closeAccount);
     document.getElementById('closeLeaderboard').addEventListener('click', closeLeaderboard);

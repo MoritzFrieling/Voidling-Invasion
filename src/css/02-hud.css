@@ -82,6 +82,8 @@ button { color: inherit; }
 .pilot-chip:hover { border-color: var(--cyan); color: var(--text); }
 .icon-button { pointer-events: auto; width: 40px; height: 40px; border: 1px solid var(--line-bright); border-radius: 50%; background: rgba(8, 22, 30, .72); cursor: pointer; }
 .icon-button:hover { border-color: var(--cyan); box-shadow: 0 0 18px rgba(109, 247, 232, .14); }
+.admin-button { color: var(--muted); font-size: 1.2rem; opacity: .72; }
+.admin-button.connected { color: var(--amber); border-color: rgba(255,179,92,.55); opacity: 1; }
 
 .vitals {
   position: absolute;

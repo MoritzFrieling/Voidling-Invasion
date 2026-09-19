@@ -188,11 +188,11 @@
 
   function updatePilotUi() {
     const connected = Boolean(activePilot);
-    ui.pilotButton.classList.toggle('connected', connected && !activePilot.isGuest);
-    ui.pilotButton.classList.toggle('guest', connected && activePilot.isGuest);
-    ui.pilotButtonText.textContent = connected ? activePilot.username : 'PILOT';
+    ui.adminButton.classList.toggle('connected', connected && isAdminPilot());
+    ui.adminButton.title = connected && isAdminPilot() ? `Admin: ${activePilot.username}` : 'Admin access';
+    if (activePilot?.isGuest && ui.publicUsername && !ui.publicUsername.value) ui.publicUsername.value = activePilot.username;
     if (!connected) return;
-    ui.pilotType.textContent = activePilot.isGuest ? 'GUEST PILOT · DEVICE SESSION' : 'CLOUD PILOT · PERMANENT ACCOUNT';
+    ui.pilotType.textContent = isAdminPilot() ? 'ADMIN PILOT · HIGHSCORE DISABLED' : activePilot.isGuest ? 'GUEST PILOT · DEVICE SESSION' : 'CLOUD PILOT · PERMANENT ACCOUNT';
     ui.pilotName.textContent = activePilot.username;
     ui.protectProgressButton.hidden = !activePilot.isGuest;
   }

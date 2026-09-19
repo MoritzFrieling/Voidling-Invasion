@@ -27,7 +27,7 @@ node scripts/build.mjs
 - `Escape` — pause
 - `L` — open Level Select from the title screen
 
-Progress is cached locally for immediate/offline play and synchronized to Supabase after the player signs in or starts a guest session. Password accounts can restore progress on another device; anonymous guest sessions can later be protected with a password. Settings remain local to each browser.
+Players start immediately with an optional callsign; leaving it blank generates one automatically. Anonymous guest sessions keep progress on the device and synchronize to Supabase when available, without requiring an account or password. The small keyhole in the top-right opens the password-only administrator access used for testing; administrator runs never submit highscores. Settings remain local to each browser.
 
 The title screen also includes a cloud leaderboard. Each pilot contributes only their strongest run.
 

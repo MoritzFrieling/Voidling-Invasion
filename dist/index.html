@@ -37,9 +37,7 @@
       <div class="score-readout">
         <div><span>SCORE</span><strong id="scoreText">000000</strong></div>
         <div><span>BEST</span><strong id="bestText">000000</strong></div>
-        <button class="pilot-chip" id="pilotButton" type="button" aria-label="Open pilot account">
-          <i></i><span id="pilotButtonText">PILOT</span>
-        </button>
+        <button class="icon-button admin-button" id="adminButton" type="button" aria-label="Open admin access" title="Admin access">⚿</button>
         <button class="icon-button" id="pauseButton" type="button" aria-label="Pause game">Ⅱ</button>
       </div>
     </header>
@@ -121,8 +119,16 @@
           <h1 id="gameTitle">VOIDLINE<br /><em>INVASION</em></h1>
           <p class="intro">Three sectors stand between the invasion fleet and Earth. Intercept every formation, salvage
             void ore, and protect earth's last stronghold.</p>
-          <div class="menu-actions">
+          <div class="menu-actions primary-actions">
             <button class="main-button" id="startButton" type="button"><span>BEGIN DEFENSE</span><b>ENTER</b></button>
+          </div>
+          <div class="callsign-entry">
+            <label for="publicUsername">CHOOSE USERNAME <small>OPTIONAL</small></label>
+            <input id="publicUsername" type="text" minlength="3" maxlength="20" pattern="[A-Za-z0-9_]+"
+              autocomplete="nickname" placeholder="AUTO-GENERATED IF BLANK" spellcheck="false" />
+            <small id="publicUsernameHint">Your callsign is used for saves and the highscore board.</small>
+          </div>
+          <div class="menu-actions secondary-actions">
             <button class="secondary-button" id="tutorialButton" type="button"><span>TRAINING
                 RUN</span><b>T</b></button>
             <button class="secondary-button level-select-button" id="levelSelectButton" type="button"><span>LEVEL
@@ -152,7 +158,7 @@
           <div class="utility-actions">
             <button id="controlsButton" type="button">CONTROLS</button>
             <button id="settingsButton" type="button">SETTINGS</button>
-            <button id="accountButton" type="button">PILOT ACCOUNT</button>
+            <span class="admin-note">ADMIN ACCESS · TOP RIGHT</span>
           </div>
         </div>
       </div>
@@ -286,11 +292,10 @@
 
     <section class="overlay panel-overlay" id="authOverlay" aria-labelledby="authTitle">
       <div class="panel auth-panel">
-        <button class="close-button" id="closeAuth" type="button" aria-label="Close pilot account">×</button>
-        <p class="kicker">VOIDLINE PILOT NETWORK</p>
-        <h2 id="authTitle">PILOT ACCESS</h2>
-        <p class="panel-copy" id="authCopy">Sign in for permanent cloud progress, create a pilot account, or enter
-          immediately as a guest.</p>
+        <button class="close-button" id="closeAuth" type="button" aria-label="Close admin access">×</button>
+        <p class="kicker">VOIDLINE ADMIN CONSOLE</p>
+        <h2 id="authTitle">ADMIN ACCESS</h2>
+        <p class="panel-copy" id="authCopy">Administrator access is reserved for testing and level verification.</p>
 
         <div class="auth-tabs" id="authTabs" role="tablist" aria-label="Pilot access options">
           <button class="active" id="showSignIn" type="button" role="tab">SIGN IN</button>

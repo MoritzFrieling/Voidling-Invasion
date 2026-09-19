@@ -1,8 +1,10 @@
   // Account, leaderboard, settings, and level-select actions.
+  let adminLoginOnly = false;
+
   function setAuthMode(nextMode) {
     authMode = nextMode;
     const signedIn = Boolean(activePilot) && nextMode === 'summary';
-    ui.authTabs.hidden = signedIn || nextMode === 'upgrade';
+    ui.authTabs.hidden = signedIn || nextMode === 'upgrade' || adminLoginOnly;
     ui.authForm.hidden = signedIn;
     ui.pilotSummary.hidden = !signedIn;
     ui.authMessage.textContent = '';
@@ -20,7 +22,13 @@
     ui.authPasswordConfirm.required = ['signup', 'upgrade'].includes(nextMode);
     document.querySelectorAll('#authTabs button').forEach((button) => button.classList.remove('active'));
 
-    if (nextMode === 'signin') {
+    if (nextMode === 'signin' && adminLoginOnly) {
+      ui.authTitle.textContent = 'ADMIN ACCESS';
+      ui.authCopy.textContent = 'Sign in with the private administrator callsign to unlock every sector and test-only access.';
+      ui.authHint.textContent = 'Administrator runs never submit a highscore.';
+      ui.authSubmit.querySelector('span').textContent = 'SIGN IN AS ADMIN';
+      ui.authPassword.autocomplete = 'current-password';
+    } else if (nextMode === 'signin') {
       document.getElementById('showSignIn').classList.add('active');
       ui.authTitle.textContent = 'WELCOME BACK';
       ui.authCopy.textContent = 'Sign in with your pilot username and password to restore cloud progress.';
@@ -46,6 +54,9 @@
       ui.authHint.textContent = 'Your guest progress will be transferred to the new permanent account.';
       ui.authSubmit.querySelector('span').textContent = 'CREATE PERMANENT ACCOUNT';
       ui.authPassword.autocomplete = 'new-password';
+    } else if (adminLoginOnly) {
+      ui.authTitle.textContent = 'ADMIN CONSOLE';
+      ui.authCopy.textContent = 'Administrator tools are active. This pilot can access every sector, but runs are excluded from highscores.';
     } else {
       ui.authTitle.textContent = 'PILOT ACCOUNT';
       ui.authCopy.textContent = activePilot?.isGuest
@@ -54,7 +65,8 @@
     }
   }
 
-  function openAccount(requestedMode = null) {
+  function openAccount(requestedMode = null, adminOnly = false) {
+    adminLoginOnly = adminOnly;
     accountReturnMode = mode;
     if (mode === 'playing') mode = 'paused';
     hideOverlays();
@@ -66,6 +78,7 @@
 
   function closeAccount() {
     ui.authOverlay.classList.remove('active');
+    adminLoginOnly = false;
     if (['playing', 'paused'].includes(accountReturnMode)) {
       mode = 'paused';
       ui.pauseOverlay.classList.add('active');
@@ -80,8 +93,35 @@
       action();
       return;
     }
-    pendingPilotAction = action;
-    openAccount('signin');
+    if (cloudBusy) return;
+    const requested = String(ui.publicUsername?.value || '').trim();
+    const username = requested || `pilot_${Math.random().toString(36).slice(2, 10)}`;
+    ui.publicUsername.value = username;
+    if (!window.VoidlineCloud) {
+      activatePilot({ id: null, username, isGuest: true, isAdmin: false }).then(action);
+      return;
+    }
+    cloudBusy = true;
+    ui.publicUsername.disabled = true;
+    ui.publicUsernameHint.textContent = `CONNECTING AS ${username.toUpperCase()}…`;
+    Promise.resolve()
+      .then(() => window.VoidlineCloud.init())
+      .then((pilot) => pilot || window.VoidlineCloud.playAsGuest(username))
+      .then((pilot) => activatePilot(pilot))
+      .then(() => action())
+      .catch((error) => {
+        const message = error.message || 'Guest flight could not be started.';
+        if (/unreachable|network|setup|required|connecting|loaded|anonymous sign-ins/i.test(message)) {
+          activatePilot({ id: null, username, isGuest: true, isAdmin: false }).then(action);
+          ui.publicUsernameHint.textContent = 'LOCAL FLIGHT · CLOUD SAVE WILL RESUME WHEN AVAILABLE';
+        } else {
+          ui.publicUsernameHint.textContent = message;
+        }
+      })
+      .finally(() => {
+        cloudBusy = false;
+        ui.publicUsername.disabled = false;
+      });
   }
 
   async function submitAuthForm(event) {
@@ -203,7 +243,7 @@
         if (action) action();
       }
     } catch (error) {
-      ui.pilotButtonText.textContent = 'SETUP';
+      ui.publicUsernameHint.textContent = 'CLOUD SAVE UNAVAILABLE · LOCAL FLIGHT READY';
       ui.pilotSyncState.textContent = 'CLOUD SETUP REQUIRED';
       console.warn('Voidline pilot network:', error);
     }
