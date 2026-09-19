@@ -227,13 +227,16 @@ button { border: 0; }
 .primary-actions { margin-bottom: 12px; }
 .primary-actions .main-button { width: min(390px, 100%); }
 .secondary-actions { margin-top: 17px; }
-.callsign-entry { display: grid; gap: 7px; width: min(390px, 100%); }
+.start-admin-button { position: absolute; z-index: 3; top: 24px; right: 24px; color: var(--muted); opacity: .72; }
+.start-admin-button:hover { opacity: 1; }
+.callsign-entry { display: flex; flex-direction: column; gap: 7px; width: min(270px, 100%); }
 .callsign-entry label { color: var(--muted); font: 700 .6rem var(--mono); letter-spacing: .14em; }
 .callsign-entry label small { color: #668181; font-size: .52rem; letter-spacing: .08em; }
-.callsign-entry input { width: 100%; height: 45px; box-sizing: border-box; padding: 0 12px; outline: none; border: 1px solid var(--line); border-left: 2px solid var(--line-bright); background: rgba(1,8,13,.72); color: var(--text); font: 700 .75rem var(--mono); letter-spacing: .08em; user-select: text; }
+.callsign-entry input { width: 100%; height: 40px; box-sizing: border-box; padding: 0 12px; outline: none; border: 1px solid var(--line); border-left: 2px solid var(--line-bright); background: rgba(1,8,13,.72); color: var(--text); font: 700 .7rem var(--mono); letter-spacing: .06em; user-select: text; }
 .callsign-entry input:focus { border-color: var(--cyan); box-shadow: 0 0 18px rgba(109,247,232,.08); }
 .callsign-entry input:disabled { opacity: .58; }
-.callsign-entry > small { color: #779291; font-size: .68rem; line-height: 1.35; }
+.callsign-entry > small { display: none; color: var(--amber); font-size: .63rem; line-height: 1.35; }
+.callsign-entry > small.active { display: block; }
 
 .start-side { position: relative; min-height: 430px; display: grid; align-content: end; }
 .sector-graphic { position: absolute; top: -10px; left: 50%; width: 300px; height: 300px; translate: -50% 0; border-radius: 50%; background: radial-gradient(circle, rgba(109,247,232,.06), transparent 62%); }
@@ -248,10 +251,9 @@ button { border: 0; }
 .briefing-card > .eyebrow { display: block; margin-bottom: 15px; }
 .brief-row { display: grid; grid-template-columns: 108px 1fr; align-items: center; gap: 14px; min-height: 38px; border-top: 1px solid rgba(142,214,214,.1); font-size: .82rem; color: #b6ccca; }
 .brief-row kbd { justify-self: start; min-width: 76px; padding: 4px 7px; }
-.utility-actions { display: grid; grid-template-columns: repeat(3, 1fr); gap: 7px; margin-top: 8px; }
+.utility-actions { display: grid; grid-template-columns: repeat(2, 1fr); gap: 7px; margin-top: 8px; }
 .utility-actions button { height: 40px; border: 1px solid var(--line); background: rgba(4,15,22,.82); color: var(--muted); font-size: .68rem; letter-spacing: .12em; cursor: pointer; }
 .utility-actions button:hover { color: var(--cyan); border-color: var(--line-bright); }
-.utility-actions .admin-note { display: grid; place-items: center; min-height: 40px; color: #627b7c; font: 700 .55rem var(--mono); letter-spacing: .08em; text-align: center; }
 .acknowledgements { position: absolute; z-index: 2; left: 50%; bottom: 13px; translate: -50% 0; width: min(900px, calc(100% - 36px)); color: #627b7c; text-align: center; font: 600 .55rem var(--mono); letter-spacing: .06em; }
 .acknowledgements span { color: #7e9998; letter-spacing: .16em; }
 .acknowledgements p { display: inline; margin: 0 0 0 9px; }

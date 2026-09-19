@@ -113,6 +113,7 @@
     <div class="status-toast" id="toast" role="status" aria-live="polite"></div>
 
     <section class="overlay start-overlay active" id="startOverlay" aria-labelledby="gameTitle">
+      <button class="icon-button start-admin-button" id="menuAdminButton" type="button" aria-label="Open admin access" title="Admin access">⚿</button>
       <div class="start-grid">
         <div class="start-main">
           <p class="kicker">EARTH DEFENSE NETWORK - FRONTIER LUNA</p>
@@ -125,8 +126,8 @@
           <div class="callsign-entry">
             <label for="publicUsername">CHOOSE USERNAME <small>OPTIONAL</small></label>
             <input id="publicUsername" type="text" minlength="3" maxlength="20" pattern="[A-Za-z0-9_]+"
-              autocomplete="nickname" placeholder="AUTO-GENERATED IF BLANK" spellcheck="false" />
-            <small id="publicUsernameHint">Your callsign is used for saves and the highscore board.</small>
+              autocomplete="nickname" placeholder="OPTIONAL CALLSIGN" title="3–20 letters, numbers, or underscores. Used for saves and the highscore board." spellcheck="false" />
+            <small id="publicUsernameHint" aria-live="polite"></small>
           </div>
           <div class="menu-actions secondary-actions">
             <button class="secondary-button" id="tutorialButton" type="button"><span>TRAINING
@@ -158,7 +159,6 @@
           <div class="utility-actions">
             <button id="controlsButton" type="button">CONTROLS</button>
             <button id="settingsButton" type="button">SETTINGS</button>
-            <span class="admin-note">ADMIN ACCESS · TOP RIGHT</span>
           </div>
         </div>
       </div>

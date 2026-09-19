@@ -104,18 +104,25 @@
     cloudBusy = true;
     ui.publicUsername.disabled = true;
     ui.publicUsernameHint.textContent = `CONNECTING AS ${username.toUpperCase()}…`;
+    ui.publicUsernameHint.classList.add('active');
     Promise.resolve()
       .then(() => window.VoidlineCloud.init())
       .then((pilot) => pilot || window.VoidlineCloud.playAsGuest(username))
       .then((pilot) => activatePilot(pilot))
-      .then(() => action())
+      .then(() => {
+        ui.publicUsernameHint.textContent = '';
+        ui.publicUsernameHint.classList.remove('active');
+        action();
+      })
       .catch((error) => {
         const message = error.message || 'Guest flight could not be started.';
         if (/unreachable|network|setup|required|connecting|loaded|anonymous sign-ins/i.test(message)) {
           activatePilot({ id: null, username, isGuest: true, isAdmin: false }).then(action);
           ui.publicUsernameHint.textContent = 'LOCAL FLIGHT · CLOUD SAVE WILL RESUME WHEN AVAILABLE';
+          ui.publicUsernameHint.classList.add('active');
         } else {
           ui.publicUsernameHint.textContent = message;
+          ui.publicUsernameHint.classList.add('active');
         }
       })
       .finally(() => {
@@ -244,6 +251,7 @@
       }
     } catch (error) {
       ui.publicUsernameHint.textContent = 'CLOUD SAVE UNAVAILABLE · LOCAL FLIGHT READY';
+      ui.publicUsernameHint.classList.add('active');
       ui.pilotSyncState.textContent = 'CLOUD SETUP REQUIRED';
       console.warn('Voidline pilot network:', error);
     }

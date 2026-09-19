@@ -87,5 +87,5 @@
     'authOverlay', 'authTitle', 'authCopy', 'authTabs', 'authForm', 'authUsername', 'authPassword',
     'authPasswordConfirm', 'authPasswordConfirmLabel', 'authHint', 'authMessage', 'authSubmit',
     'pilotSummary', 'pilotType', 'pilotName', 'pilotSyncState', 'protectProgressButton', 'adminButton',
-    'publicUsername', 'publicUsernameHint', 'leaderboardOverlay', 'leaderboardList',
+    'publicUsername', 'publicUsernameHint', 'menuAdminButton', 'leaderboardOverlay', 'leaderboardList',
   ].forEach((id) => { ui[id] = document.getElementById(id); });

@@ -90,7 +90,7 @@
     'authOverlay', 'authTitle', 'authCopy', 'authTabs', 'authForm', 'authUsername', 'authPassword',
     'authPasswordConfirm', 'authPasswordConfirmLabel', 'authHint', 'authMessage', 'authSubmit',
     'pilotSummary', 'pilotType', 'pilotName', 'pilotSyncState', 'protectProgressButton', 'adminButton',
-    'publicUsername', 'publicUsernameHint', 'leaderboardOverlay', 'leaderboardList',
+    'publicUsername', 'publicUsernameHint', 'menuAdminButton', 'leaderboardOverlay', 'leaderboardList',
   ].forEach((id) => { ui[id] = document.getElementById(id); });
   // Runtime state, local/cloud persistence, and audio services.
   const settings = {
@@ -542,8 +542,10 @@
 
   function updatePilotUi() {
     const connected = Boolean(activePilot);
-    ui.adminButton.classList.toggle('connected', connected && isAdminPilot());
-    ui.adminButton.title = connected && isAdminPilot() ? `Admin: ${activePilot.username}` : 'Admin access';
+    [ui.adminButton, ui.menuAdminButton].forEach((button) => {
+      button.classList.toggle('connected', connected && isAdminPilot());
+      button.title = connected && isAdminPilot() ? `Admin: ${activePilot.username}` : 'Admin access';
+    });
     if (activePilot?.isGuest && ui.publicUsername && !ui.publicUsername.value) ui.publicUsername.value = activePilot.username;
     if (!connected) return;
     ui.pilotType.textContent = isAdminPilot() ? 'ADMIN PILOT · HIGHSCORE DISABLED' : activePilot.isGuest ? 'GUEST PILOT · DEVICE SESSION' : 'CLOUD PILOT · PERMANENT ACCOUNT';
@@ -716,18 +718,25 @@
     cloudBusy = true;
     ui.publicUsername.disabled = true;
     ui.publicUsernameHint.textContent = `CONNECTING AS ${username.toUpperCase()}…`;
+    ui.publicUsernameHint.classList.add('active');
     Promise.resolve()
       .then(() => window.VoidlineCloud.init())
       .then((pilot) => pilot || window.VoidlineCloud.playAsGuest(username))
       .then((pilot) => activatePilot(pilot))
-      .then(() => action())
+      .then(() => {
+        ui.publicUsernameHint.textContent = '';
+        ui.publicUsernameHint.classList.remove('active');
+        action();
+      })
       .catch((error) => {
         const message = error.message || 'Guest flight could not be started.';
         if (/unreachable|network|setup|required|connecting|loaded|anonymous sign-ins/i.test(message)) {
           activatePilot({ id: null, username, isGuest: true, isAdmin: false }).then(action);
           ui.publicUsernameHint.textContent = 'LOCAL FLIGHT · CLOUD SAVE WILL RESUME WHEN AVAILABLE';
+          ui.publicUsernameHint.classList.add('active');
         } else {
           ui.publicUsernameHint.textContent = message;
+          ui.publicUsernameHint.classList.add('active');
         }
       })
       .finally(() => {
@@ -856,6 +865,7 @@
       }
     } catch (error) {
       ui.publicUsernameHint.textContent = 'CLOUD SAVE UNAVAILABLE · LOCAL FLIGHT READY';
+      ui.publicUsernameHint.classList.add('active');
       ui.pilotSyncState.textContent = 'CLOUD SETUP REQUIRED';
       console.warn('Voidline pilot network:', error);
     }
@@ -3002,6 +3012,7 @@
     document.getElementById('stationButton').addEventListener('click', useStation);
     document.getElementById('waveCallButton').addEventListener('click', callNextWave);
     document.getElementById('adminButton').addEventListener('click', () => openAccount(isAdminPilot() ? 'summary' : 'signin', true));
+    document.getElementById('menuAdminButton').addEventListener('click', () => openAccount(isAdminPilot() ? 'summary' : 'signin', true));
     document.getElementById('leaderboardButton').addEventListener('click', openLeaderboard);
     document.getElementById('closeAuth').addEventListener('click', closeAccount);
     document.getElementById('closeLeaderboard').addEventListener('click', closeLeaderboard);
