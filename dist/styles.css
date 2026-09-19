@@ -162,6 +162,7 @@ button { color: inherit; }
 .station-ability { color: var(--text); text-align: left; pointer-events: auto; cursor: pointer; }
 .station-ability:hover { border-color: var(--amber); background: rgba(255,179,92,.08); }
 .station-ability:disabled { cursor: not-allowed; opacity: .55; }
+.station-ability.affordable { border-color: rgba(255,179,92,.72); animation: stationReadyPulse 1.8s ease-in-out infinite; }
 .station-ability span { color: var(--amber) !important; }
 .ability-card.primary { border-color: rgba(109,247,232,.35); }
 kbd { min-width: 32px; padding: 6px 7px; color: var(--cyan-soft); border: 1px solid rgba(109,247,232,.28); border-radius: 3px; background: rgba(109,247,232,.07); font: 700 .66rem var(--mono); text-align: center; box-shadow: none; }
@@ -199,6 +200,7 @@ kbd { min-width: 32px; padding: 6px 7px; color: var(--cyan-soft); border: 1px so
 .wave-call.active { visibility: visible; opacity: 1; translate: -50% 0; pointer-events: auto; cursor: pointer; animation: waveCallPulse .75s ease-in-out infinite alternate; }
 .wave-call b { color: var(--amber); }.wave-call kbd { border-color: rgba(255,179,92,.35); color: var(--amber); }
 @keyframes waveCallPulse { to { border-color: var(--amber); box-shadow: 0 0 18px rgba(255,179,92,.14); } }
+@keyframes stationReadyPulse { 0%, 100% { box-shadow: 0 0 0 rgba(255,179,92,0); } 50% { box-shadow: 0 0 20px rgba(255,179,92,.22); } }
 /* Menus, panels, admin access, briefings, and acknowledgements. */
 .overlay { position: absolute; inset: 0; z-index: 20; display: none; background: radial-gradient(circle at 70% 38%, rgba(17, 67, 75, .18), transparent 38%), linear-gradient(100deg, rgba(2, 8, 13, .98) 10%, rgba(2, 8, 13, .88) 58%, rgba(2, 8, 13, .7)); backdrop-filter: blur(7px); }
 .overlay.active { display: grid; }

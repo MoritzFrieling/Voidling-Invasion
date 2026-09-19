@@ -697,11 +697,15 @@
 
     const docked = nearestStation(110);
     const buildCost = stationBuildCost();
+    let stationAffordable = false;
     if (docked) {
       const upgradeCost = 90 + docked.level * 80;
       ui.stationState.textContent = docked.level >= 4 ? 'MAXIMUM POWER' : `${upgradeCost} ◈ TO UPGRADE`;
+      stationAffordable = docked.level < 4 && player.credits >= upgradeCost;
     } else {
       ui.stationState.textContent = stations.length >= 3 ? 'STATION LIMIT' : `${buildCost} ◈ TO BUILD`;
+      stationAffordable = stations.length < 3 && player.credits >= buildCost;
     }
-    document.getElementById('stationButton').disabled = false;
+    ui.stationButton.disabled = false;
+    ui.stationButton.classList.toggle('affordable', stationAffordable);
   }

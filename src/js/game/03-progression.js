@@ -1,4 +1,6 @@
   // Player defaults, progression checkpoints, campaign setup, and pilot activation.
+  const BASE_ROCKET_DAMAGE = 125 * 1.15;
+
   function resetPlayer() {
     return {
       x: 860,
@@ -29,7 +31,7 @@
       rocketCooldown: 0,
       rocketMax: 6.8,
       rocketCharge: 0,
-      rocketDamage: 125,
+      rocketDamage: BASE_ROCKET_DAMAGE,
       invulnerable: 0,
       lastMoveX: 1,
       lastMoveY: 0,
@@ -56,7 +58,7 @@
   ];
 
   function captureProgress(source = player, shields = gateShields) {
-    const checkpoint = { gateShields: shields, progressionVersion: PROGRESSION_VERSION };
+    const checkpoint = { gateShields: shields, progressionVersion: PROGRESSION_VERSION, rocketDamageBase: BASE_ROCKET_DAMAGE };
     for (const key of PROGRESS_KEYS) checkpoint[key] = source[key];
     return checkpoint;
   }
@@ -72,6 +74,9 @@
       const value = Number(checkpoint[key]);
       if (Number.isFinite(value)) player[key] = value;
     }
+    if (!Number.isFinite(Number(checkpoint.rocketDamageBase)) && Number.isFinite(player.rocketDamage)) {
+      player.rocketDamage *= 1.15;
+    }
     if (legacyCheckpoint) {
       player.speed *= 310 / 355;
       player.acceleration *= 860 / 980;
@@ -79,7 +84,7 @@
       player.damageTier = clamp(1 + Math.round(Math.log(Math.max(1, player.damage / 18)) / Math.log(1.18)), 1, 7);
       player.rateTier = clamp(1 + Math.round(Math.log(Math.max(1, player.fireRate / 5.2)) / Math.log(1.14)), 1, 7);
       player.hullTier = clamp(1 + Math.round(Math.max(0, player.maxHp - 50) / 15), 1, 7);
-      player.rocketTier = clamp(1 + Math.round(Math.log(Math.max(1, player.rocketDamage / 125)) / Math.log(1.22)), 1, 7);
+      player.rocketTier = clamp(1 + Math.round(Math.log(Math.max(1, player.rocketDamage / BASE_ROCKET_DAMAGE)) / Math.log(1.22)), 1, 7);
       player.coolingTier = clamp(1 + Math.round(Math.log(Math.min(1, player.rocketMax / 6.8)) / Math.log(.9)), 1, 7);
     }
     player.hp = Math.max(1, Math.min(player.maxHp, player.hp));

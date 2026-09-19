@@ -81,7 +81,7 @@
     'startOverlay', 'pauseOverlay', 'settingsOverlay', 'upgradeOverlay', 'endOverlay', 'upgradeChoices',
     'tutorialCard', 'tutorialStep', 'tutorialTitle', 'tutorialText', 'tutorialProgress', 'crosshair',
     'toast', 'endKicker', 'endTitle', 'endCopy', 'finalScore', 'finalWave', 'finalKills', 'sectorText',
-    'creditText', 'portalWarning', 'lockReadout', 'stationState', 'intelOverlay', 'intelKicker', 'intelTitle',
+    'creditText', 'portalWarning', 'lockReadout', 'stationState', 'stationButton', 'intelOverlay', 'intelKicker', 'intelTitle',
     'intelRole', 'intelText', 'intelShip', 'bossOverlay', 'bossKicker', 'bossTitle', 'bossText',
     'sectorOverlay', 'sectorTitle', 'sectorCopy',
     'levelSelectOverlay', 'levelChoices',
@@ -351,6 +351,8 @@
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   }
   // Player defaults, progression checkpoints, campaign setup, and pilot activation.
+  const BASE_ROCKET_DAMAGE = 125 * 1.15;
+
   function resetPlayer() {
     return {
       x: 860,
@@ -381,7 +383,7 @@
       rocketCooldown: 0,
       rocketMax: 6.8,
       rocketCharge: 0,
-      rocketDamage: 125,
+      rocketDamage: BASE_ROCKET_DAMAGE,
       invulnerable: 0,
       lastMoveX: 1,
       lastMoveY: 0,
@@ -408,7 +410,7 @@
   ];
 
   function captureProgress(source = player, shields = gateShields) {
-    const checkpoint = { gateShields: shields, progressionVersion: PROGRESSION_VERSION };
+    const checkpoint = { gateShields: shields, progressionVersion: PROGRESSION_VERSION, rocketDamageBase: BASE_ROCKET_DAMAGE };
     for (const key of PROGRESS_KEYS) checkpoint[key] = source[key];
     return checkpoint;
   }
@@ -424,6 +426,9 @@
       const value = Number(checkpoint[key]);
       if (Number.isFinite(value)) player[key] = value;
     }
+    if (!Number.isFinite(Number(checkpoint.rocketDamageBase)) && Number.isFinite(player.rocketDamage)) {
+      player.rocketDamage *= 1.15;
+    }
     if (legacyCheckpoint) {
       player.speed *= 310 / 355;
       player.acceleration *= 860 / 980;
@@ -431,7 +436,7 @@
       player.damageTier = clamp(1 + Math.round(Math.log(Math.max(1, player.damage / 18)) / Math.log(1.18)), 1, 7);
       player.rateTier = clamp(1 + Math.round(Math.log(Math.max(1, player.fireRate / 5.2)) / Math.log(1.14)), 1, 7);
       player.hullTier = clamp(1 + Math.round(Math.max(0, player.maxHp - 50) / 15), 1, 7);
-      player.rocketTier = clamp(1 + Math.round(Math.log(Math.max(1, player.rocketDamage / 125)) / Math.log(1.22)), 1, 7);
+      player.rocketTier = clamp(1 + Math.round(Math.log(Math.max(1, player.rocketDamage / BASE_ROCKET_DAMAGE)) / Math.log(1.22)), 1, 7);
       player.coolingTier = clamp(1 + Math.round(Math.log(Math.min(1, player.rocketMax / 6.8)) / Math.log(.9)), 1, 7);
     }
     player.hp = Math.max(1, Math.min(player.maxHp, player.hp));
@@ -978,13 +983,13 @@
     scout: { name: 'DART FIGHTER', role: 'VERY FAST // LIGHT HULL', description: 'Quick attack craft with very little armor. Track it early before it slips through.', radius: 12, hp: 42, speed: 138, score: 100, xp: 10, color: '#ff8b72' },
     raider: { name: 'MARAUDER', role: 'BALANCED // ARMORED', description: 'Reliable frontline ship. Slower than a Dart, but it can absorb sustained blaster fire.', radius: 19, hp: 105, speed: 88, score: 170, xp: 16, color: '#ffb35c' },
     striker: { name: 'NEEDLE', role: 'EXTREME SPEED // FRAGILE', description: 'A tiny interceptor built entirely around speed. Its erratic lane changes make it hard to track.', radius: 10, hp: 48, speed: 178, score: 220, xp: 18, color: '#c885ff' },
-    major: { name: 'SIEGEBREAKER', role: 'HEAVY HULL // MISSILES', description: 'A slow assault vessel that launches guided rockets at your ship. Keep moving.', radius: 32, hp: 390, speed: 58, score: 700, xp: 48, color: '#ff6f61', major: true },
+    major: { name: 'SIEGEBREAKER', role: 'HEAVY HULL // MISSILES', description: 'A slow assault vessel that launches guided rockets at your ship. Keep moving.', radius: 32, hp: 390, speed: 55.1, score: 700, xp: 48, color: '#ff6f61', major: true },
     interceptor: { name: 'CARRIER INTERCEPTOR', role: 'LAUNCHED // DESTRUCTIBLE', description: 'A light interceptor launched by carrier vessels. Its reinforced light hull can be destroyed by focused blaster fire before it reaches the gate.', radius: 10, hp: 34, speed: 148, score: 80, xp: 7, color: '#ff9f88', interceptor: true },
     carrier: { name: 'BROOD CARRIER', role: 'SPAWNER // HEAVY HULL', description: 'A mobile hangar that launches smaller fighters along the route. Destroy it before the swarm grows.', radius: 37, hp: 520, speed: 49, score: 920, xp: 60, color: '#f071c8', major: true, carrier: true },
-    sentinel: { name: 'AEGIS SENTINEL', role: 'ROCKET-BREAK SHIELD', description: 'Light blasters cannot pierce its barrier. Two heavy-rocket impacts collapse the barrier, regardless of rocket level.', radius: 29, hp: 310, shield: 0, shieldCharges: 2, speed: 62, score: 840, xp: 58, color: '#79a8ff', major: true, shielded: true },
+    sentinel: { name: 'AEGIS SENTINEL', role: 'ROCKET-BREAK SHIELD', description: 'Light blasters cannot pierce its barrier. Two heavy-rocket impacts collapse the barrier, regardless of rocket level.', radius: 29, hp: 310, shield: 0, shieldCharges: 2, speed: 62, score: 840, xp: 58, color: '#aeb8c0', major: true, shielded: true },
     bossOmega: { name: 'DREADNOUGHT OMEGA', role: 'MISSILE COMMAND SHIP', description: 'The first invasion commander. It saturates the defense zone with guided warheads.', radius: 66, hp: 2850, speed: 34, score: 5400, xp: 260, color: '#ff506b', major: true, boss: true, bossSkill: 'rockets' },
     bossCarrier: { name: 'THE HOLLOW QUEEN', role: 'RIFT CARRIER // SWARM COMMAND', description: 'A vast carrier that continuously deploys escort wings through the twin rift. Its emergency shield activates if it is damaged too early.', radius: 74, hp: 4600, speed: 29, score: 7600, xp: 340, color: '#ef67d1', major: true, boss: true, carrier: true, bossSkill: 'swarm', emergencyShield: true },
-    bossTitan: { name: 'AEGIS TITAN', role: 'PHASE SHIELD // FINAL COMMAND', description: 'The final gatebreaker. Heavy rockets are required; several may be needed to collapse each regenerating shield phase.', radius: 82, hp: 7200, shield: 900, speed: 26, score: 12000, xp: 500, color: '#6b8cff', major: true, boss: true, shielded: true, bossSkill: 'titan' },
+    bossTitan: { name: 'AEGIS TITAN', role: 'PHASE SHIELD // FINAL COMMAND', description: 'The final gatebreaker. Heavy rockets are required; several may be needed to collapse each regenerating shield phase.', radius: 82, hp: 7200, shield: 900, speed: 26, score: 12000, xp: 500, color: '#aeb8c0', major: true, boss: true, shielded: true, bossSkill: 'titan' },
   };
 
   function activateWave() {
@@ -1072,6 +1077,7 @@
       boss: Boolean(blueprint.boss),
       carrier: Boolean(blueprint.carrier),
       interceptor: Boolean(blueprint.interceptor),
+      shielded: Boolean(blueprint.shielded),
       shieldCharges: blueprint.shieldCharges || 0,
       maxShieldCharges: blueprint.shieldCharges || 0,
       shieldHp: (blueprint.shield || 0) * difficultyScale,
@@ -2885,13 +2891,17 @@
 
     const docked = nearestStation(110);
     const buildCost = stationBuildCost();
+    let stationAffordable = false;
     if (docked) {
       const upgradeCost = 90 + docked.level * 80;
       ui.stationState.textContent = docked.level >= 4 ? 'MAXIMUM POWER' : `${upgradeCost} ◈ TO UPGRADE`;
+      stationAffordable = docked.level < 4 && player.credits >= upgradeCost;
     } else {
       ui.stationState.textContent = stations.length >= 3 ? 'STATION LIMIT' : `${buildCost} ◈ TO BUILD`;
+      stationAffordable = stations.length < 3 && player.credits >= buildCost;
     }
-    document.getElementById('stationButton').disabled = false;
+    ui.stationButton.disabled = false;
+    ui.stationButton.classList.toggle('affordable', stationAffordable);
   }
   // Keyboard, pointer, UI event wiring, and the animation frame loop.
   function showToast(message) {
