@@ -361,8 +361,8 @@
       vy: 0,
       angle: 0,
       radius: 18,
-      hp: 75,
-      maxHp: 75,
+      hp: 50,
+      maxHp: 50,
       speed: 310,
       acceleration: 860,
       fireRate: 5.2,
@@ -385,6 +385,7 @@
       lastMoveX: 1,
       lastMoveY: 0,
       multiShot: 1,
+      multiUpgradeLevel: 0,
       salvage: 1,
       credits: 40,
       speedTier: 1,
@@ -397,7 +398,7 @@
     };
   }
 
-  const PROGRESSION_VERSION = 4;
+  const PROGRESSION_VERSION = 5;
 
   const PROGRESS_KEYS = [
     'hp', 'maxHp', 'speed', 'acceleration', 'fireRate', 'damage', 'projectileSpeed', 'level', 'xp', 'xpNext',
@@ -425,12 +426,12 @@
     if (legacyCheckpoint) {
       player.speed *= 310 / 355;
       player.acceleration *= 860 / 980;
-      player.speedTier = clamp(1 + Math.round(Math.log(Math.max(1, player.speed / 310)) / Math.log(1.14)), 1, 7);
-      player.damageTier = clamp(1 + Math.round(Math.log(Math.max(1, player.damage / 18)) / Math.log(1.24)), 1, 7);
-      player.rateTier = clamp(1 + Math.round(Math.log(Math.max(1, player.fireRate / 5.2)) / Math.log(1.2)), 1, 7);
-      player.hullTier = clamp(1 + Math.round(Math.max(0, player.maxHp - 75) / 25), 1, 7);
-      player.rocketTier = clamp(1 + Math.round(Math.log(Math.max(1, player.rocketDamage / 125)) / Math.log(1.32)), 1, 7);
-      player.coolingTier = clamp(1 + Math.round(Math.log(Math.min(1, player.rocketMax / 6.8)) / Math.log(.84)), 1, 7);
+      player.speedTier = clamp(1 + Math.round(Math.log(Math.max(1, player.speed / 310)) / Math.log(1.1)), 1, 7);
+      player.damageTier = clamp(1 + Math.round(Math.log(Math.max(1, player.damage / 18)) / Math.log(1.18)), 1, 7);
+      player.rateTier = clamp(1 + Math.round(Math.log(Math.max(1, player.fireRate / 5.2)) / Math.log(1.14)), 1, 7);
+      player.hullTier = clamp(1 + Math.round(Math.max(0, player.maxHp - 50) / 15), 1, 7);
+      player.rocketTier = clamp(1 + Math.round(Math.log(Math.max(1, player.rocketDamage / 125)) / Math.log(1.22)), 1, 7);
+      player.coolingTier = clamp(1 + Math.round(Math.log(Math.min(1, player.rocketMax / 6.8)) / Math.log(.9)), 1, 7);
     }
     player.hp = Math.max(1, Math.min(player.maxHp, player.hp));
     gateShields = Math.max(1, Math.min(5, Number(checkpoint.gateShields) || 3));
@@ -1911,14 +1912,14 @@
   }
 
   const UPGRADES = [
-    { id: 'damage', tier: 'damageTier', icon: '◆', name: 'Overcharged Bolts', description: 'Blaster damage increases by 24%.', detail: 'DAMAGE +24%', apply: () => { player.damage *= 1.24; player.damageTier += 1; } },
-    { id: 'rate', tier: 'rateTier', icon: '≋', name: 'Flux Repeater', description: 'Blaster cycles 20% faster.', detail: 'FIRE RATE +20%', apply: () => { player.fireRate *= 1.2; player.rateTier += 1; } },
-    { id: 'speed', tier: 'speedTier', icon: '»', name: 'Vector Thrusters', description: 'Flight speed and acceleration improve.', detail: 'SPEED +14%', apply: () => { player.speed *= 1.14; player.acceleration *= 1.1; player.speedTier += 1; } },
-    { id: 'hull', tier: 'hullTier', icon: '⬡', name: 'Reactive Plating', description: 'Increase maximum hull and repair damage.', detail: 'MAX HULL +25', apply: () => { player.maxHp += 25; player.hp = Math.min(player.maxHp, player.hp + 35); player.hullTier += 1; } },
-    { id: 'rocket', tier: 'rocketTier', icon: '▲', name: 'Siege Warhead', description: 'Heavy rockets deal more blast damage.', detail: 'ROCKET +32%', apply: () => { player.rocketDamage *= 1.32; player.rocketTier += 1; } },
-    { id: 'cooling', tier: 'coolingTier', icon: '❄', name: 'Cryo Manifold', description: 'Rocket and void jump systems reload faster.', detail: 'COOLDOWNS -16%', apply: () => { player.rocketMax *= .84; player.boostMax *= .84; player.coolingTier += 1; } },
-    { id: 'salvage', icon: 'XP', name: 'Salvage Matrix', description: 'Void ore yields more experience.', detail: 'RESOURCE XP +28%', apply: () => { player.salvage *= 1.28; } },
-    { id: 'multi', icon: 'III', name: 'Splitfire Array', description: 'Add a tightly grouped blaster shot.', detail: 'MAX 3 SHOTS', apply: () => { player.multiShot = Math.min(3, player.multiShot + 1); } },
+    { id: 'damage', tier: 'damageTier', icon: '◆', name: 'Overcharged Bolts', description: 'Blaster damage increases by 18%.', detail: 'DAMAGE +18%', apply: () => { player.damage *= 1.18; player.damageTier += 1; } },
+    { id: 'rate', tier: 'rateTier', icon: '≋', name: 'Flux Repeater', description: 'Blaster cycles 14% faster.', detail: 'FIRE RATE +14%', apply: () => { player.fireRate *= 1.14; player.rateTier += 1; } },
+    { id: 'speed', tier: 'speedTier', icon: '»', name: 'Vector Thrusters', description: 'Flight speed and acceleration improve.', detail: 'SPEED +10%', apply: () => { player.speed *= 1.1; player.acceleration *= 1.07; player.speedTier += 1; } },
+    { id: 'hull', tier: 'hullTier', icon: '⬡', name: 'Reactive Plating', description: 'Increase maximum hull and restore a little hull.', detail: 'MAX HULL +15', apply: () => { player.maxHp += 15; player.hp = Math.min(player.maxHp, player.hp + 15); player.hullTier += 1; } },
+    { id: 'rocket', tier: 'rocketTier', icon: '▲', name: 'Siege Warhead', description: 'Heavy rockets deal more blast damage.', detail: 'ROCKET +22%', apply: () => { player.rocketDamage *= 1.22; player.rocketTier += 1; } },
+    { id: 'cooling', tier: 'coolingTier', icon: '❄', name: 'Cryo Manifold', description: 'Rocket and void jump systems reload faster.', detail: 'COOLDOWNS -10%', apply: () => { player.rocketMax *= .9; player.boostMax *= .9; player.coolingTier += 1; } },
+    { id: 'salvage', icon: 'XP', name: 'Salvage Matrix', description: 'Void ore yields more experience.', detail: 'RESOURCE XP +18%', apply: () => { player.salvage *= 1.18; } },
+    { id: 'multi', icon: 'III', name: 'Splitfire Array', description: 'Add a tightly grouped blaster shot. Offered every four levels.', detail: '+1 SHOT · EVERY 4 LVL', apply: () => { player.multiShot = Math.min(3, player.multiShot + 1); player.multiUpgradeLevel = player.level; } },
     { id: 'gate', icon: 'AEG', name: 'Gate Capacitor', description: 'Send a recovered charge to Earth.', detail: 'GATE SHIELD +1', apply: () => { gateShields = Math.min(5, gateShields + 1); } },
   ];
 
@@ -1926,7 +1927,8 @@
     mode = 'upgrade';
     ui.crosshair.style.opacity = '0';
     ui.lockReadout.classList.remove('active');
-    const pool = [...UPGRADES].filter((upgrade) => (!upgrade.tier || player[upgrade.tier] < 7) && (upgrade.id !== 'multi' || player.multiShot < 3));
+    const pool = [...UPGRADES].filter((upgrade) => (!upgrade.tier || player[upgrade.tier] < 7)
+      && (upgrade.id !== 'multi' || (player.multiShot < 3 && player.level >= 4 && player.level % 4 === 0 && player.multiUpgradeLevel !== player.level)));
     const choices = [];
     while (choices.length < 3 && pool.length) choices.push(pool.splice((Math.random() * pool.length) | 0, 1)[0]);
     ui.upgradeChoices.replaceChildren();
