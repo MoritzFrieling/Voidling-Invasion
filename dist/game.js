@@ -1245,7 +1245,7 @@
         setWaveCallAvailable(waveCallEligible);
       }
       waveClearTimer += dt;
-      if (waveClearTimer > 2) advanceAfterClear();
+      if (waveClearTimer > 3) advanceAfterClear();
     }
 
     resourceTimer -= dt;
@@ -1718,6 +1718,15 @@
       if (target) {
         rocket.dead = true;
         explodeRocket(rocket.x, rocket.y, rocket.damage);
+        continue;
+      }
+      for (const rock of resources) {
+        if (rock.dead) continue;
+        if (distanceSq(rocket, rock) <= (rocket.radius + rock.radius) ** 2) {
+          rocket.dead = true;
+          explodeRocket(rocket.x, rocket.y, rocket.damage);
+          break;
+        }
       }
     }
 
@@ -1862,7 +1871,7 @@
   }
 
   function explodeRocket(x, y, damage) {
-    const radius = 128;
+    const radius = 150;
     for (const enemy of enemies) {
       const distance = Math.hypot(enemy.x - x, enemy.y - y);
       if (distance < radius + enemy.radius) damageEnemy(enemy, damage * (1 - distance / (radius * 1.7)), enemy.x, enemy.y, true);
