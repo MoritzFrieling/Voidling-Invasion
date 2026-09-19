@@ -957,7 +957,7 @@
     carrier: { name: 'BROOD CARRIER', role: 'SPAWNER // HEAVY HULL', description: 'A mobile hangar that launches smaller fighters along the route. Destroy it before the swarm grows.', radius: 37, hp: 520, speed: 49, score: 920, xp: 60, color: '#f071c8', major: true, carrier: true },
     sentinel: { name: 'AEGIS SENTINEL', role: 'ROCKET-BREAK SHIELD', description: 'Light blasters cannot pierce its barrier. Three heavy-rocket impacts collapse the barrier, regardless of rocket level.', radius: 29, hp: 310, shield: 0, shieldCharges: 3, speed: 62, score: 840, xp: 58, color: '#79a8ff', major: true, shielded: true },
     bossOmega: { name: 'DREADNOUGHT OMEGA', role: 'MISSILE COMMAND SHIP', description: 'The first invasion commander. It saturates the defense zone with guided warheads.', radius: 66, hp: 2850, speed: 34, score: 5400, xp: 260, color: '#ff506b', major: true, boss: true, bossSkill: 'rockets' },
-    bossCarrier: { name: 'THE HOLLOW QUEEN', role: 'RIFT CARRIER // SWARM COMMAND', description: 'A vast carrier that continuously deploys escort wings through the twin rift.', radius: 74, hp: 4600, speed: 29, score: 7600, xp: 340, color: '#ef67d1', major: true, boss: true, carrier: true, bossSkill: 'swarm' },
+    bossCarrier: { name: 'THE HOLLOW QUEEN', role: 'RIFT CARRIER // SWARM COMMAND', description: 'A vast carrier that continuously deploys escort wings through the twin rift. Its emergency shield activates if it is damaged too early.', radius: 74, hp: 4600, speed: 29, score: 7600, xp: 340, color: '#ef67d1', major: true, boss: true, carrier: true, bossSkill: 'swarm', emergencyShield: true },
     bossTitan: { name: 'AEGIS TITAN', role: 'PHASE SHIELD // FINAL COMMAND', description: 'The final gatebreaker. Heavy rockets are required; several may be needed to collapse each regenerating shield phase.', radius: 82, hp: 7200, shield: 900, speed: 26, score: 12000, xp: 500, color: '#6b8cff', major: true, boss: true, shielded: true, bossSkill: 'titan' },
   };
 
@@ -1049,6 +1049,8 @@
       maxShieldCharges: blueprint.shieldCharges || 0,
       shieldHp: (blueprint.shield || 0) * difficultyScale,
       maxShield: (blueprint.shield || 0) * difficultyScale,
+      emergencyShield: Boolean(blueprint.emergencyShield),
+      emergencyShieldUsed: false,
       bossSkill: blueprint.bossSkill || '',
       rocketTimer: rand(1.3, 3),
       spawnTimer: rand(3.2, 5.4),
@@ -1802,6 +1804,15 @@
       camera.shake = Math.max(camera.shake, enemy.boss ? 22 : enemy.major ? 9 : 3.5);
       audio.tone(enemy.boss ? 48 : enemy.major ? 72 : 130, enemy.boss ? .75 : .16, 'sawtooth', enemy.boss ? .14 : .05, -35);
       if (enemy.major && Math.random() < .28) spawnPickupAt('repair', enemy.x, enemy.y);
+    } else if (enemy.emergencyShield && !enemy.emergencyShieldUsed
+      && enemy.hp / enemy.maxHp <= .4 && enemy.progress < enemy.pathLength * .7) {
+      enemy.emergencyShieldUsed = true;
+      enemy.maxShield = enemy.maxHp * .2;
+      enemy.shieldHp = enemy.maxShield;
+      enemy.shieldHitTimer = .45;
+      showToast(`${ENEMY_TYPES[enemy.type].name} // EMERGENCY SHIELD ONLINE`);
+      addFloater(enemy.x, enemy.y - enemy.radius, 'EMERGENCY SHIELD', '#9acbff');
+      burst(enemy.x, enemy.y, '#79a8ff', 34, 280);
     } else if (enemy.bossSkill === 'titan') {
       const ratio = enemy.hp / enemy.maxHp;
       enemy.shieldPhase ??= 0;
