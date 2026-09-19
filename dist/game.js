@@ -2821,7 +2821,7 @@
       mctx.fillRect(rock.x * sx, rock.y * sy, 2, 2);
     }
     for (const enemy of enemies) {
-      const mapColor = enemy.major ? (enemy.shielded ? '#aeb8c0' : enemy.color) : COLORS.coral;
+      const mapColor = enemy.major ? enemy.color : COLORS.coral;
       mctx.fillStyle = mapColor;
       const size = enemy.boss ? 5 : enemy.major ? 4 : 2.5;
       mctx.fillRect(enemy.x * sx - size / 2, enemy.y * sy - size / 2, size, size);
