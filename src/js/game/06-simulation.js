@@ -455,7 +455,7 @@
           for (let i = 0; i < count; i += 1) {
             spawnEnemy({ type: 'interceptor', pathId: enemy.pathId, entryProgress: Math.max(0, enemy.progress - 28 - i * 12) }, enemy);
           }
-          enemy.spawnTimer = enemy.bossSkill === 'swarm' ? rand(3.1, 4.4) : rand(4.5, 6.3);
+          enemy.spawnTimer = enemy.bossSkill === 'swarm' ? rand(2.9, 4.2) : rand(4.2, 5.9);
           burst(enemy.x, enemy.y, enemy.color, 10, 110);
           showToast(enemy.boss ? 'CARRIER WING DEPLOYED' : 'BROOD CARRIER LAUNCHED INTERCEPTORS');
         }
