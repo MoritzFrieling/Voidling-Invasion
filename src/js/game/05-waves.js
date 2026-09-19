@@ -111,7 +111,8 @@
     announcementTimer = 2.2;
     spawnTimer = .55;
     formationStartedAt = gameClock;
-    formationParTime = 18 + spawnQueue.length * 1.45 + currentLevel * 2.5;
+    const sectorThreeSpacing = currentLevel === 2 ? 1.08 : 1;
+    formationParTime = (18 + spawnQueue.length * 1.45 + currentLevel * 2.5) * sectorThreeSpacing;
     formationGateShields = gateShields;
     waveReady = false;
     waveCallEligible = false;

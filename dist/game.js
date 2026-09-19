@@ -968,7 +968,8 @@
     announcementTimer = 2.2;
     spawnTimer = .55;
     formationStartedAt = gameClock;
-    formationParTime = 18 + spawnQueue.length * 1.45 + currentLevel * 2.5;
+    const sectorThreeSpacing = currentLevel === 2 ? 1.08 : 1;
+    formationParTime = (18 + spawnQueue.length * 1.45 + currentLevel * 2.5) * sectorThreeSpacing;
     formationGateShields = gateShields;
     waveReady = false;
     waveCallEligible = false;
@@ -1233,7 +1234,7 @@
       if (spawnTimer <= 0) {
         spawnEnemy(spawnQueue.shift());
         const openingBuffer = wave <= 2 ? .12 : 0;
-        const sectorThreeSpacing = currentLevel === 2 ? 1.05 : 1;
+        const sectorThreeSpacing = currentLevel === 2 ? 1.08 : 1;
         spawnTimer = Math.max(.34, (.78 + currentLevel * .12 - wave * .018 + openingBuffer) * sectorThreeSpacing);
       }
     } else if (!enemies.length && wave > 0) {

@@ -116,7 +116,7 @@
       if (spawnTimer <= 0) {
         spawnEnemy(spawnQueue.shift());
         const openingBuffer = wave <= 2 ? .12 : 0;
-        const sectorThreeSpacing = currentLevel === 2 ? 1.05 : 1;
+        const sectorThreeSpacing = currentLevel === 2 ? 1.08 : 1;
         spawnTimer = Math.max(.34, (.78 + currentLevel * .12 - wave * .018 + openingBuffer) * sectorThreeSpacing);
       }
     } else if (!enemies.length && wave > 0) {
