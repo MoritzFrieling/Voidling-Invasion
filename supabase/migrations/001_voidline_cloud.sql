@@ -34,16 +34,9 @@ create table if not exists public.leaderboard_scores (
   primary key (user_id, game_id)
 );
 
-create table if not exists public.account_upgrades (
-  token uuid primary key,
-  from_user uuid not null unique references auth.users(id) on delete cascade,
-  expires_at timestamptz not null default (now() + interval '10 minutes')
-);
-
 alter table public.profiles enable row level security;
 alter table public.game_saves enable row level security;
 alter table public.leaderboard_scores enable row level security;
-alter table public.account_upgrades enable row level security;
 
 drop policy if exists "pilots can read their profile" on public.profiles;
 create policy "pilots can read their profile"
@@ -106,6 +99,31 @@ drop trigger if exists on_voidline_auth_user_created on auth.users;
 create trigger on_voidline_auth_user_created
   after insert on auth.users
   for each row execute procedure public.handle_voidline_auth_user();
+
+create or replace function public.set_voidline_guest_username(p_username text)
+returns text
+language plpgsql
+security definer
+set search_path = ''
+as $$
+declare
+  pilot_id uuid := auth.uid();
+  normalized text := lower(trim(coalesce(p_username, '')));
+begin
+  if pilot_id is null or not coalesce((auth.jwt() ->> 'is_anonymous')::boolean, false) then
+    raise exception 'Anonymous pilot required';
+  end if;
+  if normalized !~ '^[a-z0-9_]{3,20}$' then raise exception 'Invalid callsign'; end if;
+
+  update public.profiles
+  set username = normalized
+  where user_id = pilot_id and is_guest = true;
+  if not found then raise exception 'Guest profile was not found'; end if;
+  return normalized;
+exception
+  when unique_violation then raise exception 'That callsign is already in use';
+end;
+$$;
 
 -- Store only a pilot's best run. The browser cannot modify leaderboard rows directly.
 create or replace function public.submit_voidline_score(
@@ -173,94 +191,17 @@ as $$
   limit greatest(1, least(coalesce(p_limit, 12), 50));
 $$;
 
--- A short-lived handoff lets an anonymous guest create a password account while
--- retaining cloud saves, leaderboard ownership, and the same public username.
-create or replace function public.prepare_voidline_account_upgrade(p_token uuid)
-returns void
-language plpgsql
-security definer
-set search_path = ''
-as $$
-declare
-  pilot_id uuid := auth.uid();
-  anonymous boolean := coalesce((auth.jwt() ->> 'is_anonymous')::boolean, false);
-begin
-  if pilot_id is null or not anonymous then raise exception 'Anonymous pilot required'; end if;
-  delete from public.account_upgrades where expires_at < now();
-  insert into public.account_upgrades (token, from_user, expires_at)
-  values (p_token, pilot_id, now() + interval '10 minutes')
-  on conflict (from_user) do update
-    set token = excluded.token, expires_at = excluded.expires_at;
-end;
-$$;
-
-create or replace function public.claim_voidline_account_upgrade(p_token uuid)
-returns void
-language plpgsql
-security definer
-set search_path = ''
-as $$
-declare
-  new_user uuid := auth.uid();
-  old_user uuid;
-  old_username text;
-  anonymous boolean := coalesce((auth.jwt() ->> 'is_anonymous')::boolean, false);
-begin
-  if new_user is null or anonymous then raise exception 'Permanent account required'; end if;
-
-  select upgrades.from_user into old_user
-  from public.account_upgrades as upgrades
-  where upgrades.token = p_token and upgrades.expires_at >= now()
-  for update;
-  if old_user is null then raise exception 'Upgrade token is invalid or expired'; end if;
-
-  select profiles.username into old_username
-  from public.profiles as profiles
-  where profiles.user_id = old_user;
-  if old_username is null then raise exception 'Guest profile was not found'; end if;
-
-  insert into public.game_saves (user_id, game_id, campaign, high_score, updated_at)
-  select new_user, saves.game_id, saves.campaign, saves.high_score, now()
-  from public.game_saves as saves where saves.user_id = old_user
-  on conflict (user_id, game_id) do update
-    set campaign = excluded.campaign,
-        high_score = greatest(public.game_saves.high_score, excluded.high_score),
-        updated_at = now();
-
-  insert into public.leaderboard_scores
-    (user_id, game_id, best_score, level_reached, stage_reached, kills, achieved_at)
-  select new_user, scores.game_id, scores.best_score, scores.level_reached,
-         scores.stage_reached, scores.kills, scores.achieved_at
-  from public.leaderboard_scores as scores where scores.user_id = old_user
-  on conflict (user_id, game_id) do update
-    set best_score = greatest(public.leaderboard_scores.best_score, excluded.best_score),
-        level_reached = case when excluded.best_score > public.leaderboard_scores.best_score then excluded.level_reached else public.leaderboard_scores.level_reached end,
-        stage_reached = case when excluded.best_score > public.leaderboard_scores.best_score then excluded.stage_reached else public.leaderboard_scores.stage_reached end,
-        kills = case when excluded.best_score > public.leaderboard_scores.best_score then excluded.kills else public.leaderboard_scores.kills end,
-        achieved_at = least(public.leaderboard_scores.achieved_at, excluded.achieved_at);
-
-  delete from public.leaderboard_scores where user_id = old_user;
-  delete from public.game_saves where user_id = old_user;
-  delete from public.profiles where user_id = old_user;
-  update public.profiles set username = old_username, is_guest = false where user_id = new_user;
-  delete from public.account_upgrades where token = p_token;
-end;
-$$;
-
 revoke all on public.profiles from anon, authenticated;
 revoke all on public.game_saves from anon, authenticated;
 revoke all on public.leaderboard_scores from anon, authenticated;
-revoke all on public.account_upgrades from anon, authenticated;
 
 grant select on public.profiles to authenticated;
 grant select, insert, update on public.game_saves to authenticated;
 
 revoke all on function public.submit_voidline_score(integer, integer, integer, integer) from public;
 revoke all on function public.get_voidline_leaderboard(integer) from public;
-revoke all on function public.prepare_voidline_account_upgrade(uuid) from public;
-revoke all on function public.claim_voidline_account_upgrade(uuid) from public;
+revoke all on function public.set_voidline_guest_username(text) from public;
 
 grant execute on function public.submit_voidline_score(integer, integer, integer, integer) to authenticated;
 grant execute on function public.get_voidline_leaderboard(integer) to anon, authenticated;
-grant execute on function public.prepare_voidline_account_upgrade(uuid) to authenticated;
-grant execute on function public.claim_voidline_account_upgrade(uuid) to authenticated;
+grant execute on function public.set_voidline_guest_username(text) to authenticated;

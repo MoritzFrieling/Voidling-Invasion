@@ -10,7 +10,8 @@
   canvas.addEventListener('contextmenu', (event) => event.preventDefault());
 
   bindUi();
-  setAuthMode('signin');
+  prepareDefaultCallsign();
+  renderAdminPanel();
   resize();
   player = resetPlayer();
   camera.x = player.x - screenWidth / 2;

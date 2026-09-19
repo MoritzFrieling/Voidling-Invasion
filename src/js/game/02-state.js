@@ -67,8 +67,6 @@
   const HIGH_SCORE_KEY = 'voidline-highscore';
   let activePilot = null;
   let activePilotId = null;
-  let pendingPilotAction = null;
-  let authMode = 'signin';
   let accountReturnMode = 'menu';
   let cloudSaveTimer = 0;
   let cloudBusy = false;

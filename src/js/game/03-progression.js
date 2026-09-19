@@ -192,11 +192,10 @@
       button.classList.toggle('connected', connected && isAdminPilot());
       button.title = connected && isAdminPilot() ? `Admin: ${activePilot.username}` : 'Admin access';
     });
-    if (activePilot?.isGuest && ui.publicUsername && !ui.publicUsername.value) ui.publicUsername.value = activePilot.username;
+    if (activePilot?.isGuest && ui.publicUsername) ui.publicUsername.value = activePilot.username;
     if (!connected) return;
-    ui.pilotType.textContent = isAdminPilot() ? 'ADMIN PILOT · HIGHSCORE DISABLED' : activePilot.isGuest ? 'GUEST PILOT · DEVICE SESSION' : 'CLOUD PILOT · PERMANENT ACCOUNT';
+    ui.pilotType.textContent = isAdminPilot() ? 'ADMIN PILOT · HIGHSCORE DISABLED' : 'GUEST PILOT · DEVICE SESSION';
     ui.pilotName.textContent = activePilot.username;
-    ui.protectProgressButton.hidden = !activePilot.isGuest;
   }
 
   async function activatePilot(pilot) {

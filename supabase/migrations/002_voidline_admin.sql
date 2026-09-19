@@ -1,11 +1,13 @@
--- Run this once before creating the permanent `admin` pilot account, then run it again afterward.
+-- Create admin@pilots.voidline.game in Authentication > Users, then run this migration.
 -- The password stays in Supabase Auth and is never stored in this repository.
 
 alter table public.profiles add column if not exists is_admin boolean not null default false;
 
 update public.profiles
-set is_admin = true
-where lower(username) = 'admin' and is_guest = false;
+set username = 'admin', is_guest = false, is_admin = true
+where user_id in (
+  select id from auth.users where lower(email) = 'admin@pilots.voidline.game'
+);
 
 -- An admin account is a test/operator account, not a leaderboard pilot.
 delete from public.leaderboard_scores

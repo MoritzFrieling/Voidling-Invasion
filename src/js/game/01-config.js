@@ -84,8 +84,8 @@
     'levelSelectOverlay', 'levelChoices',
     'speedTierText', 'damageTierText', 'rateTierText', 'hullTierText', 'rocketTierText', 'coolingTierText',
     'staticWarning', 'waveCallButton',
-    'authOverlay', 'authTitle', 'authCopy', 'authTabs', 'authForm', 'authUsername', 'authPassword',
-    'authPasswordConfirm', 'authPasswordConfirmLabel', 'authHint', 'authMessage', 'authSubmit',
-    'pilotSummary', 'pilotType', 'pilotName', 'pilotSyncState', 'protectProgressButton', 'adminButton',
+    'authOverlay', 'authTitle', 'authCopy', 'authForm', 'authUsername', 'authPassword',
+    'authMessage',
+    'pilotSummary', 'pilotType', 'pilotName', 'pilotSyncState', 'adminButton',
     'publicUsername', 'publicUsernameHint', 'menuAdminButton', 'leaderboardOverlay', 'leaderboardList',
   ].forEach((id) => { ui[id] = document.getElementById(id); });

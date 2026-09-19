@@ -21,7 +21,7 @@
     if (event.code === 'KeyR') callNextWave();
     if (event.code === 'KeyT' && mode === 'playing') placeJumpDestination();
     if (event.code === 'Escape') {
-      if (ui.authOverlay.classList.contains('active')) closeAccount();
+      if (ui.authOverlay.classList.contains('active')) closeAdminAccess();
       else if (ui.leaderboardOverlay.classList.contains('active')) closeLeaderboard();
       else if (mode === 'levelSelect') closeLevelSelect();
       else togglePause();
@@ -90,17 +90,13 @@
     document.getElementById('nextSectorButton').addEventListener('click', enterNextSector);
     document.getElementById('stationButton').addEventListener('click', useStation);
     document.getElementById('waveCallButton').addEventListener('click', callNextWave);
-    document.getElementById('adminButton').addEventListener('click', () => openAccount(isAdminPilot() ? 'summary' : 'signin', true));
-    document.getElementById('menuAdminButton').addEventListener('click', () => openAccount(isAdminPilot() ? 'summary' : 'signin', true));
+    document.getElementById('adminButton').addEventListener('click', openAdminAccess);
+    document.getElementById('menuAdminButton').addEventListener('click', openAdminAccess);
     document.getElementById('leaderboardButton').addEventListener('click', openLeaderboard);
-    document.getElementById('closeAuth').addEventListener('click', closeAccount);
+    document.getElementById('closeAuth').addEventListener('click', closeAdminAccess);
     document.getElementById('closeLeaderboard').addEventListener('click', closeLeaderboard);
-    document.getElementById('showSignIn').addEventListener('click', () => setAuthMode('signin'));
-    document.getElementById('showSignUp').addEventListener('click', () => setAuthMode('signup'));
-    document.getElementById('showGuest').addEventListener('click', () => setAuthMode('guest'));
-    document.getElementById('authForm').addEventListener('submit', submitAuthForm);
-    document.getElementById('protectProgressButton').addEventListener('click', () => setAuthMode('upgrade'));
-    document.getElementById('signOutButton').addEventListener('click', signOutPilot);
+    document.getElementById('authForm').addEventListener('submit', submitAdminForm);
+    document.getElementById('signOutButton').addEventListener('click', signOutAdmin);
     document.getElementById('skipTutorial').addEventListener('click', () => {
       tutorialMode = false;
       ui.tutorialCard.classList.remove('active');

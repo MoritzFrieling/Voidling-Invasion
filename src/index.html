@@ -113,7 +113,7 @@
     <div class="status-toast" id="toast" role="status" aria-live="polite"></div>
 
     <section class="overlay start-overlay active" id="startOverlay" aria-labelledby="gameTitle">
-      <button class="icon-button start-admin-button" id="menuAdminButton" type="button" aria-label="Open admin access" title="Admin access">⚿</button>
+      <button class="start-admin-button" id="menuAdminButton" type="button" aria-label="Open admin access" title="Admin access"><span aria-hidden="true">⚿</span><b>ADMIN</b></button>
       <div class="start-grid">
         <div class="start-main">
           <p class="kicker">EARTH DEFENSE NETWORK - FRONTIER LUNA</p>
@@ -124,9 +124,8 @@
             <button class="main-button" id="startButton" type="button"><span>BEGIN DEFENSE</span><b>ENTER</b></button>
           </div>
           <div class="callsign-entry">
-            <label for="publicUsername">CHOOSE USERNAME <small>OPTIONAL</small></label>
             <input id="publicUsername" type="text" minlength="3" maxlength="20" pattern="[A-Za-z0-9_]+"
-              autocomplete="nickname" placeholder="OPTIONAL CALLSIGN" title="3–20 letters, numbers, or underscores. Used for saves and the highscore board." spellcheck="false" />
+              autocomplete="nickname" aria-label="Callsign" title="3–20 letters, numbers, or underscores. Used for saves and the highscore board." spellcheck="false" />
             <small id="publicUsernameHint" aria-live="polite"></small>
           </div>
           <div class="menu-actions secondary-actions">
@@ -297,32 +296,21 @@
         <h2 id="authTitle">ADMIN ACCESS</h2>
         <p class="panel-copy" id="authCopy">Administrator access is reserved for testing and level verification.</p>
 
-        <div class="auth-tabs" id="authTabs" role="tablist" aria-label="Pilot access options">
-          <button class="active" id="showSignIn" type="button" role="tab">SIGN IN</button>
-          <button id="showSignUp" type="button" role="tab">CREATE ACCOUNT</button>
-          <button id="showGuest" type="button" role="tab">PLAY AS GUEST</button>
-        </div>
-
         <form class="auth-form" id="authForm">
-          <label id="authUsernameLabel"><span>USERNAME</span><input id="authUsername" name="username" type="text"
+          <label><span>USERNAME</span><input id="authUsername" name="username" type="text"
               minlength="3" maxlength="20" pattern="[A-Za-z0-9_]+" autocomplete="username" spellcheck="false"
               required /></label>
-          <label id="authPasswordLabel"><span>PASSWORD</span><input id="authPassword" name="password" type="password"
+          <label><span>PASSWORD</span><input id="authPassword" name="password" type="password"
               minlength="8" maxlength="72" autocomplete="current-password" required /></label>
-          <label id="authPasswordConfirmLabel" hidden><span>CONFIRM PASSWORD</span><input id="authPasswordConfirm"
-              name="password-confirm" type="password" minlength="8" maxlength="72"
-              autocomplete="new-password" /></label>
-          <p class="auth-hint" id="authHint">Your progress will load on any device after you sign in.</p>
+          <p class="auth-hint">Admin runs unlock every sector and never submit highscores.</p>
           <p class="auth-message" id="authMessage" role="status" aria-live="polite"></p>
-          <button class="main-button" id="authSubmit" type="submit"><span>SIGN IN</span><b>ENTER</b></button>
+          <button class="main-button" type="submit"><span>SIGN IN AS ADMIN</span><b>ENTER</b></button>
         </form>
 
         <div class="pilot-summary" id="pilotSummary" hidden>
           <div class="pilot-avatar" aria-hidden="true">V</div>
           <div><span id="pilotType">CLOUD PILOT</span><strong id="pilotName">—</strong><small id="pilotSyncState">CLOUD
               SAVE READY</small></div>
-          <button class="main-button" id="protectProgressButton" type="button"><span>PROTECT
-              PROGRESS</span><b>ACCOUNT</b></button>
           <button class="ghost-button" id="signOutButton" type="button">SIGN OUT</button>
         </div>
       </div>

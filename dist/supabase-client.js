@@ -42,9 +42,12 @@
     const message = String(error?.message || error || 'The pilot network did not respond.');
     const lower = message.toLowerCase();
     if (lower.includes('invalid login credentials')) return new Error('Username or password is incorrect.');
-    if (lower.includes('already registered') || lower.includes('already exists') || lower.includes('duplicate key')) return new Error('That username is already in use.');
+    if (lower.includes('already registered') || lower.includes('already exists') || lower.includes('already in use') || lower.includes('duplicate key')) return new Error('That callsign is already in use.');
     if (lower.includes('anonymous sign-ins are disabled')) return new Error('Guest access must be enabled in the Supabase Auth settings.');
-    if (lower.includes('email not confirmed')) return new Error('Disable email confirmation for username-only accounts in Supabase Auth settings.');
+    if (lower.includes('email not confirmed')) return new Error('Confirm the administrator user in Supabase Auth before signing in.');
+    if (lower.includes('set_voidline_guest_username') && lower.includes('could not find the function')) {
+      return new Error('Guest callsign editing needs migration 003. Run supabase/migrations/003_remove_account_upgrades.sql in the Supabase SQL Editor.');
+    }
     if (lower.includes('relation') || lower.includes('schema cache') || lower.includes('could not find the function')) {
       return new Error('The Supabase database setup is not installed yet. Run supabase/migrations/001_voidline_cloud.sql in the SQL Editor.');
     }
@@ -117,7 +120,18 @@
     return setPilotFromSession(data.session);
   }
 
-  async function signIn(usernameValue, passwordValue) {
+  async function updateGuestUsername(usernameValue) {
+    requireClient();
+    if (!pilot?.isGuest) throw new Error('Only guest callsigns can be changed.');
+    const username = validateUsername(usernameValue);
+    const { data, error } = await client.rpc('set_voidline_guest_username', { p_username: username });
+    if (error) throw friendlyError(error);
+    pilot = { ...pilot, username: data || username };
+    notify();
+    return pilot;
+  }
+
+  async function signInAdmin(usernameValue, passwordValue) {
     requireClient();
     const username = validateUsername(usernameValue);
     const password = validatePassword(passwordValue);
@@ -126,69 +140,18 @@
       password,
     });
     if (error) throw friendlyError(error);
-    return setPilotFromSession(data.session);
-  }
-
-  async function createAccount(usernameValue, passwordValue) {
-    requireClient();
-    const username = validateUsername(usernameValue);
-    const password = validatePassword(passwordValue);
-    if (pilot?.isGuest) return upgradeGuest(username, password);
-
-    const { data, error } = await client.auth.signUp({
-      email: accountIdentifier(username),
-      password,
-      options: { data: { username, display_name: username } },
-    });
-    if (error) throw friendlyError(error);
-    if (!data.session) throw new Error('Email confirmation must be disabled for username-only accounts.');
-    return setPilotFromSession(data.session);
-  }
-
-  async function upgradeGuest(usernameValue, passwordValue) {
-    requireClient();
-    if (!pilot?.isGuest) return createAccount(usernameValue, passwordValue);
-    const username = validateUsername(usernameValue);
-    const password = validatePassword(passwordValue);
-    if (username !== pilot.username) throw new Error('A guest keeps the same callsign when protecting progress.');
-
-    const transferToken = crypto.randomUUID();
-    const { error: prepareError } = await client.rpc('prepare_voidline_account_upgrade', { p_token: transferToken });
-    if (prepareError) throw friendlyError(prepareError);
-
-    const temporaryUsername = `upgrade_${crypto.randomUUID().replaceAll('-', '').slice(0, 10)}`;
-    const transientClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
-      auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
-    });
-    const { data, error } = await transientClient.auth.signUp({
-      email: accountIdentifier(username),
-      password,
-      options: { data: { username: temporaryUsername, display_name: username } },
-    });
-    if (error) throw friendlyError(error);
-    if (!data.session) throw new Error('Email confirmation must be disabled for username-only accounts.');
-
-    const { error: sessionError } = await client.auth.setSession({
-      access_token: data.session.access_token,
-      refresh_token: data.session.refresh_token,
-    });
-    if (sessionError) throw friendlyError(sessionError);
-
-    const { error: claimError } = await client.rpc('claim_voidline_account_upgrade', { p_token: transferToken });
-    if (claimError) throw friendlyError(claimError);
-    await client.auth.updateUser({ data: { username, display_name: username } });
-    const { data: current } = await client.auth.getSession();
-    return setPilotFromSession(current.session);
+    const signedInPilot = await setPilotFromSession(data.session);
+    if (signedInPilot?.isAdmin) return signedInPilot;
+    await signOut();
+    throw new Error('This account does not have administrator access.');
   }
 
   async function signOut() {
     requireClient();
-    const wasGuest = Boolean(pilot?.isGuest);
     const { error } = await client.auth.signOut({ scope: 'local' });
     if (error) throw friendlyError(error);
     pilot = null;
     notify();
-    return { wasGuest };
   }
 
   async function loadProgress() {
@@ -244,9 +207,8 @@
     getPilot() { return pilot; },
     normalizeUsername,
     playAsGuest,
-    signIn,
-    createAccount,
-    upgradeGuest,
+    updateGuestUsername,
+    signInAdmin,
     signOut,
     loadProgress,
     saveProgress,

@@ -87,9 +87,9 @@
     'levelSelectOverlay', 'levelChoices',
     'speedTierText', 'damageTierText', 'rateTierText', 'hullTierText', 'rocketTierText', 'coolingTierText',
     'staticWarning', 'waveCallButton',
-    'authOverlay', 'authTitle', 'authCopy', 'authTabs', 'authForm', 'authUsername', 'authPassword',
-    'authPasswordConfirm', 'authPasswordConfirmLabel', 'authHint', 'authMessage', 'authSubmit',
-    'pilotSummary', 'pilotType', 'pilotName', 'pilotSyncState', 'protectProgressButton', 'adminButton',
+    'authOverlay', 'authTitle', 'authCopy', 'authForm', 'authUsername', 'authPassword',
+    'authMessage',
+    'pilotSummary', 'pilotType', 'pilotName', 'pilotSyncState', 'adminButton',
     'publicUsername', 'publicUsernameHint', 'menuAdminButton', 'leaderboardOverlay', 'leaderboardList',
   ].forEach((id) => { ui[id] = document.getElementById(id); });
   // Runtime state, local/cloud persistence, and audio services.
@@ -161,8 +161,6 @@
   const HIGH_SCORE_KEY = 'voidline-highscore';
   let activePilot = null;
   let activePilotId = null;
-  let pendingPilotAction = null;
-  let authMode = 'signin';
   let accountReturnMode = 'menu';
   let cloudSaveTimer = 0;
   let cloudBusy = false;
@@ -546,11 +544,10 @@
       button.classList.toggle('connected', connected && isAdminPilot());
       button.title = connected && isAdminPilot() ? `Admin: ${activePilot.username}` : 'Admin access';
     });
-    if (activePilot?.isGuest && ui.publicUsername && !ui.publicUsername.value) ui.publicUsername.value = activePilot.username;
+    if (activePilot?.isGuest && ui.publicUsername) ui.publicUsername.value = activePilot.username;
     if (!connected) return;
-    ui.pilotType.textContent = isAdminPilot() ? 'ADMIN PILOT · HIGHSCORE DISABLED' : activePilot.isGuest ? 'GUEST PILOT · DEVICE SESSION' : 'CLOUD PILOT · PERMANENT ACCOUNT';
+    ui.pilotType.textContent = isAdminPilot() ? 'ADMIN PILOT · HIGHSCORE DISABLED' : 'GUEST PILOT · DEVICE SESSION';
     ui.pilotName.textContent = activePilot.username;
-    ui.protectProgressButton.hidden = !activePilot.isGuest;
   }
 
   async function activatePilot(pilot) {
@@ -612,87 +609,55 @@
     ui.bestText.textContent = formatScore(highScore);
     if (mode === 'levelSelect') renderLevelSelect();
   }
-  // Account, leaderboard, settings, and level-select actions.
-  let adminLoginOnly = false;
+  // Guest launch, admin access, leaderboard, settings, and level-select actions.
+  const CALLSIGN_PREFIXES = ['nova', 'void', 'lunar', 'solar', 'orbit', 'rift', 'astro', 'comet'];
+  const CALLSIGN_SUFFIXES = ['hawk', 'fox', 'ace', 'lancer', 'raven', 'drift', 'spark', 'guard'];
 
-  function setAuthMode(nextMode) {
-    authMode = nextMode;
-    const signedIn = Boolean(activePilot) && nextMode === 'summary';
-    ui.authTabs.hidden = signedIn || nextMode === 'upgrade' || adminLoginOnly;
-    ui.authForm.hidden = signedIn;
-    ui.pilotSummary.hidden = !signedIn;
-    ui.authMessage.textContent = '';
-    ui.authMessage.classList.remove('success');
-    ui.authForm.classList.remove('busy');
-    ui.authUsername.readOnly = nextMode === 'upgrade';
-    ui.authUsername.value = nextMode === 'upgrade' ? activePilot?.username || '' : '';
-    ui.authPassword.value = '';
-    ui.authPasswordConfirm.value = '';
-
-    const needsPassword = nextMode !== 'guest';
-    document.getElementById('authPasswordLabel').hidden = !needsPassword;
-    ui.authPassword.required = needsPassword;
-    ui.authPasswordConfirmLabel.hidden = !['signup', 'upgrade'].includes(nextMode);
-    ui.authPasswordConfirm.required = ['signup', 'upgrade'].includes(nextMode);
-    document.querySelectorAll('#authTabs button').forEach((button) => button.classList.remove('active'));
-
-    if (nextMode === 'signin' && adminLoginOnly) {
-      ui.authTitle.textContent = 'ADMIN ACCESS';
-      ui.authCopy.textContent = 'Sign in with the private administrator callsign to unlock every sector and test-only access.';
-      ui.authHint.textContent = 'Administrator runs never submit a highscore.';
-      ui.authSubmit.querySelector('span').textContent = 'SIGN IN AS ADMIN';
-      ui.authPassword.autocomplete = 'current-password';
-    } else if (nextMode === 'signin') {
-      document.getElementById('showSignIn').classList.add('active');
-      ui.authTitle.textContent = 'WELCOME BACK';
-      ui.authCopy.textContent = 'Sign in with your pilot username and password to restore cloud progress.';
-      ui.authHint.textContent = 'Your password is handled by Supabase Auth and is never stored in the game.';
-      ui.authSubmit.querySelector('span').textContent = 'SIGN IN';
-      ui.authPassword.autocomplete = 'current-password';
-    } else if (nextMode === 'signup') {
-      document.getElementById('showSignUp').classList.add('active');
-      ui.authTitle.textContent = 'CREATE PILOT';
-      ui.authCopy.textContent = 'Choose a unique callsign and password. No email address is required.';
-      ui.authHint.textContent = 'There is no password recovery without an email, so keep your password safe.';
-      ui.authSubmit.querySelector('span').textContent = 'CREATE ACCOUNT';
-      ui.authPassword.autocomplete = 'new-password';
-    } else if (nextMode === 'guest') {
-      document.getElementById('showGuest').classList.add('active');
-      ui.authTitle.textContent = 'GUEST FLIGHT';
-      ui.authCopy.textContent = 'Choose a unique callsign and enter immediately. You can protect the progress with a password later.';
-      ui.authHint.textContent = 'Guest progress stays with this browser session and cannot be recovered after signing out or clearing site data.';
-      ui.authSubmit.querySelector('span').textContent = 'CONTINUE AS GUEST';
-    } else if (nextMode === 'upgrade') {
-      ui.authTitle.textContent = 'PROTECT PROGRESS';
-      ui.authCopy.textContent = 'Add a password to keep this callsign, cloud save, and leaderboard record permanently.';
-      ui.authHint.textContent = 'Your guest progress will be transferred to the new permanent account.';
-      ui.authSubmit.querySelector('span').textContent = 'CREATE PERMANENT ACCOUNT';
-      ui.authPassword.autocomplete = 'new-password';
-    } else if (adminLoginOnly) {
-      ui.authTitle.textContent = 'ADMIN CONSOLE';
-      ui.authCopy.textContent = 'Administrator tools are active. This pilot can access every sector, but runs are excluded from highscores.';
-    } else {
-      ui.authTitle.textContent = 'PILOT ACCOUNT';
-      ui.authCopy.textContent = activePilot?.isGuest
-        ? 'This guest session is saved to the cloud but cannot be recovered after sign-out.'
-        : 'Your campaign progress and best score synchronize through the pilot network.';
-    }
+  function generateCallsign() {
+    const prefix = pick(CALLSIGN_PREFIXES);
+    const suffix = pick(CALLSIGN_SUFFIXES);
+    return `${prefix}_${suffix}_${Math.floor(rand(10, 100))}`;
   }
 
-  function openAccount(requestedMode = null, adminOnly = false) {
-    adminLoginOnly = adminOnly;
+  function prepareDefaultCallsign() {
+    if (!ui.publicUsername.value.trim()) ui.publicUsername.value = generateCallsign();
+  }
+
+  function readCallsign() {
+    const username = String(ui.publicUsername.value || '').trim().toLowerCase() || generateCallsign();
+    ui.publicUsername.value = username;
+    if (!/^[a-z0-9_]{3,20}$/.test(username)) {
+      throw new Error('Use 3–20 letters, numbers, or underscores.');
+    }
+    return username;
+  }
+
+  function renderAdminPanel() {
+    const signedIn = isAdminPilot();
+    ui.authForm.hidden = signedIn;
+    ui.pilotSummary.hidden = !signedIn;
+    ui.authForm.classList.remove('busy');
+    ui.authMessage.textContent = '';
+    ui.authMessage.classList.remove('success');
+    ui.authPassword.value = '';
+    ui.authTitle.textContent = signedIn ? 'ADMIN CONSOLE' : 'ADMIN ACCESS';
+    ui.authCopy.textContent = signedIn
+      ? 'Administrator tools are active. Every sector is unlocked and runs are excluded from highscores.'
+      : 'Sign in with the private administrator account to unlock testing access.';
+  }
+
+  function openAdminAccess() {
     accountReturnMode = mode;
     if (mode === 'playing') mode = 'paused';
     hideOverlays();
     ui.crosshair.style.opacity = '0';
-    setAuthMode(requestedMode || (activePilot ? 'summary' : 'signin'));
+    renderAdminPanel();
     ui.authOverlay.classList.add('active');
-    if (!activePilot || requestedMode === 'upgrade') setTimeout(() => (requestedMode === 'upgrade' ? ui.authPassword : ui.authUsername).focus(), 30);
+    if (!isAdminPilot()) setTimeout(() => ui.authUsername.focus(), 30);
   }
 
-  function closeAccount() {
+  function closeAdminAccess() {
     ui.authOverlay.classList.remove('active');
-    adminLoginOnly = false;
     if (['playing', 'paused'].includes(accountReturnMode)) {
       mode = 'paused';
       ui.pauseOverlay.classList.add('active');
@@ -702,50 +667,76 @@
     }
   }
 
-  function requirePilot(action) {
+  async function requirePilot(action) {
+    let username;
+    try {
+      username = readCallsign();
+    } catch (error) {
+      ui.publicUsernameHint.textContent = error.message;
+      ui.publicUsernameHint.classList.add('active');
+      ui.publicUsername.focus();
+      return;
+    }
     if (activePilot) {
+      if (activePilot.isGuest && username !== activePilot.username) {
+        if (activePilot.id && window.VoidlineCloud) {
+          if (cloudBusy) return;
+          cloudBusy = true;
+          ui.publicUsername.disabled = true;
+          try {
+            activePilot = await window.VoidlineCloud.updateGuestUsername(username);
+            updatePilotUi();
+          } catch (error) {
+            ui.publicUsernameHint.textContent = error.message || 'The callsign could not be changed.';
+            ui.publicUsernameHint.classList.add('active');
+            return;
+          } finally {
+            cloudBusy = false;
+            ui.publicUsername.disabled = false;
+          }
+        } else {
+          activePilot.username = username;
+          updatePilotUi();
+        }
+      }
       action();
       return;
     }
     if (cloudBusy) return;
-    const requested = String(ui.publicUsername?.value || '').trim();
-    const username = requested || `pilot_${Math.random().toString(36).slice(2, 10)}`;
-    ui.publicUsername.value = username;
     if (!window.VoidlineCloud) {
-      activatePilot({ id: null, username, isGuest: true, isAdmin: false }).then(action);
+      await activatePilot({ id: null, username, isGuest: true, isAdmin: false });
+      action();
       return;
     }
     cloudBusy = true;
     ui.publicUsername.disabled = true;
     ui.publicUsernameHint.textContent = `CONNECTING AS ${username.toUpperCase()}…`;
     ui.publicUsernameHint.classList.add('active');
-    Promise.resolve()
-      .then(() => window.VoidlineCloud.init())
-      .then((pilot) => pilot || window.VoidlineCloud.playAsGuest(username))
-      .then((pilot) => activatePilot(pilot))
-      .then(() => {
-        ui.publicUsernameHint.textContent = '';
-        ui.publicUsernameHint.classList.remove('active');
+    try {
+      const currentPilot = await window.VoidlineCloud.init();
+      const pilot = currentPilot || await window.VoidlineCloud.playAsGuest(username);
+      await activatePilot(pilot);
+      ui.publicUsernameHint.textContent = '';
+      ui.publicUsernameHint.classList.remove('active');
+      action();
+    } catch (error) {
+      const message = error.message || 'Guest flight could not be started.';
+      if (/unreachable|network|setup|required|connecting|loaded|anonymous sign-ins/i.test(message)) {
+        await activatePilot({ id: null, username, isGuest: true, isAdmin: false });
+        ui.publicUsernameHint.textContent = 'LOCAL FLIGHT · CLOUD SAVE WILL RESUME WHEN AVAILABLE';
+        ui.publicUsernameHint.classList.add('active');
         action();
-      })
-      .catch((error) => {
-        const message = error.message || 'Guest flight could not be started.';
-        if (/unreachable|network|setup|required|connecting|loaded|anonymous sign-ins/i.test(message)) {
-          activatePilot({ id: null, username, isGuest: true, isAdmin: false }).then(action);
-          ui.publicUsernameHint.textContent = 'LOCAL FLIGHT · CLOUD SAVE WILL RESUME WHEN AVAILABLE';
-          ui.publicUsernameHint.classList.add('active');
-        } else {
-          ui.publicUsernameHint.textContent = message;
-          ui.publicUsernameHint.classList.add('active');
-        }
-      })
-      .finally(() => {
-        cloudBusy = false;
-        ui.publicUsername.disabled = false;
-      });
+      } else {
+        ui.publicUsernameHint.textContent = message;
+        ui.publicUsernameHint.classList.add('active');
+      }
+    } finally {
+      cloudBusy = false;
+      ui.publicUsername.disabled = false;
+    }
   }
 
-  async function submitAuthForm(event) {
+  async function submitAdminForm(event) {
     event.preventDefault();
     if (!window.VoidlineCloud) {
       ui.authMessage.textContent = 'The pilot network could not be loaded. Check your connection and refresh.';
@@ -754,28 +745,16 @@
     if (cloudBusy) return;
     const username = ui.authUsername.value;
     const password = ui.authPassword.value;
-    if (['signup', 'upgrade'].includes(authMode) && password !== ui.authPasswordConfirm.value) {
-      ui.authMessage.textContent = 'Passwords do not match.';
-      return;
-    }
     cloudBusy = true;
     ui.authForm.classList.add('busy');
     ui.authMessage.textContent = 'CONTACTING PILOT NETWORK…';
     try {
-      let pilot;
-      if (authMode === 'guest') pilot = await window.VoidlineCloud.playAsGuest(username);
-      else if (authMode === 'signin') pilot = await window.VoidlineCloud.signIn(username, password);
-      else if (authMode === 'upgrade') pilot = await window.VoidlineCloud.upgradeGuest(username, password);
-      else pilot = await window.VoidlineCloud.createAccount(username, password);
+      await window.VoidlineCloud.init();
+      const pilot = await window.VoidlineCloud.signInAdmin(username, password);
       await activatePilot(pilot);
-      ui.authMessage.textContent = 'PILOT LINK ESTABLISHED';
+      ui.authMessage.textContent = 'ADMIN LINK ESTABLISHED';
       ui.authMessage.classList.add('success');
-      const action = pendingPilotAction;
-      pendingPilotAction = null;
-      setTimeout(() => {
-        closeAccount();
-        if (action) action();
-      }, 260);
+      setTimeout(closeAdminAccess, 260);
     } catch (error) {
       ui.authMessage.textContent = error.message || 'Pilot access failed.';
     } finally {
@@ -784,15 +763,14 @@
     }
   }
 
-  async function signOutPilot() {
-    if (!activePilot || cloudBusy) return;
-    if (activePilot.isGuest && !window.confirm('Signing out of a guest session makes it impossible to recover. Continue?')) return;
+  async function signOutAdmin() {
+    if (!isAdminPilot() || cloudBusy) return;
     cloudBusy = true;
     try {
       await window.VoidlineCloud.signOut();
       await activatePilot(null);
-      pendingPilotAction = null;
-      setAuthMode('signin');
+      prepareDefaultCallsign();
+      renderAdminPanel();
     } catch (error) {
       ui.pilotSyncState.textContent = error.message || 'SIGN OUT FAILED';
     } finally {
@@ -857,12 +835,7 @@
     try {
       const pilot = await window.VoidlineCloud.init();
       await activatePilot(pilot);
-      if (pilot && ui.authOverlay.classList.contains('active')) {
-        const action = pendingPilotAction;
-        pendingPilotAction = null;
-        closeAccount();
-        if (action) action();
-      }
+      if (ui.authOverlay.classList.contains('active')) renderAdminPanel();
     } catch (error) {
       ui.publicUsernameHint.textContent = 'CLOUD SAVE UNAVAILABLE · LOCAL FLIGHT READY';
       ui.publicUsernameHint.classList.add('active');
@@ -2942,7 +2915,7 @@
     if (event.code === 'KeyR') callNextWave();
     if (event.code === 'KeyT' && mode === 'playing') placeJumpDestination();
     if (event.code === 'Escape') {
-      if (ui.authOverlay.classList.contains('active')) closeAccount();
+      if (ui.authOverlay.classList.contains('active')) closeAdminAccess();
       else if (ui.leaderboardOverlay.classList.contains('active')) closeLeaderboard();
       else if (mode === 'levelSelect') closeLevelSelect();
       else togglePause();
@@ -3011,17 +2984,13 @@
     document.getElementById('nextSectorButton').addEventListener('click', enterNextSector);
     document.getElementById('stationButton').addEventListener('click', useStation);
     document.getElementById('waveCallButton').addEventListener('click', callNextWave);
-    document.getElementById('adminButton').addEventListener('click', () => openAccount(isAdminPilot() ? 'summary' : 'signin', true));
-    document.getElementById('menuAdminButton').addEventListener('click', () => openAccount(isAdminPilot() ? 'summary' : 'signin', true));
+    document.getElementById('adminButton').addEventListener('click', openAdminAccess);
+    document.getElementById('menuAdminButton').addEventListener('click', openAdminAccess);
     document.getElementById('leaderboardButton').addEventListener('click', openLeaderboard);
-    document.getElementById('closeAuth').addEventListener('click', closeAccount);
+    document.getElementById('closeAuth').addEventListener('click', closeAdminAccess);
     document.getElementById('closeLeaderboard').addEventListener('click', closeLeaderboard);
-    document.getElementById('showSignIn').addEventListener('click', () => setAuthMode('signin'));
-    document.getElementById('showSignUp').addEventListener('click', () => setAuthMode('signup'));
-    document.getElementById('showGuest').addEventListener('click', () => setAuthMode('guest'));
-    document.getElementById('authForm').addEventListener('submit', submitAuthForm);
-    document.getElementById('protectProgressButton').addEventListener('click', () => setAuthMode('upgrade'));
-    document.getElementById('signOutButton').addEventListener('click', signOutPilot);
+    document.getElementById('authForm').addEventListener('submit', submitAdminForm);
+    document.getElementById('signOutButton').addEventListener('click', signOutAdmin);
     document.getElementById('skipTutorial').addEventListener('click', () => {
       tutorialMode = false;
       ui.tutorialCard.classList.remove('active');
@@ -3070,7 +3039,8 @@
   canvas.addEventListener('contextmenu', (event) => event.preventDefault());
 
   bindUi();
-  setAuthMode('signin');
+  prepareDefaultCallsign();
+  renderAdminPanel();
   resize();
   player = resetPlayer();
   camera.x = player.x - screenWidth / 2;
