@@ -54,6 +54,7 @@
   let spawnTimer = 0;
   let spawnQueue = [];
   let pendingLevelUps = 0;
+  let lastSelectedUpgradeId = null;
   let tutorialMode = false;
   let tutorialIndex = 0;
   let tutorialDelay = 0;

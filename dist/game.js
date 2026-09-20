@@ -148,6 +148,7 @@
   let spawnTimer = 0;
   let spawnQueue = [];
   let pendingLevelUps = 0;
+  let lastSelectedUpgradeId = null;
   let tutorialMode = false;
   let tutorialIndex = 0;
   let tutorialDelay = 0;
@@ -501,6 +502,7 @@
     spawnTimer = 0;
     spawnQueue = [];
     pendingLevelUps = 0;
+    lastSelectedUpgradeId = null;
     seenEnemyTypes = new Set(campaignState.seenEnemyTypes || []);
     introQueue = [];
     pendingWaveStart = false;
@@ -2064,36 +2066,43 @@
     { id: 'gate', icon: 'AEG', name: 'Gate Capacitor', description: 'Send a recovered charge to Earth.', detail: 'GATE SHIELD +1', apply: () => { gateShields = Math.min(5, gateShields + 1); } },
   ];
 
-  function upgradeCurrentStat(upgrade) {
+  function upgradeSummary(upgrade) {
     switch (upgrade.id) {
-      case 'damage': return `CURRENT DAMAGE ${player.damage.toFixed(1)}`;
-      case 'rate': return `CURRENT FIRE RATE ${player.fireRate.toFixed(1)}/S`;
-      case 'speed': return `CURRENT SPEED ${Math.round(player.speed)}`;
-      case 'hull': return `CURRENT MAX HULL ${Math.round(player.maxHp)}`;
-      case 'rocket': return `CURRENT ROCKET DMG ${Math.round(player.rocketDamage)}`;
-      case 'cooling': return `ROCKET CD ${player.rocketMax.toFixed(1)}S · JUMP CD ${player.boostMax.toFixed(1)}S`;
-      case 'salvage': return `CURRENT RESOURCE XP ×${player.salvage.toFixed(2)}`;
-      case 'multi': return `CURRENT SHOTS ${player.multiShot}`;
-      case 'gate': return `CURRENT GATE SHIELDS ${gateShields}/5`;
-      default: return upgrade.detail;
+      case 'damage': return { current: `DAMAGE ${player.damage.toFixed(1)}`, effect: `→ ${(player.damage * 1.18).toFixed(1)} · +18%` };
+      case 'rate': return { current: `FIRE RATE ${player.fireRate.toFixed(1)}/S`, effect: `→ ${(player.fireRate * 1.14).toFixed(1)}/S · +14%` };
+      case 'speed': return { current: `SPEED ${Math.round(player.speed)}`, effect: `→ ${Math.round(player.speed * 1.1)} · +10%` };
+      case 'hull': return { current: `MAX HULL ${Math.round(player.maxHp)}`, effect: `→ ${Math.round(player.maxHp + 15)} · +15` };
+      case 'rocket': return { current: `ROCKET DMG ${Math.round(player.rocketDamage)}`, effect: `→ ${Math.round(player.rocketDamage * 1.22)} · +22%` };
+      case 'cooling': return { current: `ROCKET ${player.rocketMax.toFixed(1)}S · JUMP ${player.boostMax.toFixed(1)}S`, effect: `→ ${(player.rocketMax * .9).toFixed(1)}S · ${(player.boostMax * .9).toFixed(1)}S · -10%` };
+      case 'salvage': return { current: `RESOURCE XP ×${player.salvage.toFixed(2)}`, effect: `→ ×${(player.salvage * 1.18).toFixed(2)} · +18%` };
+      case 'multi': return { current: `SHOTS ${player.multiShot}`, effect: `→ ${player.multiShot + 1} · +1 SHOT` };
+      case 'gate': return { current: `GATE SHIELDS ${gateShields}/5`, effect: `→ ${Math.min(5, gateShields + 1)}/5 · +1` };
+      default: return { current: '', effect: upgrade.detail };
     }
+  }
+
+  function eligibleUpgrades() {
+    const nextMultiLevel = Math.max(4, (Math.floor(Number(player.multiUpgradeLevel) / 4) * 4) + 4);
+    return UPGRADES.filter((upgrade) => (!upgrade.tier || player[upgrade.tier] < 7)
+      && (upgrade.id !== 'multi' || (player.multiShot < 3 && player.level >= nextMultiLevel)));
   }
 
   function showUpgradeChoices() {
     mode = 'upgrade';
     ui.crosshair.style.opacity = '0';
     ui.lockReadout.classList.remove('active');
-    const nextMultiLevel = Math.max(4, (Math.floor(Number(player.multiUpgradeLevel) / 4) * 4) + 4);
-    const pool = [...UPGRADES].filter((upgrade) => (!upgrade.tier || player[upgrade.tier] < 7)
-      && (upgrade.id !== 'multi' || (player.multiShot < 3 && player.level >= nextMultiLevel)));
+    const eligible = eligibleUpgrades();
+    const pool = eligible.filter((upgrade) => upgrade.id !== lastSelectedUpgradeId);
+    if (!pool.length) pool.push(...eligible);
     const choices = [];
     while (choices.length < 3 && pool.length) choices.push(pool.splice((Math.random() * pool.length) | 0, 1)[0]);
     ui.upgradeChoices.replaceChildren();
     choices.forEach((upgrade) => {
       const button = document.createElement('button');
+      const summary = upgradeSummary(upgrade);
       button.className = 'upgrade-choice';
       button.type = 'button';
-      button.innerHTML = `<span class="upgrade-icon">${upgrade.icon}</span><strong>${upgrade.name}</strong><p>${upgrade.description}</p><small>${upgradeCurrentStat(upgrade)}</small>`;
+      button.innerHTML = `<span class="upgrade-icon">${upgrade.icon}</span><strong>${upgrade.name}</strong><p>${upgrade.description}</p><small><span>CURRENT // ${summary.current}</span><b>UPGRADE // ${summary.effect}</b></small>`;
       button.addEventListener('click', () => selectUpgrade(upgrade));
       ui.upgradeChoices.append(button);
     });
@@ -2103,6 +2112,7 @@
 
   function selectUpgrade(upgrade) {
     upgrade.apply();
+    lastSelectedUpgradeId = upgrade.id;
     pendingLevelUps -= 1;
     ui.upgradeOverlay.classList.remove('active');
     showToast(`${upgrade.name.toUpperCase()} INSTALLED`);

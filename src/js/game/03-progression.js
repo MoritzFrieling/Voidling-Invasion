@@ -147,6 +147,7 @@
     spawnTimer = 0;
     spawnQueue = [];
     pendingLevelUps = 0;
+    lastSelectedUpgradeId = null;
     seenEnemyTypes = new Set(campaignState.seenEnemyTypes || []);
     introQueue = [];
     pendingWaveStart = false;
