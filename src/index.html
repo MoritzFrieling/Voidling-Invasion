@@ -15,11 +15,11 @@
 
 <body>
   <main class="game-shell" id="gameShell">
-    <canvas id="gameCanvas" aria-label="Voidline Invasion game world"></canvas>
+    <canvas id="gameCanvas" data-i18n-aria-label="aria.gameWorld" aria-label="Voidline Invasion game world"></canvas>
 
     <div class="scanlines" aria-hidden="true"></div>
 
-    <header class="topbar" aria-label="Game status">
+    <header class="topbar" data-i18n-aria-label="aria.gameStatus" aria-label="Game status">
       <div class="brand-lockup">
         <span class="brand-mark" aria-hidden="true"></span>
         <div>
@@ -28,111 +28,119 @@
         </div>
       </div>
 
-      <section class="vitals" aria-label="Ship status">
+      <section class="vitals" data-i18n-aria-label="aria.shipStatus" aria-label="Ship status">
         <div class="vital-row">
-          <span>HULL</span>
+          <span data-i18n="hud.hull">HULL</span>
           <div class="meter"><i id="healthBar"></i></div>
           <strong id="healthText">50</strong>
         </div>
         <div class="vital-row xp-row">
-          <span>LVL <b id="levelText">1</b></span>
+          <span><i data-i18n="hud.level">LVL</i> <b id="levelText">1</b></span>
           <div class="meter"><i id="xpBar"></i></div>
           <strong id="xpText">0 / 60</strong>
         </div>
         <div class="gate-row">
-          <span>EARTH GATE</span>
+          <span data-i18n="hud.earthGate">EARTH GATE</span>
           <div id="shieldPips" class="shield-pips" aria-label="3 portal shields"></div>
         </div>
-        <div class="credit-row"><span>SALVAGE CREDITS</span><strong id="creditText">000</strong></div>
+        <div class="credit-row"><span data-i18n="hud.salvageCredits">SALVAGE CREDITS</span><strong id="creditText">000</strong></div>
       </section>
 
       <div class="round-readout">
-        <span class="eyebrow" id="sectorText">SECTOR DEFENSE</span>
+        <span class="eyebrow" id="sectorText" data-i18n="hud.sectorDefense">SECTOR DEFENSE</span>
         <strong id="waveText">WAVE —</strong>
         <span id="waveState">STANDBY</span>
       </div>
 
       <div class="score-readout">
-        <div><span>SCORE</span><strong id="scoreText">000000</strong></div>
-        <div><span>BEST</span><strong id="bestText">000000</strong></div>
-        <button class="icon-button admin-button" id="adminButton" type="button" aria-label="Open admin access" title="Admin access">⚿</button>
-        <button class="icon-button" id="pauseButton" type="button" aria-label="Pause game">Ⅱ</button>
+        <div><span data-i18n="hud.score">SCORE</span><strong id="scoreText">000000</strong></div>
+        <div><span data-i18n="hud.best">BEST</span><strong id="bestText">000000</strong></div>
+        <select class="language-select" id="languageSelect" data-i18n-aria-label="language.label" aria-label="Language">
+          <option value="en">EN</option>
+          <option value="ko">한국어</option>
+        </select>
+        <button class="icon-button admin-button" id="adminButton" type="button" data-i18n-aria-label="aria.adminAccess" aria-label="Open admin access" data-i18n-title="tooltip.adminAccess" title="Admin access">⚿</button>
+        <button class="icon-button" id="pauseButton" type="button" data-i18n-aria-label="aria.pause" aria-label="Pause game">Ⅱ</button>
       </div>
     </header>
 
-    <aside class="minimap-wrap" aria-label="Sector minimap">
-      <div class="minimap-head"><span>TACTICAL MAP</span><i>LIVE</i></div>
+    <aside class="minimap-wrap" data-i18n-aria-label="aria.sectorMinimap" aria-label="Sector minimap">
+      <div class="minimap-head"><span data-i18n="hud.tacticalMap">TACTICAL MAP</span><i data-i18n="hud.live">LIVE</i></div>
       <canvas id="minimap" width="240" height="144"></canvas>
-      <div class="map-legend"><span><i class="you"></i>YOU</span><span><i class="hostile"></i>HOSTILE</span><span><i
-            class="gate"></i>GATE</span></div>
+      <div class="map-legend"><span><i class="you"></i><b data-i18n="hud.you">YOU</b></span><span><i class="hostile"></i><b data-i18n="hud.hostile">HOSTILE</b></span><span><i
+            class="gate"></i><b data-i18n="hud.gate">GATE</b></span></div>
     </aside>
 
     <div class="crosshair" id="crosshair" aria-hidden="true"><i></i></div>
-    <div class="portal-warning" id="portalWarning" role="alert"><i></i><span>GATE PROXIMITY ALERT</span></div>
-    <div class="lock-readout" id="lockReadout"><i></i><span>TARGET LOCKED</span></div>
-    <div class="static-warning" id="staticWarning" role="status"><i></i><span>STATIC SIGNATURE // HULL DRAIN</span></div>
-    <button class="wave-call" id="waveCallButton" type="button" disabled aria-hidden="true"><span>CALL NEXT
+    <div class="portal-warning" id="portalWarning" role="alert"><i></i><span data-i18n="hud.gateProximity">GATE PROXIMITY ALERT</span></div>
+    <div class="lock-readout" id="lockReadout"><i></i><span data-i18n="hud.targetLocked">TARGET LOCKED</span></div>
+    <div class="static-warning" id="staticWarning" role="status"><i></i><span data-i18n="hud.staticDrain">STATIC SIGNATURE // HULL DRAIN</span></div>
+    <button class="wave-call" id="waveCallButton" type="button" disabled aria-hidden="true"><span data-i18n="hud.callNextWave">CALL NEXT
         WAVE</span><b>+XP</b><kbd>R</kbd></button>
 
-    <section class="ability-dock" aria-label="Weapons and abilities">
+    <section class="ability-dock" data-i18n-aria-label="aria.abilities" aria-label="Weapons and abilities">
       <div class="ability-card primary">
         <kbd>↑</kbd>
-        <div><strong>BLASTER</strong><span>READY</span></div>
+        <div><strong data-i18n="ability.blaster">BLASTER</strong><span data-i18n="ability.ready">READY</span></div>
         <i class="cooldown" id="blasterCooldown"></i>
       </div>
       <div class="ability-card">
         <kbd>F</kbd>
-        <div><strong>HEAVY ROCKET</strong><span id="rocketState">READY</span></div>
+        <div><strong data-i18n="ability.heavyRocket">HEAVY ROCKET</strong><span id="rocketState" data-i18n="ability.ready">READY</span></div>
         <i class="cooldown" id="rocketCooldown"></i>
       </div>
       <div class="ability-card">
         <kbd>Q / SPACE</kbd>
-        <div><strong>VOID JUMP</strong><span id="boostState">T PLACE DEST</span></div>
+        <div><strong data-i18n="ability.voidJump">VOID JUMP</strong><span id="boostState">T PLACE DEST</span></div>
         <i class="cooldown" id="boostCooldown"></i>
       </div>
       <button class="ability-card station-ability" id="stationButton" type="button">
         <kbd>B</kbd>
-        <div><strong>DEFENSE STATION</strong><span id="stationState">120 ◈ TO BUILD</span></div>
+        <div><strong data-i18n="ability.station">DEFENSE STATION</strong><span id="stationState">120 ◈ TO BUILD</span></div>
         <i class="cooldown"></i>
       </button>
     </section>
 
-    <aside class="upgrade-readout" aria-label="Installed ship upgrade tiers">
-      <span class="eyebrow">SHIP MODULES</span>
+    <aside class="upgrade-readout" data-i18n-aria-label="aria.upgradeTiers" aria-label="Installed ship upgrade tiers">
+      <span class="eyebrow" data-i18n="hud.shipModules">SHIP MODULES</span>
       <div class="upgrade-tier-grid">
-        <span class="upgrade-tier" title="Flight speed"><i>»</i><b id="speedTierText">1/7</b></span>
-        <span class="upgrade-tier" title="Blaster damage"><i>◆</i><b id="damageTierText">1/7</b></span>
-        <span class="upgrade-tier" title="Fire rate"><i>≋</i><b id="rateTierText">1/7</b></span>
-        <span class="upgrade-tier" title="Hull strength"><i>⬡</i><b id="hullTierText">1/7</b></span>
-        <span class="upgrade-tier" title="Rocket power"><i>▲</i><b id="rocketTierText">1/7</b></span>
-        <span class="upgrade-tier" title="System cooling"><i>❄</i><b id="coolingTierText">1/7</b></span>
+        <span class="upgrade-tier" data-i18n-title="tooltip.flightSpeed" title="Flight speed"><i>»</i><b id="speedTierText">1/7</b></span>
+        <span class="upgrade-tier" data-i18n-title="tooltip.blasterDamage" title="Blaster damage"><i>◆</i><b id="damageTierText">1/7</b></span>
+        <span class="upgrade-tier" data-i18n-title="tooltip.fireRate" title="Fire rate"><i>≋</i><b id="rateTierText">1/7</b></span>
+        <span class="upgrade-tier" data-i18n-title="tooltip.hullStrength" title="Hull strength"><i>⬡</i><b id="hullTierText">1/7</b></span>
+        <span class="upgrade-tier" data-i18n-title="tooltip.rocketPower" title="Rocket power"><i>▲</i><b id="rocketTierText">1/7</b></span>
+        <span class="upgrade-tier" data-i18n-title="tooltip.systemCooling" title="System cooling"><i>❄</i><b id="coolingTierText">1/7</b></span>
       </div>
     </aside>
 
     <div class="status-toast" id="toast" role="status" aria-live="polite"></div>
 
     <section class="overlay start-overlay active" id="startOverlay" aria-labelledby="gameTitle">
-      <button class="start-admin-button" id="menuAdminButton" type="button" aria-label="Open admin access" title="Admin access"><span aria-hidden="true">⚿</span><b>ADMIN</b></button>
+      <select class="language-select menu-language-select" id="menuLanguageSelect" data-i18n-aria-label="language.label" aria-label="Language">
+        <option value="en">EN</option>
+        <option value="ko">한국어</option>
+      </select>
+      <button class="start-admin-button" id="menuAdminButton" type="button" data-i18n-aria-label="aria.adminAccess" aria-label="Open admin access" data-i18n-title="tooltip.adminAccess" title="Admin access"><span aria-hidden="true">⚿</span><b data-i18n="auth.admin">ADMIN</b></button>
       <div class="start-grid">
         <div class="start-main">
           <p class="kicker">EARTH DEFENSE NETWORK - FRONTIER LUNA</p>
           <h1 id="gameTitle">VOIDLINE<br /><em>INVASION</em></h1>
-          <p class="intro">Three sectors stand between the invasion fleet and Earth. Intercept every formation, salvage
-            void ore, and protect earth's last stronghold.</p>
+          <p class="intro" data-i18n="menu.intro">Three sectors stand between the invasion fleet and Earth. Intercept every formation, salvage
+            void ore, and protect Earth's last stronghold.</p>
           <div class="menu-actions primary-actions">
-            <button class="main-button" id="startButton" type="button"><span>BEGIN DEFENSE</span><b>ENTER</b></button>
+            <button class="main-button" id="startButton" type="button"><span data-i18n="menu.beginDefense">BEGIN DEFENSE</span><b>ENTER</b></button>
           </div>
           <div class="callsign-entry">
             <input id="publicUsername" type="text" minlength="3" maxlength="20" pattern="[A-Za-z0-9_]+"
-              autocomplete="nickname" aria-label="Callsign" title="3–20 letters, numbers, or underscores. Used for saves and the highscore board." spellcheck="false" />
+              autocomplete="nickname" data-i18n-aria-label="menu.callsignAria" aria-label="Callsign" data-i18n-title="menu.callsignTitle" title="3–20 letters, numbers, or underscores. Used for saves and the highscore board." spellcheck="false" />
             <small id="publicUsernameHint" aria-live="polite"></small>
           </div>
           <div class="menu-actions secondary-actions">
-            <button class="secondary-button" id="tutorialButton" type="button"><span>TRAINING
+            <button class="secondary-button" id="tutorialButton" type="button"><span data-i18n="menu.trainingRun">TRAINING
                 RUN</span><b>T</b></button>
-            <button class="secondary-button level-select-button" id="levelSelectButton" type="button"><span>LEVEL
+            <button class="secondary-button level-select-button" id="levelSelectButton" type="button"><span data-i18n="menu.levelSelect">LEVEL
                 SELECT</span><b>L</b></button>
-            <button class="secondary-button" id="leaderboardButton" type="button"><span>TOP
+            <button class="secondary-button" id="leaderboardButton" type="button"><span data-i18n="menu.topPilots">TOP
                 PILOTS</span><b>RANKS</b></button>
           </div>
         </div>
@@ -145,34 +153,34 @@
             <div class="needle"></div>
           </div>
           <div class="briefing-card">
-            <span class="eyebrow">FLIGHT BRIEFING</span>
-            <div class="brief-row"><kbd>WASD</kbd><span>Fly freely</span></div>
-            <div class="brief-row"><kbd>↑ / CLICK</kbd><span>Fire blaster</span></div>
-            <div class="brief-row"><kbd>F</kbd><span>Charge heavy rocket</span></div>
-            <div class="brief-row"><kbd>T</kbd><span>Place jump destination</span></div>
-            <div class="brief-row"><kbd>Q / RMB</kbd><span>Void jump — recharges</span></div>
-            <div class="brief-row"><kbd>B</kbd><span>Build / upgrade station</span></div>
-            <div class="brief-row"><kbd>SHIFT</kbd><span>Precision flight</span></div>
+            <span class="eyebrow" data-i18n="menu.flightBriefing">FLIGHT BRIEFING</span>
+            <div class="brief-row"><kbd>WASD</kbd><span data-i18n="menu.flyFreely">Fly freely</span></div>
+            <div class="brief-row"><kbd>↑ / CLICK</kbd><span data-i18n="menu.fireBlaster">Fire blaster</span></div>
+            <div class="brief-row"><kbd>F</kbd><span data-i18n="menu.chargeRocket">Charge heavy rocket</span></div>
+            <div class="brief-row"><kbd>T</kbd><span data-i18n="menu.placeJump">Place jump destination</span></div>
+            <div class="brief-row"><kbd>Q / SPACE</kbd><span data-i18n="menu.voidJumpRecharge">Void jump — recharges</span></div>
+            <div class="brief-row"><kbd>B</kbd><span data-i18n="menu.buildStation">Build / upgrade station</span></div>
+            <div class="brief-row"><kbd>SHIFT</kbd><span data-i18n="menu.precisionFlight">Precision flight</span></div>
           </div>
           <div class="utility-actions">
-            <button id="controlsButton" type="button">CONTROLS</button>
-            <button id="settingsButton" type="button">SETTINGS</button>
+            <button id="controlsButton" type="button" data-i18n="menu.controls">CONTROLS</button>
+            <button id="settingsButton" type="button" data-i18n="menu.settings">SETTINGS</button>
           </div>
         </div>
       </div>
       <footer class="acknowledgements">
-        <span>GAMEPLAY INSPIRATIONS</span>
+        <span data-i18n="menu.inspirations">GAMEPLAY INSPIRATIONS</span>
         <p>Bloons Tower Defense · Kingdom Rush · <a href="https://marth1703.github.io/GameStudio/Skyrush/index.html"
-            target="_blank" rel="noopener noreferrer">SkyRush — created by a friend</a></p>
+            target="_blank" rel="noopener noreferrer" data-i18n="menu.skyRushCredit">SkyRush — created by a friend</a></p>
       </footer>
     </section>
 
     <section class="overlay panel-overlay" id="levelSelectOverlay" aria-labelledby="levelSelectTitle">
       <div class="panel level-select-panel">
-        <button class="close-button" id="closeLevelSelect" type="button" aria-label="Close level selection">×</button>
-        <p class="kicker">CAMPAIGN ARCHIVE</p>
-        <h2 id="levelSelectTitle">CHOOSE A SECTOR</h2>
-        <p class="panel-copy">Replaying a sector restores the ship and resources saved when that sector was first
+        <button class="close-button" id="closeLevelSelect" type="button" data-i18n-aria-label="aria.closeLevelSelect" aria-label="Close level selection">×</button>
+        <p class="kicker" data-i18n="level.archive">CAMPAIGN ARCHIVE</p>
+        <h2 id="levelSelectTitle" data-i18n="level.chooseSector">CHOOSE A SECTOR</h2>
+        <p class="panel-copy" data-i18n="level.copy">Replaying a sector restores the ship and resources saved when that sector was first
           unlocked.</p>
         <div class="level-grid" id="levelChoices"></div>
       </div>
@@ -180,45 +188,45 @@
 
     <section class="overlay panel-overlay" id="pauseOverlay" aria-labelledby="pauseTitle">
       <div class="panel compact-panel">
-        <p class="kicker">FLIGHT SUSPENDED</p>
-        <h2 id="pauseTitle">PAUSED</h2>
+        <p class="kicker" data-i18n="pause.kicker">FLIGHT SUSPENDED</p>
+        <h2 id="pauseTitle" data-i18n="pause.title">PAUSED</h2>
         <div class="stack-actions">
-          <button class="main-button" id="resumeButton" type="button"><span>RESUME</span><b>ESC</b></button>
-          <button class="secondary-button" id="pauseSettingsButton" type="button">SETTINGS & CONTROLS</button>
-          <button class="ghost-button" id="restartButton" type="button">RESTART RUN</button>
-          <button class="ghost-button" id="quitButton" type="button">QUIT TO TITLE</button>
+          <button class="main-button" id="resumeButton" type="button"><span data-i18n="pause.resume">RESUME</span><b>ESC</b></button>
+          <button class="secondary-button" id="pauseSettingsButton" type="button" data-i18n="pause.settingsControls">SETTINGS & CONTROLS</button>
+          <button class="ghost-button" id="restartButton" type="button" data-i18n="pause.restart">RESTART RUN</button>
+          <button class="ghost-button" id="quitButton" type="button" data-i18n="pause.quit">QUIT TO TITLE</button>
         </div>
       </div>
     </section>
 
     <section class="overlay panel-overlay" id="settingsOverlay" aria-labelledby="settingsTitle">
       <div class="panel settings-panel">
-        <button class="close-button" id="closeSettings" type="button" aria-label="Close settings">×</button>
-        <p class="kicker">SHIP CONFIGURATION</p>
-        <h2 id="settingsTitle">SETTINGS</h2>
+        <button class="close-button" id="closeSettings" type="button" data-i18n-aria-label="aria.closeSettings" aria-label="Close settings">×</button>
+        <p class="kicker" data-i18n="settings.kicker">SHIP CONFIGURATION</p>
+        <h2 id="settingsTitle" data-i18n="settings.title">SETTINGS</h2>
         <div class="settings-grid">
           <div>
-            <h3>AUDIO & DISPLAY</h3>
-            <label class="toggle-row"><span><b>MUSIC</b><small>Procedural deep-space score</small></span><input
+            <h3 data-i18n="settings.audioDisplay">AUDIO & DISPLAY</h3>
+            <label class="toggle-row"><span><b data-i18n="settings.music">MUSIC</b><small data-i18n="settings.musicCopy">Procedural deep-space score</small></span><input
                 id="musicToggle" type="checkbox" checked /><i></i></label>
-            <label class="toggle-row"><span><b>SOUND FX</b><small>Weapons, impacts, alerts</small></span><input
+            <label class="toggle-row"><span><b data-i18n="settings.sfx">SOUND FX</b><small data-i18n="settings.sfxCopy">Weapons, impacts, alerts</small></span><input
                 id="sfxToggle" type="checkbox" checked /><i></i></label>
-            <label class="toggle-row"><span><b>SCREEN SHAKE</b><small>Impact feedback</small></span><input
+            <label class="toggle-row"><span><b data-i18n="settings.shake">SCREEN SHAKE</b><small data-i18n="settings.shakeCopy">Impact feedback</small></span><input
                 id="shakeToggle" type="checkbox" checked /><i></i></label>
           </div>
           <div>
-            <h3>CONTROLS</h3>
+            <h3 data-i18n="settings.controls">CONTROLS</h3>
             <div class="control-table">
-              <span><kbd>W A S D</kbd><b>Flight vector</b></span>
-              <span><kbd>↑</kbd><b>Fire forward</b></span>
-              <span><kbd>LMB</kbd><b>Aim & fire</b></span>
-              <span><kbd>F</kbd><b>Heavy rocket</b></span>
-              <span><kbd>T</kbd><b>Place jump destination</b></span>
-              <span><kbd>Q / RMB</kbd><b>Void jump</b></span>
-              <span><kbd>B</kbd><b>Build / upgrade station</b></span>
-              <span><kbd>R</kbd><b>Call earned next wave</b></span>
-              <span><kbd>SHIFT</kbd><b>Precision flight</b></span>
-              <span><kbd>ESC</kbd><b>Pause</b></span>
+              <span><kbd>W A S D</kbd><b data-i18n="settings.flightVector">Flight vector</b></span>
+              <span><kbd>↑</kbd><b data-i18n="settings.fireForward">Fire forward</b></span>
+              <span><kbd>LMB</kbd><b data-i18n="settings.aimFire">Aim & fire</b></span>
+              <span><kbd>F</kbd><b data-i18n="settings.heavyRocket">Heavy rocket</b></span>
+              <span><kbd>T</kbd><b data-i18n="settings.placeJump">Place jump destination</b></span>
+              <span><kbd>Q / SPACE</kbd><b data-i18n="settings.voidJump">Void jump</b></span>
+              <span><kbd>B</kbd><b data-i18n="settings.station">Build / upgrade station</b></span>
+              <span><kbd>R</kbd><b data-i18n="settings.callWave">Call earned next wave</b></span>
+              <span><kbd>SHIFT</kbd><b data-i18n="settings.precision">Precision flight</b></span>
+              <span><kbd>ESC</kbd><b data-i18n="settings.pause">Pause</b></span>
             </div>
           </div>
         </div>
@@ -234,7 +242,7 @@
           <p class="intel-role" id="intelRole">FAST // LIGHT HULL</p>
           <p class="panel-copy" id="intelText">Quick attack craft with very little armor. Track early and destroy before
             it slips through.</p>
-          <button class="main-button" id="intelContinue" type="button"><span>ACKNOWLEDGE</span><b>ENTER</b></button>
+          <button class="main-button" id="intelContinue" type="button"><span data-i18n="intel.acknowledge">ACKNOWLEDGE</span><b>ENTER</b></button>
         </div>
       </div>
     </section>
@@ -245,28 +253,28 @@
         <h2 id="bossTitle">DREADNOUGHT OMEGA</h2>
         <p id="bossText">MISSILE COMMAND SHIP</p>
         <div class="boss-scan" aria-hidden="true"><i></i><b></b></div>
-        <button class="ghost-button" id="skipBossIntro" type="button">ENGAGE NOW</button>
+        <button class="ghost-button" id="skipBossIntro" type="button" data-i18n="boss.engage">ENGAGE NOW</button>
       </div>
     </section>
 
     <section class="overlay panel-overlay" id="sectorOverlay" aria-labelledby="sectorTitle">
       <div class="panel sector-panel">
-        <p class="kicker">SECTOR SECURED</p>
+        <p class="kicker" data-i18n="sector.secured">SECTOR SECURED</p>
         <h2 id="sectorTitle">OUTER PERIMETER</h2>
         <p class="panel-copy" id="sectorCopy">The route ahead has split. Hostiles are regrouping around twin approach
           corridors.</p>
-        <div class="sector-reward"><span>FIELD REPAIR</span><strong>+35% HULL</strong><span>GATE
-            SUPPORT</span><strong>+1 SHIELD</strong></div>
-        <button class="main-button" id="nextSectorButton" type="button"><span>ENTER NEXT
+        <div class="sector-reward"><span data-i18n="sector.fieldRepair">FIELD REPAIR</span><strong data-i18n="sector.hullReward">+35% HULL</strong><span data-i18n="sector.gateSupport">GATE
+            SUPPORT</span><strong data-i18n="sector.shieldReward">+1 SHIELD</strong></div>
+        <button class="main-button" id="nextSectorButton" type="button"><span data-i18n="sector.next">ENTER NEXT
             SECTOR</span><b>ENTER</b></button>
       </div>
     </section>
 
     <section class="overlay panel-overlay" id="upgradeOverlay" aria-labelledby="upgradeTitle">
       <div class="panel upgrade-panel">
-        <p class="kicker">POWER SIGNATURE INCREASED</p>
-        <h2 id="upgradeTitle">CHOOSE AN UPGRADE</h2>
-        <p class="panel-copy">Your ship can safely integrate one recovered module.</p>
+        <p class="kicker" data-i18n="upgrade.kicker">POWER SIGNATURE INCREASED</p>
+        <h2 id="upgradeTitle" data-i18n="upgrade.title">CHOOSE AN UPGRADE</h2>
+        <p class="panel-copy" data-i18n="upgrade.copy">Your ship can safely integrate one recovered module.</p>
         <div class="upgrade-grid" id="upgradeChoices"></div>
       </div>
     </section>
@@ -277,52 +285,52 @@
         <h2 id="endTitle">THE GATE HAS FALLEN</h2>
         <p class="panel-copy" id="endCopy">The invasion fleet breached the last defense corridor.</p>
         <div class="result-grid">
-          <span><small>SCORE</small><strong id="finalScore">0</strong></span>
-          <span><small>PROGRESS</small><strong id="finalWave">0</strong></span>
-          <span><small>HOSTILES</small><strong id="finalKills">0</strong></span>
+          <span><small data-i18n="end.score">SCORE</small><strong id="finalScore">0</strong></span>
+          <span><small data-i18n="end.progress">PROGRESS</small><strong id="finalWave">0</strong></span>
+          <span><small data-i18n="end.hostiles">HOSTILES</small><strong id="finalKills">0</strong></span>
         </div>
         <div class="stack-actions">
-          <button class="main-button" id="playAgainButton" type="button"><span>FLY AGAIN</span><b>ENTER</b></button>
-          <button class="ghost-button" id="endQuitButton" type="button">RETURN TO TITLE</button>
+          <button class="main-button" id="playAgainButton" type="button"><span data-i18n="end.flyAgain">FLY AGAIN</span><b>ENTER</b></button>
+          <button class="ghost-button" id="endQuitButton" type="button" data-i18n="end.returnTitle">RETURN TO TITLE</button>
         </div>
       </div>
     </section>
 
     <section class="overlay panel-overlay" id="authOverlay" aria-labelledby="authTitle">
       <div class="panel auth-panel">
-        <button class="close-button" id="closeAuth" type="button" aria-label="Close admin access">×</button>
-        <p class="kicker">VOIDLINE ADMIN CONSOLE</p>
+        <button class="close-button" id="closeAuth" type="button" data-i18n-aria-label="aria.closeAdmin" aria-label="Close admin access">×</button>
+        <p class="kicker" data-i18n="auth.kicker">VOIDLINE ADMIN CONSOLE</p>
         <h2 id="authTitle">ADMIN ACCESS</h2>
         <p class="panel-copy" id="authCopy">Administrator access is reserved for testing and level verification.</p>
 
         <form class="auth-form" id="authForm">
-          <label><span>USERNAME</span><input id="authUsername" name="username" type="text"
+          <label><span data-i18n="auth.username">USERNAME</span><input id="authUsername" name="username" type="text"
               minlength="3" maxlength="20" pattern="[A-Za-z0-9_]+" autocomplete="username" spellcheck="false"
               required /></label>
-          <label><span>PASSWORD</span><input id="authPassword" name="password" type="password"
+          <label><span data-i18n="auth.password">PASSWORD</span><input id="authPassword" name="password" type="password"
               minlength="8" maxlength="72" autocomplete="current-password" required /></label>
-          <p class="auth-hint">Admin runs unlock every sector and never submit highscores.</p>
+          <p class="auth-hint" data-i18n="auth.hint">Admin runs unlock every sector and never submit highscores.</p>
           <p class="auth-message" id="authMessage" role="status" aria-live="polite"></p>
-          <button class="main-button" type="submit"><span>SIGN IN AS ADMIN</span><b>ENTER</b></button>
+          <button class="main-button" type="submit"><span data-i18n="auth.signIn">SIGN IN AS ADMIN</span><b>ENTER</b></button>
         </form>
 
         <div class="pilot-summary" id="pilotSummary" hidden>
           <div class="pilot-avatar" aria-hidden="true">V</div>
-          <div><span id="pilotType">CLOUD PILOT</span><strong id="pilotName">—</strong><small id="pilotSyncState">CLOUD
-              SAVE READY</small></div>
-          <button class="ghost-button" id="signOutButton" type="button">SIGN OUT</button>
+          <div><span id="pilotType" data-i18n="account.guestPilot">GUEST PILOT · DEVICE SESSION</span><strong id="pilotName">—</strong><small id="pilotSyncState" data-i18n="account.saveCurrent">CLOUD
+              SAVE CURRENT</small></div>
+          <button class="ghost-button" id="signOutButton" type="button" data-i18n="auth.signOut">SIGN OUT</button>
         </div>
       </div>
     </section>
 
     <section class="overlay panel-overlay" id="leaderboardOverlay" aria-labelledby="leaderboardTitle">
       <div class="panel leaderboard-panel">
-        <button class="close-button" id="closeLeaderboard" type="button" aria-label="Close leaderboard">×</button>
-        <p class="kicker">EARTH DEFENSE RECORDS</p>
-        <h2 id="leaderboardTitle">TOP PILOTS</h2>
-        <p class="panel-copy">The strongest run from each pilot is shown. </p>
+        <button class="close-button" id="closeLeaderboard" type="button" data-i18n-aria-label="aria.closeLeaderboard" aria-label="Close leaderboard">×</button>
+        <p class="kicker" data-i18n="leaderboard.kicker">EARTH DEFENSE RECORDS</p>
+        <h2 id="leaderboardTitle" data-i18n="leaderboard.title">TOP PILOTS</h2>
+        <p class="panel-copy" data-i18n="leaderboard.copy">The strongest run from each pilot is shown.</p>
         <div class="leaderboard-list" id="leaderboardList">
-          <p class="leaderboard-empty">CONTACTING DEFENSE NETWORK…</p>
+          <p class="leaderboard-empty" data-i18n="leaderboard.connecting">CONTACTING DEFENSE NETWORK…</p>
         </div>
       </div>
     </section>
@@ -332,10 +340,10 @@
       <h2 id="tutorialTitle">TAKE THE CONTROLS</h2>
       <p id="tutorialText">Use W, A, S, and D to move through the sector.</p>
       <div class="tutorial-progress" id="tutorialProgress"></div>
-      <button id="skipTutorial" type="button">SKIP TRAINING</button>
+      <button id="skipTutorial" type="button" data-i18n="tutorial.skip">SKIP TRAINING</button>
     </section>
 
-    <div class="rotate-notice">For the best flight view, rotate your device to landscape.</div>
+    <div class="rotate-notice" data-i18n="rotate">For the best flight view, rotate your device to landscape.</div>
   </main>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>

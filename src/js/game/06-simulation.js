@@ -178,7 +178,7 @@
     if (mode !== 'playing' || !waveReady || !waveCallEligible) return;
     const bonus = Math.round((6 + wave * 2 + currentLevel * 3) * (1 + formation * .15));
     grantXp(bonus, true);
-    showToast(`RAPID CLEAR // +${bonus} XP`);
+    showToast(t('toast.rapidClear', { xp: bonus }));
     advanceAfterClear();
   }
 
@@ -281,7 +281,7 @@
     if (mode !== 'playing' || player.rocketCooldown > 0 || player.rocketCharge > 0) return;
     player.rocketCharge = .62;
     player.rocketTarget = lockedTarget && !lockedTarget.dead ? lockedTarget : null;
-    showToast(player.rocketTarget ? `LOCK CONFIRMED // ${ENEMY_TYPES[player.rocketTarget.type].name}` : 'HEAVY ROCKET CHARGING // NO LOCK');
+    showToast(player.rocketTarget ? t('toast.lockConfirmed', { enemy: translateEnemy(player.rocketTarget.type).name }) : t('toast.rocketCharging'));
     audio.tone(96, .55, 'sawtooth', .05, 260);
   }
 
@@ -331,7 +331,7 @@
     player.jumpDestinationY = clamp(targetY, 70, WORLD.height - 70);
     player.jumpDestinationCooldown = player.jumpDestinationMax;
     burst(player.jumpDestinationX, player.jumpDestinationY, COLORS.purple, 12, 120);
-    showToast('VOID DESTINATION SET');
+    showToast(t('toast.destinationSet'));
     audio.tone(340, .16, 'sine', .07, 520);
   }
 
@@ -339,7 +339,7 @@
     player.jumpDestinationX = null;
     player.jumpDestinationY = null;
     player.jumpDestinationCooldown = 0;
-    showToast('VOID DESTINATION CLEARED // DASH RESTORED');
+    showToast(t('toast.destinationCleared'));
     audio.tone(220, .14, 'sine', .06, -280);
   }
 
@@ -360,7 +360,7 @@
       const length = Math.hypot(dx, dy) || 1;
       targetX = clamp(player.x + (dx / length) * 410, 45, WORLD.width - 45);
       targetY = clamp(player.y + (dy / length) * 410, 45, WORLD.height - 45);
-      showToast('JUMPED AHEAD // PRESS T TO SET A DESTINATION');
+      showToast(t('toast.jumpedAhead'));
     } else {
       targetX = clamp(targetX, 45, WORLD.width - 45);
       targetY = clamp(targetY, 45, WORLD.height - 45);
@@ -483,7 +483,7 @@
           }
           enemy.spawnTimer = enemy.bossSkill === 'swarm' ? rand(2.9, 4.2) : rand(4.2, 5.9);
           burst(enemy.x, enemy.y, enemy.color, 10, 110);
-          showToast(enemy.boss ? 'CARRIER WING DEPLOYED' : 'BROOD CARRIER LAUNCHED INTERCEPTORS');
+          showToast(enemy.boss ? t('toast.carrierWing') : t('toast.carrierLaunch'));
         }
       }
 
@@ -493,7 +493,7 @@
         camera.shake = Math.max(camera.shake, 16);
         burst(PORTAL.x, PORTAL.y, COLORS.coral, 30, 320);
         audio.tone(58, .5, 'sawtooth', .11, -28);
-        showToast(gateShields > 0 ? `GATE HIT // ${gateShields} SHIELD${gateShields === 1 ? '' : 'S'} REMAIN` : 'EARTH GATE BREACHED');
+        showToast(gateShields > 0 ? t('toast.gateHit', { count: gateShields }) : t('toast.gateBreached'));
         if (gateShields <= 0) finishRun(false, 'gate');
       }
     });
@@ -537,10 +537,10 @@
     if (mode !== 'playing') return;
     const docked = nearestStation(110);
     if (docked) {
-      if (Math.hypot(player.vx, player.vy) > 150) { showToast('SLOW DOWN TO DOCK'); return; }
-      if (docked.level >= 4) { showToast('STATION AT MAXIMUM POWER'); return; }
+      if (Math.hypot(player.vx, player.vy) > 150) { showToast(t('toast.slowDock')); return; }
+      if (docked.level >= 4) { showToast(t('toast.stationMax')); return; }
       const cost = 90 + docked.level * 80;
-      if (player.credits < cost) { showToast(`UPGRADE REQUIRES ${cost} SALVAGE CREDITS`); return; }
+      if (player.credits < cost) { showToast(t('toast.upgradeRequires', { cost })); return; }
       player.credits -= cost;
       docked.level += 1;
       docked.range += 72;
@@ -548,17 +548,17 @@
       docked.fireRate *= .86;
       player.hp = Math.min(player.maxHp, player.hp + 12);
       burst(docked.x, docked.y, COLORS.amber, 24, 180);
-      showToast(`STATION UPGRADED // MK ${docked.level}`);
+      showToast(t('toast.stationUpgraded', { level: docked.level }));
       audio.tone(420, .36, 'sine', .07, 280);
       return;
     }
-    if (stations.length >= 3) { showToast('STATION LIMIT REACHED'); return; }
+    if (stations.length >= 3) { showToast(t('toast.stationLimit')); return; }
     const cost = stationBuildCost();
-    if (player.credits < cost) { showToast(`NEED ${cost} SALVAGE CREDITS`); return; }
+    if (player.credits < cost) { showToast(t('toast.needCredits', { cost })); return; }
     player.credits -= cost;
     stations.push({ x: player.x, y: player.y, radius: 30, level: 1, range: 470, damage: 17, fireRate: .8, fireTimer: .25, angle: 0, target: null });
     burst(player.x, player.y, COLORS.amber, 28, 210);
-    showToast('FRIENDLY DEFENSE STATION DEPLOYED');
+    showToast(t('toast.stationDeployed'));
     audio.tone(230, .5, 'triangle', .075, 310);
   }
 
@@ -709,7 +709,7 @@
         const angle = Math.atan2(player.y - rock.y, player.x - rock.x);
         player.vx += Math.cos(angle) * (260 + rock.radius * 4);
         player.vy += Math.sin(angle) * (260 + rock.radius * 4);
-        addFloater(rock.x, rock.y - rock.radius, 'COLLISION', COLORS.coral);
+        addFloater(rock.x, rock.y - rock.radius, t('floater.collision'), COLORS.coral);
       }
     }
 
@@ -722,7 +722,7 @@
     if (enemy.shieldCharges > 0) {
       enemy.shieldHitTimer = .16;
       if (!heavy) {
-        if (Math.random() < .18) addFloater(enemy.x, enemy.y - enemy.radius, 'SHIELDED', '#79a8ff');
+        if (Math.random() < .18) addFloater(enemy.x, enemy.y - enemy.radius, t('floater.shielded'), '#79a8ff');
         addParticle(x, y, { vx: rand(-60, 60), vy: rand(-60, 60), color: '#79a8ff', life: .34, size: 2.5 });
         audio.tone(780, .045, 'sine', .022, -100);
         return;
@@ -730,17 +730,17 @@
       enemy.shieldCharges -= 1;
       burst(x, y, '#79a8ff', 14, 160);
       if (enemy.shieldCharges > 0) {
-        showToast(`${ENEMY_TYPES[enemy.type].name} // ${enemy.shieldCharges} SHIELD CHARGES REMAIN`);
-        addFloater(enemy.x, enemy.y - enemy.radius, `SHIELD ${enemy.shieldCharges}/${enemy.maxShieldCharges}`, '#9acbff');
+        showToast(t('toast.shieldRemaining', { enemy: translateEnemy(enemy.type).name, count: enemy.shieldCharges }));
+        addFloater(enemy.x, enemy.y - enemy.radius, t('floater.shield', { current: enemy.shieldCharges, total: enemy.maxShieldCharges }), '#9acbff');
         return;
       }
       amount *= .72;
-      showToast(`${ENEMY_TYPES[enemy.type].name} // SHIELD COLLAPSED`);
-      addFloater(enemy.x, enemy.y - enemy.radius, 'SHIELD COLLAPSED', COLORS.amber);
+      showToast(t('toast.shieldCollapsed', { enemy: translateEnemy(enemy.type).name }));
+      addFloater(enemy.x, enemy.y - enemy.radius, t('floater.shieldCollapsed'), COLORS.amber);
     } else if (enemy.shieldHp > 0) {
       enemy.shieldHitTimer = .16;
       if (!heavy) {
-        if (enemy.shieldHitTimer <= .17 && Math.random() < .18) addFloater(enemy.x, enemy.y - enemy.radius, 'SHIELDED', '#79a8ff');
+        if (enemy.shieldHitTimer <= .17 && Math.random() < .18) addFloater(enemy.x, enemy.y - enemy.radius, t('floater.shielded'), '#79a8ff');
         addParticle(x, y, { vx: rand(-60, 60), vy: rand(-60, 60), color: '#79a8ff', life: .34, size: 2.5 });
         audio.tone(780, .045, 'sine', .022, -100);
         return;
@@ -749,12 +749,12 @@
       burst(x, y, '#79a8ff', 14, 160);
       if (enemy.shieldHp > 0) return;
       amount *= .72;
-      showToast(`${ENEMY_TYPES[enemy.type].name} // SHIELD COLLAPSED`);
-      addFloater(enemy.x, enemy.y - enemy.radius, 'SHIELD BROKEN', COLORS.amber);
+      showToast(t('toast.shieldCollapsed', { enemy: translateEnemy(enemy.type).name }));
+      addFloater(enemy.x, enemy.y - enemy.radius, t('floater.shieldBroken'), COLORS.amber);
     }
     enemy.hp -= amount;
     enemy.hitFlash = .08;
-    if (enemy.interceptor) addFloater(enemy.x, enemy.y - enemy.radius, `${Math.max(1, Math.round(enemy.hp))} HULL`, enemy.color);
+    if (enemy.interceptor) addFloater(enemy.x, enemy.y - enemy.radius, t('floater.hull', { amount: Math.max(1, Math.round(enemy.hp)) }), enemy.color);
     addParticle(x, y, { vx: rand(-80, 80), vy: rand(-80, 80), color: enemy.color, life: .28, size: 2.2 });
     if (enemy.hp <= 0 && !enemy.dead) {
       enemy.dead = true;
@@ -763,7 +763,7 @@
       grantXp(enemy.xp);
       burst(enemy.x, enemy.y, enemy.color, enemy.boss ? 60 : enemy.major ? 30 : 14, enemy.boss ? 520 : 240);
       addFloater(enemy.x, enemy.y - enemy.radius, `+${enemy.score}`, enemy.boss ? COLORS.amber : COLORS.cyan);
-      if (enemy.interceptor) showToast('CARRIER INTERCEPTOR DESTROYED');
+      if (enemy.interceptor) showToast(t('toast.carrierInterceptorDestroyed'));
       camera.shake = Math.max(camera.shake, enemy.boss ? 22 : enemy.major ? 9 : 3.5);
       audio.tone(enemy.boss ? 48 : enemy.major ? 72 : 130, enemy.boss ? .75 : .16, 'sawtooth', enemy.boss ? .14 : .05, -35);
       if (enemy.major && Math.random() < .28) spawnPickupAt('repair', enemy.x, enemy.y);
@@ -773,8 +773,8 @@
       enemy.maxShield = enemy.maxHp * .2;
       enemy.shieldHp = enemy.maxShield;
       enemy.shieldHitTimer = .45;
-      showToast(`${ENEMY_TYPES[enemy.type].name} // EMERGENCY SHIELD ONLINE`);
-      addFloater(enemy.x, enemy.y - enemy.radius, 'EMERGENCY SHIELD', '#9acbff');
+      showToast(t('toast.emergencyShield', { enemy: translateEnemy(enemy.type).name }));
+      addFloater(enemy.x, enemy.y - enemy.radius, t('floater.emergencyShield'), '#9acbff');
       burst(enemy.x, enemy.y, '#79a8ff', 34, 280);
     }
   }
@@ -787,11 +787,11 @@
     if (rocket.hp <= 0) {
       rocket.dead = true;
       burst(rocket.x, rocket.y, COLORS.coral, 11, 190);
-      addFloater(rocket.x, rocket.y - 13, 'MISSILE INTERCEPTED', COLORS.cyan);
+      addFloater(rocket.x, rocket.y - 13, t('floater.missileIntercepted'), COLORS.cyan);
       camera.shake = Math.max(camera.shake, 2.5);
       audio.tone(190, .1, 'square', .035, -70);
     } else {
-      addFloater(rocket.x, rocket.y - 11, `${Math.ceil(rocket.hp)} HULL`, COLORS.coral);
+      addFloater(rocket.x, rocket.y - 11, t('floater.hull', { amount: Math.ceil(rocket.hp) }), COLORS.coral);
       audio.tone(520, .035, 'square', .018, -80);
     }
   }
@@ -839,7 +839,7 @@
     player.invulnerable = .5;
     camera.shake = Math.max(camera.shake, 12);
     burst(player.x, player.y, COLORS.coral, 14, 240);
-    addFloater(player.x, player.y - 28, `-${Math.round(amount)} HULL`, COLORS.coral);
+    addFloater(player.x, player.y - 28, t('floater.hull', { amount: `-${Math.round(amount)}` }), COLORS.coral);
     audio.tone(94, .28, 'sawtooth', .09, -54);
     if (player.hp <= 0) finishRun(false, 'ship');
   }
@@ -849,12 +849,12 @@
     if (item.kind === 'repair') {
       const healed = Math.min(36, player.maxHp - player.hp);
       player.hp += healed;
-      showToast(healed > 0 ? `REPAIR FIELD // +${Math.round(healed)} HULL` : 'HULL ALREADY STABLE');
-      addFloater(item.x, item.y, `+${Math.round(healed)} HP`, COLORS.cyan);
+      showToast(healed > 0 ? t('toast.repairField', { amount: Math.round(healed) }) : t('toast.hullStable'));
+      addFloater(item.x, item.y, t('floater.hull', { amount: `+${Math.round(healed)}` }), COLORS.cyan);
     } else {
       gateShields = Math.min(5, gateShields + 1);
-      showToast('AEGIS CORE RECOVERED // GATE +1');
-      addFloater(item.x, item.y, '+1 GATE SHIELD', COLORS.amber);
+      showToast(t('toast.aegisRecovered'));
+      addFloater(item.x, item.y, t('floater.gateShield'), COLORS.amber);
     }
     burst(item.x, item.y, item.kind === 'repair' ? COLORS.cyan : COLORS.amber, 20, 170);
     audio.tone(item.kind === 'repair' ? 660 : 420, .35, 'sine', .065, 240);

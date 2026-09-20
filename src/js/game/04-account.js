@@ -16,7 +16,7 @@
     const username = String(ui.publicUsername.value || '').trim().toLowerCase() || generateCallsign();
     ui.publicUsername.value = username;
     if (!/^[a-z0-9_]{3,20}$/.test(username)) {
-      throw new Error('Use 3–20 letters, numbers, or underscores.');
+      throw new Error(t('account.callsignInvalid'));
     }
     return username;
   }
@@ -29,10 +29,10 @@
     ui.authMessage.textContent = '';
     ui.authMessage.classList.remove('success');
     ui.authPassword.value = '';
-    ui.authTitle.textContent = signedIn ? 'ADMIN CONSOLE' : 'ADMIN ACCESS';
+    ui.authTitle.textContent = signedIn ? t('account.adminConsole') : t('account.adminAccess');
     ui.authCopy.textContent = signedIn
-      ? 'Administrator tools are active. Every sector is unlocked and runs are excluded from highscores.'
-      : 'Sign in with the private administrator account to unlock testing access.';
+      ? t('account.adminCopy')
+      : t('account.signInCopy');
   }
 
   function openAdminAccess() {
@@ -76,7 +76,7 @@
             activePilot = await window.VoidlineCloud.updateGuestUsername(username);
             updatePilotUi();
           } catch (error) {
-            ui.publicUsernameHint.textContent = error.message || 'The callsign could not be changed.';
+            ui.publicUsernameHint.textContent = error.message || t('account.callsignChanged');
             ui.publicUsernameHint.classList.add('active');
             return;
           } finally {
@@ -99,7 +99,7 @@
     }
     cloudBusy = true;
     ui.publicUsername.disabled = true;
-    ui.publicUsernameHint.textContent = `CONNECTING AS ${username.toUpperCase()}…`;
+    ui.publicUsernameHint.textContent = t('account.connectingAs', { username: username.toUpperCase() });
     ui.publicUsernameHint.classList.add('active');
     try {
       const currentPilot = await window.VoidlineCloud.init();
@@ -109,10 +109,10 @@
       ui.publicUsernameHint.classList.remove('active');
       action();
     } catch (error) {
-      const message = error.message || 'Guest flight could not be started.';
+      const message = error.message || t('account.guestStartFailed');
       if (/unreachable|network|setup|required|connecting|loaded|anonymous sign-ins/i.test(message)) {
         await activatePilot({ id: null, username, isGuest: true, isAdmin: false });
-        ui.publicUsernameHint.textContent = 'LOCAL FLIGHT · CLOUD SAVE WILL RESUME WHEN AVAILABLE';
+        ui.publicUsernameHint.textContent = t('account.localFlight');
         ui.publicUsernameHint.classList.add('active');
         action();
       } else {
@@ -128,7 +128,7 @@
   async function submitAdminForm(event) {
     event.preventDefault();
     if (!window.VoidlineCloud) {
-      ui.authMessage.textContent = 'The pilot network could not be loaded. Check your connection and refresh.';
+      ui.authMessage.textContent = t('account.networkLoadFailed');
       return;
     }
     if (cloudBusy) return;
@@ -136,16 +136,16 @@
     const password = ui.authPassword.value;
     cloudBusy = true;
     ui.authForm.classList.add('busy');
-    ui.authMessage.textContent = 'CONTACTING PILOT NETWORK…';
+    ui.authMessage.textContent = t('account.contacting');
     try {
       await window.VoidlineCloud.init();
       const pilot = await window.VoidlineCloud.signInAdmin(username, password);
       await activatePilot(pilot);
-      ui.authMessage.textContent = 'ADMIN LINK ESTABLISHED';
+      ui.authMessage.textContent = t('account.linkEstablished');
       ui.authMessage.classList.add('success');
       setTimeout(closeAdminAccess, 260);
     } catch (error) {
-      ui.authMessage.textContent = error.message || 'Pilot access failed.';
+      ui.authMessage.textContent = error.message || t('account.accessFailed');
     } finally {
       cloudBusy = false;
       ui.authForm.classList.remove('busy');
@@ -161,7 +161,7 @@
       prepareDefaultCallsign();
       renderAdminPanel();
     } catch (error) {
-      ui.pilotSyncState.textContent = error.message || 'SIGN OUT FAILED';
+      ui.pilotSyncState.textContent = error.message || t('account.signOutFailed');
     } finally {
       cloudBusy = false;
     }
@@ -173,12 +173,12 @@
     hideOverlays();
     ui.crosshair.style.opacity = '0';
     ui.leaderboardOverlay.classList.add('active');
-    ui.leaderboardList.innerHTML = '<p class="leaderboard-empty">CONTACTING DEFENSE NETWORK…</p>';
+    ui.leaderboardList.innerHTML = `<p class="leaderboard-empty">${t('leaderboard.connecting')}</p>`;
     try {
       const entries = await window.VoidlineCloud.getLeaderboard(12);
       ui.leaderboardList.replaceChildren();
       if (!entries.length) {
-        ui.leaderboardList.innerHTML = '<p class="leaderboard-empty">NO COMBAT RECORDS YET · SET THE FIRST SCORE</p>';
+        ui.leaderboardList.innerHTML = `<p class="leaderboard-empty">${t('account.recordsEmpty')}</p>`;
         return;
       }
       for (const entry of entries) {
@@ -192,7 +192,7 @@
         const name = document.createElement('strong');
         name.textContent = entry.username;
         const detail = document.createElement('small');
-        detail.textContent = `${entry.is_guest ? 'GUEST · ' : ''}SECTOR ${entry.level_reached} · STAGE ${entry.stage_reached} · ${entry.kills} KILLS`;
+        detail.textContent = t('leaderboard.detail', { guest: entry.is_guest ? t('leaderboard.guest') : '', level: entry.level_reached, stage: entry.stage_reached, kills: entry.kills });
         pilotCell.append(name, detail);
         const value = document.createElement('span');
         value.className = 'leaderboard-score';
@@ -204,7 +204,7 @@
       ui.leaderboardList.innerHTML = '';
       const message = document.createElement('p');
       message.className = 'leaderboard-empty';
-      message.textContent = error.message || 'LEADERBOARD UNAVAILABLE';
+      message.textContent = error.message || t('account.leaderboardUnavailable');
       ui.leaderboardList.append(message);
     }
   }
@@ -226,9 +226,9 @@
       await activatePilot(pilot);
       if (ui.authOverlay.classList.contains('active')) renderAdminPanel();
     } catch (error) {
-      ui.publicUsernameHint.textContent = 'CLOUD SAVE UNAVAILABLE · LOCAL FLIGHT READY';
+      ui.publicUsernameHint.textContent = t('account.cloudUnavailable');
       ui.publicUsernameHint.classList.add('active');
-      ui.pilotSyncState.textContent = 'CLOUD SETUP REQUIRED';
+      ui.pilotSyncState.textContent = t('account.cloudSetup');
       console.warn('Voidline pilot network:', error);
     }
   }
@@ -242,17 +242,19 @@
       const unlocked = adminAccess || index <= campaignState.highestUnlocked;
       const completed = !adminAccess && (index < campaignState.highestUnlocked || (index === LEVELS.length - 1 && campaignState.completedCampaigns > 0));
       const checkpoint = campaignState.checkpoints[index] || expectedCheckpoint(index);
-      const paths = level.paths.length === 1 ? '1 APPROACH' : `${level.paths.length} APPROACHES`;
+      const localizedLevel = translateLevel(level);
+      const paths = level.paths.length === 1 ? t('level.oneApproach') : t('level.approaches', { count: level.paths.length });
+      const descriptionKey = index === 0 ? 'level.oneDescription' : index === 1 ? 'level.twoDescription' : 'level.threeDescription';
       const card = document.createElement('button');
       card.type = 'button';
       card.className = `level-card${unlocked ? '' : ' locked'}`;
       card.dataset.index = String(index + 1).padStart(2, '0');
       card.disabled = !unlocked;
       card.innerHTML = `
-        <span class="level-status">${adminAccess ? 'ADMIN ACCESS' : unlocked ? completed ? 'CLEARED' : 'UNLOCKED' : 'LOCKED'}</span>
-        <h3>${level.name}</h3>
-        <p>${index === 0 ? 'Single-route frontier defense.' : index === 1 ? 'Twin routes and unstable rift entries.' : 'Three converging lanes and deep wormholes.'}</p>
-        <footer><span>${level.stages} STAGES · ${paths}</span><span class="checkpoint-note">SHIP LVL ${checkpoint.level || 1} · ${checkpoint.credits || 0} ◈</span></footer>`;
+        <span class="level-status">${adminAccess ? t('level.adminAccess') : unlocked ? completed ? t('level.cleared') : t('level.unlocked') : t('level.locked')}</span>
+        <h3>${localizedLevel.name}</h3>
+        <p>${t(descriptionKey)}</p>
+        <footer><span>${t('level.stagesApproaches', { stages: level.stages, paths })}</span><span class="checkpoint-note">${t('level.checkpoint', { level: checkpoint.level || 1, credits: checkpoint.credits || 0 })}</span></footer>`;
       if (unlocked) card.addEventListener('click', () => startGame(false, index));
       ui.levelChoices.append(card);
     });

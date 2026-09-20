@@ -179,7 +179,7 @@
       updateTutorialCard();
       const rock = resources[0];
       if (rock) { rock.x = player.x + 300; rock.y = player.y - 50; }
-      showToast('TRAINING LINK ACTIVE');
+      showToast(t('toast.trainingLink'));
     } else {
       ui.tutorialCard.classList.remove('active');
       beginWave();
@@ -205,11 +205,11 @@
     const connected = Boolean(activePilot);
     [ui.adminButton, ui.menuAdminButton].forEach((button) => {
       button.classList.toggle('connected', connected && isAdminPilot());
-      button.title = connected && isAdminPilot() ? `Admin: ${activePilot.username}` : 'Admin access';
+      button.title = connected && isAdminPilot() ? `${t('account.adminAccess')}: ${activePilot.username}` : t('tooltip.adminAccess');
     });
     if (activePilot?.isGuest && ui.publicUsername) ui.publicUsername.value = activePilot.username;
     if (!connected) return;
-    ui.pilotType.textContent = isAdminPilot() ? 'ADMIN PILOT · HIGHSCORE DISABLED' : 'GUEST PILOT · DEVICE SESSION';
+    ui.pilotType.textContent = isAdminPilot() ? t('account.adminPilot') : t('account.guestPilot');
     ui.pilotName.textContent = activePilot.username;
   }
 
@@ -234,7 +234,7 @@
       remote = await window.VoidlineCloud.loadProgress();
     } catch (error) {
       cloudSyncSuspended = true;
-      ui.pilotSyncState.textContent = 'OFFLINE · USING DEVICE SAVE';
+      ui.pilotSyncState.textContent = t('account.offlineDevice');
       console.warn('Voidline cloud load:', error);
     }
 
@@ -244,23 +244,23 @@
       highScore = Math.max(0, Number(remote.high_score) || 0);
       saveCampaignState(false, false);
       localStorage.setItem(localUpdatedKey(), remote.updated_at);
-      ui.pilotSyncState.textContent = 'CLOUD SAVE LOADED';
+      ui.pilotSyncState.textContent = t('account.cloudLoaded');
     } else if (cachedCampaign) {
       campaignState = cachedCampaign;
       highScore = cachedHighScore;
-      ui.pilotSyncState.textContent = cloudSyncSuspended ? 'OFFLINE · SAVED ON DEVICE' : remote ? 'UPLOADING DEVICE SAVE…' : 'DEVICE SAVE LOADED';
+      ui.pilotSyncState.textContent = cloudSyncSuspended ? t('account.offlineSaved') : remote ? t('account.uploading') : t('account.deviceLoaded');
       scheduleCloudSave();
     } else if (localStorage.getItem(CAMPAIGN_KEY) && !localStorage.getItem('voidline-legacy-cloud-claimed')) {
       campaignState = readCampaignState(CAMPAIGN_KEY);
       highScore = Number(localStorage.getItem(HIGH_SCORE_KEY) || 0);
       localStorage.setItem('voidline-legacy-cloud-claimed', 'true');
       saveCampaignState();
-      ui.pilotSyncState.textContent = 'IMPORTING EXISTING PROGRESS…';
+      ui.pilotSyncState.textContent = t('account.importing');
     } else {
       campaignState = emptyCampaignState();
       highScore = 0;
       saveCampaignState();
-      ui.pilotSyncState.textContent = 'NEW CLOUD SAVE CREATED';
+      ui.pilotSyncState.textContent = t('account.cloudCreated');
     }
 
     ensureCampaignCheckpoints();

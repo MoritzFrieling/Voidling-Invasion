@@ -245,7 +245,7 @@
     ctx.fillStyle = COLORS.pale;
     ctx.font = '700 10px "Space Mono", monospace';
     ctx.textAlign = 'center';
-    ctx.fillText('EARTH GATE', 0, 57);
+    ctx.fillText(t('render.earthGate'), 0, 57);
     ctx.restore();
   }
 
@@ -339,7 +339,7 @@
     ctx.fillStyle = COLORS.amber;
     ctx.font = '700 9px "Space Mono", monospace';
     ctx.textAlign = 'center';
-    ctx.fillText(`DEFENSE STATION // MK ${station.level}`, station.x, station.y - 46);
+    ctx.fillText(t('render.station', { level: station.level }), station.x, station.y - 46);
     ctx.restore();
     const upgradeCost = 90 + station.level * 80;
     if (station.level < 4 && player.credits >= upgradeCost) {
@@ -348,7 +348,7 @@
       ctx.globalAlpha = pulse;
       ctx.font = '700 8px "Space Mono", monospace';
       ctx.textAlign = 'center';
-      const label = 'UPGRADE AVAILABLE';
+      const label = t('render.upgradeAvailable');
       const width = ctx.measureText(label).width + 14;
       ctx.fillStyle = 'rgba(255,179,92,.16)';
       ctx.strokeStyle = COLORS.amber;
@@ -475,7 +475,7 @@
       ctx.fillStyle = '#9acbff';
       ctx.font = '700 8px "Space Mono", monospace';
       ctx.textAlign = 'center';
-      ctx.fillText(chargeShield ? `SHIELD ${enemy.shieldCharges}/${enemy.maxShieldCharges}` : `SHIELD ${Math.ceil(enemy.shieldHp)}`, enemy.x, shieldBarY - 4);
+      ctx.fillText(t('render.shield', { amount: chargeShield ? `${enemy.shieldCharges}/${enemy.maxShieldCharges}` : Math.ceil(enemy.shieldHp) }), enemy.x, shieldBarY - 4);
       ctx.restore();
       ctx.save();
       ctx.translate(enemy.x, enemy.y);
@@ -494,7 +494,7 @@
       ctx.fillStyle = COLORS.coral;
       ctx.font = '700 10px "Space Mono", monospace';
       ctx.textAlign = 'center';
-      ctx.fillText(ENEMY_TYPES[enemy.type].name, enemy.x, enemy.y - enemy.radius - 25);
+      ctx.fillText(translateEnemy(enemy.type).name, enemy.x, enemy.y - enemy.radius - 25);
       ctx.restore();
     }
   }
@@ -622,10 +622,10 @@
       const bossStage = wave === LEVELS[currentLevel].stages;
       ctx.fillStyle = bossStage ? COLORS.coral : COLORS.pale;
       ctx.font = `700 ${Math.min(48, screenWidth * .045)}px "Chakra Petch", sans-serif`;
-      ctx.fillText(bossStage ? 'FINAL STAGE' : `STAGE ${String(wave).padStart(2, '0')}`, screenWidth / 2, screenHeight * .36);
+      ctx.fillText(bossStage ? t('render.finalStage') : t('status.stage', { stage: String(wave).padStart(2, '0'), total: LEVELS[currentLevel].stages }), screenWidth / 2, screenHeight * .36);
       ctx.fillStyle = COLORS.muted || '#8ca9aa';
       ctx.font = '700 10px "Space Mono", monospace';
-      ctx.fillText(bossStage ? 'COMMAND SHIP ENTERING THE CORRIDOR' : 'HOSTILE FORMATION DETECTED', screenWidth / 2, screenHeight * .36 + 26);
+      ctx.fillText(bossStage ? t('toast.commandEntering') : t('render.hostileFormation'), screenWidth / 2, screenHeight * .36 + 26);
       ctx.restore();
     }
   }
@@ -699,11 +699,12 @@
   function syncUi() {
     if (!player) return;
     const level = LEVELS[currentLevel];
-    ui.sectorText.textContent = `${level.short} // ${level.name}`;
-    ui.waveText.textContent = `STAGE ${wave ? String(wave).padStart(2, '0') : '—'} / ${level.stages}`;
+    const localizedLevel = translateLevel(level);
+    ui.sectorText.textContent = `${localizedLevel.short} // ${localizedLevel.name}`;
+    ui.waveText.textContent = t('status.stage', { stage: wave ? String(wave).padStart(2, '0') : '—', total: level.stages });
     ui.waveState.textContent = spawnQueue.length || enemies.length
-      ? `WAVE ${formation}/${formationsInStage} · ${spawnQueue.length + enemies.length} HOSTILES`
-      : wave ? `WAVE ${formation}/${formationsInStage} CLEAR` : 'STANDBY';
+      ? t('status.waveActive', { current: formation, total: formationsInStage, hostiles: spawnQueue.length + enemies.length })
+      : wave ? t('status.waveClear', { current: formation, total: formationsInStage }) : t('hud.standby');
     ui.scoreText.textContent = formatScore(score);
     ui.bestText.textContent = formatScore(isAdminPilot() ? 0 : Math.max(highScore, score));
     const healthRatio = clamp(player.hp / player.maxHp, 0, 1);
@@ -721,18 +722,18 @@
     ui.rocketTierText.textContent = `${player.rocketTier}/7`;
     ui.coolingTierText.textContent = `${player.coolingTier}/7`;
     ui.shieldPips.innerHTML = Array.from({ length: 5 }, (_, index) => `<i class="${index >= gateShields ? 'empty' : ''}"></i>`).join('');
-    ui.shieldPips.setAttribute('aria-label', `${gateShields} portal shields`);
+    ui.shieldPips.setAttribute('aria-label', t('status.portalShields', { count: gateShields }));
 
     const rocketProgress = player.rocketCharge > 0 ? 1 - player.rocketCharge / .62 : 1 - player.rocketCooldown / player.rocketMax;
     ui.rocketCooldown.style.width = `${clamp(rocketProgress, 0, 1) * 100}%`;
-    ui.rocketState.textContent = player.rocketCharge > 0 ? 'CHARGING' : player.rocketCooldown > 0 ? `${player.rocketCooldown.toFixed(1)}S` : 'READY';
+    ui.rocketState.textContent = player.rocketCharge > 0 ? t('status.charging') : player.rocketCooldown > 0 ? `${player.rocketCooldown.toFixed(1)}S` : t('ability.ready');
     ui.rocketCooldown.closest('.ability-card').classList.toggle('cooling', player.rocketCooldown > 0 || player.rocketCharge > 0);
 
     const boostProgress = 1 - player.boostCooldown / player.boostMax;
     ui.boostCooldown.style.width = `${clamp(boostProgress, 0, 1) * 100}%`;
     if (player.boostCooldown > 0) ui.boostState.textContent = `${player.boostCooldown.toFixed(1)}S`;
-    else if (player.jumpDestinationCooldown > 0) ui.boostState.textContent = `JUMP READY · T ${player.jumpDestinationCooldown.toFixed(1)}S`;
-    else ui.boostState.textContent = Number.isFinite(player.jumpDestinationX) ? 'T TAP REPLACE · HOLD CLEAR' : 'T PLACE DEST';
+    else if (player.jumpDestinationCooldown > 0) ui.boostState.textContent = t('status.jumpReady', { seconds: player.jumpDestinationCooldown.toFixed(1) });
+    else ui.boostState.textContent = Number.isFinite(player.jumpDestinationX) ? t('status.replaceClear') : t('status.placeDestination');
     ui.boostCooldown.closest('.ability-card').classList.toggle('cooling', player.boostCooldown > 0);
 
     const docked = nearestStation(110);
@@ -740,10 +741,10 @@
     let stationAffordable = false;
     if (docked) {
       const upgradeCost = 90 + docked.level * 80;
-      ui.stationState.textContent = docked.level >= 4 ? 'MAXIMUM POWER' : `${upgradeCost} ◈ TO UPGRADE`;
+      ui.stationState.textContent = docked.level >= 4 ? t('status.maximumPower') : t('status.toUpgrade', { cost: upgradeCost });
       stationAffordable = docked.level < 4 && player.credits >= upgradeCost;
     } else {
-      ui.stationState.textContent = stations.length >= 3 ? 'STATION LIMIT' : `${buildCost} ◈ TO BUILD`;
+      ui.stationState.textContent = stations.length >= 3 ? t('status.stationLimit') : t('status.toBuild', { cost: buildCost });
       stationAffordable = stations.length < 3 && player.credits >= buildCost;
     }
     ui.stationButton.disabled = false;

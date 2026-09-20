@@ -1,6 +1,202 @@
 (() => {
   'use strict';
 
+  // Localized player-facing copy. Add a locale here; game code only refers to keys.
+  const LANGUAGE_STORAGE_KEY = 'voidline-language';
+  const TRANSLATIONS = {
+    en: {
+      'language.label': 'Language', 'aria.gameWorld': 'Voidline Invasion game world', 'aria.gameStatus': 'Game status', 'aria.shipStatus': 'Ship status', 'aria.sectorMinimap': 'Sector minimap', 'aria.abilities': 'Weapons and abilities', 'aria.upgradeTiers': 'Installed ship upgrade tiers',
+      'aria.adminAccess': 'Open admin access', 'aria.pause': 'Pause game', 'aria.closeLevelSelect': 'Close level selection', 'aria.closeSettings': 'Close settings', 'aria.closeAdmin': 'Close admin access', 'aria.closeLeaderboard': 'Close leaderboard',
+      'tooltip.adminAccess': 'Admin access', 'tooltip.flightSpeed': 'Flight speed', 'tooltip.blasterDamage': 'Blaster damage', 'tooltip.fireRate': 'Fire rate', 'tooltip.hullStrength': 'Hull strength', 'tooltip.rocketPower': 'Rocket power', 'tooltip.systemCooling': 'System cooling',
+      'hud.hull': 'HULL', 'hud.level': 'LVL', 'hud.earthGate': 'EARTH GATE', 'hud.salvageCredits': 'SALVAGE CREDITS',
+      'hud.sectorDefense': 'SECTOR DEFENSE', 'hud.wave': 'WAVE', 'hud.standby': 'STANDBY', 'hud.score': 'SCORE', 'hud.best': 'BEST',
+      'hud.tacticalMap': 'TACTICAL MAP', 'hud.live': 'LIVE', 'hud.you': 'YOU', 'hud.hostile': 'HOSTILE', 'hud.gate': 'GATE',
+      'hud.gateProximity': 'GATE PROXIMITY ALERT', 'hud.targetLocked': 'TARGET LOCKED', 'hud.staticDrain': 'STATIC SIGNATURE // HULL DRAIN',
+      'hud.callNextWave': 'CALL NEXT WAVE', 'hud.shipModules': 'SHIP MODULES',
+      'ability.blaster': 'BLASTER', 'ability.ready': 'READY', 'ability.heavyRocket': 'HEAVY ROCKET', 'ability.voidJump': 'VOID JUMP', 'ability.station': 'DEFENSE STATION',
+      'menu.beginDefense': 'BEGIN DEFENSE', 'menu.trainingRun': 'TRAINING RUN', 'menu.levelSelect': 'LEVEL SELECT', 'menu.topPilots': 'TOP PILOTS',
+      'menu.intro': "Three sectors stand between the invasion fleet and Earth. Intercept every formation, salvage void ore, and protect Earth's last stronghold.",
+      'menu.callsignAria': 'Callsign', 'menu.callsignTitle': '3–20 letters, numbers, or underscores. Used for saves and the highscore board.',
+      'menu.flightBriefing': 'FLIGHT BRIEFING', 'menu.flyFreely': 'Fly freely', 'menu.fireBlaster': 'Fire blaster', 'menu.chargeRocket': 'Charge heavy rocket',
+      'menu.placeJump': 'Place jump destination', 'menu.voidJumpRecharge': 'Void jump — recharges', 'menu.buildStation': 'Build / upgrade station', 'menu.precisionFlight': 'Precision flight',
+      'menu.controls': 'CONTROLS', 'menu.settings': 'SETTINGS', 'menu.inspirations': 'GAMEPLAY INSPIRATIONS', 'menu.skyRushCredit': 'SkyRush — created by a friend',
+      'level.archive': 'CAMPAIGN ARCHIVE', 'level.chooseSector': 'CHOOSE A SECTOR', 'level.copy': 'Replaying a sector restores the ship and resources saved when that sector was first unlocked.',
+      'pause.kicker': 'FLIGHT SUSPENDED', 'pause.title': 'PAUSED', 'pause.resume': 'RESUME', 'pause.settingsControls': 'SETTINGS & CONTROLS', 'pause.restart': 'RESTART RUN', 'pause.quit': 'QUIT TO TITLE',
+      'settings.kicker': 'SHIP CONFIGURATION', 'settings.title': 'SETTINGS', 'settings.audioDisplay': 'AUDIO & DISPLAY', 'settings.music': 'MUSIC', 'settings.musicCopy': 'Procedural deep-space score',
+      'settings.sfx': 'SOUND FX', 'settings.sfxCopy': 'Weapons, impacts, alerts', 'settings.shake': 'SCREEN SHAKE', 'settings.shakeCopy': 'Impact feedback',
+      'settings.controls': 'CONTROLS', 'settings.flightVector': 'Flight vector', 'settings.fireForward': 'Fire forward', 'settings.aimFire': 'Aim & fire',
+      'settings.heavyRocket': 'Heavy rocket', 'settings.placeJump': 'Place jump destination', 'settings.voidJump': 'Void jump', 'settings.station': 'Build / upgrade station',
+      'settings.callWave': 'Call earned next wave', 'settings.precision': 'Precision flight', 'settings.pause': 'Pause',
+      'intel.newHostile': 'NEW HOSTILE IDENTIFIED', 'intel.firstContact': 'FIRST CONTACT // HOSTILE PROFILE', 'intel.acknowledge': 'ACKNOWLEDGE', 'boss.commandSignature': 'COMMAND SIGNATURE DETECTED', 'boss.engage': 'ENGAGE NOW',
+      'sector.secured': 'SECTOR SECURED', 'sector.fieldRepair': 'FIELD REPAIR', 'sector.hullReward': '+35% HULL', 'sector.gateSupport': 'GATE SUPPORT', 'sector.shieldReward': '+1 SHIELD', 'sector.next': 'ENTER NEXT SECTOR',
+      'upgrade.kicker': 'POWER SIGNATURE INCREASED', 'upgrade.title': 'CHOOSE AN UPGRADE', 'upgrade.copy': 'Your ship can safely integrate one recovered module.',
+      'end.score': 'SCORE', 'end.progress': 'PROGRESS', 'end.hostiles': 'HOSTILES', 'end.flyAgain': 'FLY AGAIN', 'end.returnTitle': 'RETURN TO TITLE',
+      'auth.kicker': 'VOIDLINE ADMIN CONSOLE', 'auth.admin': 'ADMIN', 'auth.access': 'ADMIN ACCESS', 'auth.username': 'USERNAME', 'auth.password': 'PASSWORD',
+      'auth.hint': 'Admin runs unlock every sector and never submit highscores.', 'auth.signIn': 'SIGN IN AS ADMIN', 'auth.signOut': 'SIGN OUT',
+      'leaderboard.kicker': 'EARTH DEFENSE RECORDS', 'leaderboard.title': 'TOP PILOTS', 'leaderboard.copy': 'The strongest run from each pilot is shown.',
+      'leaderboard.connecting': 'CONTACTING DEFENSE NETWORK…', 'tutorial.skip': 'SKIP TRAINING', 'rotate': 'For the best flight view, rotate your device to landscape.',
+      'sector.one.name': 'OUTER PERIMETER', 'sector.one.short': 'SECTOR 01', 'sector.one.next': 'The route ahead has split. Hostiles are regrouping around twin approach corridors.',
+      'sector.two.name': 'TWIN RIFT', 'sector.two.short': 'SECTOR 02', 'sector.two.next': 'A shattered approach lies ahead. Three lanes and unstable wormholes converge on Earth.',
+      'sector.three.name': 'SHATTERED APPROACH', 'sector.three.short': 'SECTOR 03',
+      'enemy.scout.name': 'DART FIGHTER', 'enemy.scout.role': 'VERY FAST // LIGHT HULL', 'enemy.scout.description': 'Quick attack craft with very little armor. Track it early before it slips through.',
+      'enemy.raider.name': 'MARAUDER', 'enemy.raider.role': 'BALANCED // ARMORED', 'enemy.raider.description': 'Reliable frontline ship. Slower than a Dart, but it can absorb sustained blaster fire.',
+      'enemy.striker.name': 'NEEDLE', 'enemy.striker.role': 'EXTREME SPEED // FRAGILE', 'enemy.striker.description': 'A tiny interceptor built entirely around speed. Its erratic lane changes make it hard to track.',
+      'enemy.major.name': 'SIEGEBREAKER', 'enemy.major.role': 'HEAVY HULL // MISSILES', 'enemy.major.description': 'A slow assault vessel that launches guided rockets at your ship. Keep moving.',
+      'enemy.interceptor.name': 'CARRIER INTERCEPTOR', 'enemy.interceptor.role': 'LAUNCHED // DESTRUCTIBLE', 'enemy.interceptor.description': 'A light interceptor launched by carrier vessels. Destroy it before it reaches the gate.',
+      'enemy.carrier.name': 'BROOD CARRIER', 'enemy.carrier.role': 'SPAWNER // HEAVY HULL', 'enemy.carrier.description': 'A mobile hangar that launches smaller fighters along the route. Destroy it before the swarm grows.',
+      'enemy.sentinel.name': 'AEGIS SENTINEL', 'enemy.sentinel.role': 'ROCKET-BREAK SHIELD', 'enemy.sentinel.description': 'Light blasters cannot pierce its barrier. Two heavy-rocket impacts collapse the barrier.',
+      'enemy.bossOmega.name': 'DREADNOUGHT OMEGA', 'enemy.bossOmega.role': 'MISSILE COMMAND SHIP', 'enemy.bossOmega.description': 'The first invasion commander. It saturates the defense zone with guided warheads.',
+      'enemy.bossCarrier.name': 'THE HOLLOW QUEEN', 'enemy.bossCarrier.role': 'RIFT CARRIER // SWARM COMMAND', 'enemy.bossCarrier.description': 'A vast carrier that continuously deploys escort wings through the twin rift.',
+      'enemy.bossTitan.name': 'AEGIS TITAN', 'enemy.bossTitan.role': 'ROCKET-BREAK SHIELD // FINAL COMMAND', 'enemy.bossTitan.description': 'Heavy rockets collapse its shield and leave the command ship exposed.',
+      'upgrade.damage.name': 'Overcharged Bolts', 'upgrade.damage.description': 'Blaster damage increases by 18%.', 'upgrade.damage.detail': 'DAMAGE +18%',
+      'upgrade.rate.name': 'Flux Repeater', 'upgrade.rate.description': 'Blaster cycles 14% faster.', 'upgrade.rate.detail': 'FIRE RATE +14%',
+      'upgrade.speed.name': 'Vector Thrusters', 'upgrade.speed.description': 'Flight speed and acceleration improve.', 'upgrade.speed.detail': 'SPEED +10%',
+      'upgrade.hull.name': 'Reactive Plating', 'upgrade.hull.description': 'Increase maximum hull and restore a little hull.', 'upgrade.hull.detail': 'MAX HULL +15',
+      'upgrade.rocket.name': 'Siege Warhead', 'upgrade.rocket.description': 'Heavy rockets deal more blast damage.', 'upgrade.rocket.detail': 'ROCKET +22%',
+      'upgrade.cooling.name': 'Cryo Manifold', 'upgrade.cooling.description': 'Rocket and void jump systems reload faster.', 'upgrade.cooling.detail': 'COOLDOWNS -10%',
+      'upgrade.salvage.name': 'Salvage Matrix', 'upgrade.salvage.description': 'Void ore yields more experience.', 'upgrade.salvage.detail': 'RESOURCE XP +18%',
+      'upgrade.multi.name': 'Splitfire Array', 'upgrade.multi.description': 'Add a tightly grouped blaster shot. Offered every four levels.', 'upgrade.multi.detail': '+1 SHOT · EVERY 4 LVL',
+      'upgrade.gate.name': 'Gate Capacitor', 'upgrade.gate.description': 'Send a recovered charge to Earth.', 'upgrade.gate.detail': 'GATE SHIELD +1',
+      'label.current': 'CURRENT', 'label.upgrade': 'UPGRADE', 'label.damage': 'DAMAGE', 'label.fireRate': 'FIRE RATE', 'label.speed': 'SPEED', 'label.maxHull': 'MAX HULL', 'label.rocketDamage': 'ROCKET DMG', 'label.rocket': 'ROCKET', 'label.jump': 'JUMP', 'label.resourceXp': 'RESOURCE XP', 'label.shots': 'SHOTS', 'label.gateShields': 'GATE SHIELDS',
+      'status.stage': 'STAGE {stage} / {total}', 'status.waveActive': 'WAVE {current}/{total} · {hostiles} HOSTILES', 'status.waveClear': 'WAVE {current}/{total} CLEAR',
+      'status.charging': 'CHARGING', 'status.jumpReady': 'JUMP READY · T {seconds}S', 'status.replaceClear': 'T TAP REPLACE · HOLD CLEAR', 'status.placeDestination': 'T PLACE DEST',
+      'status.maximumPower': 'MAXIMUM POWER', 'status.stationLimit': 'STATION LIMIT', 'status.toUpgrade': '{cost} ◈ TO UPGRADE', 'status.toBuild': '{cost} ◈ TO BUILD', 'status.portalShields': '{count} portal shields',
+      'toast.trainingLink': 'TRAINING LINK ACTIVE', 'toast.rapidClear': 'RAPID CLEAR // +{xp} XP', 'toast.lockConfirmed': 'LOCK CONFIRMED // {enemy}', 'toast.rocketCharging': 'HEAVY ROCKET CHARGING // NO LOCK',
+      'toast.destinationSet': 'VOID DESTINATION SET', 'toast.destinationCleared': 'VOID DESTINATION CLEARED // DASH RESTORED', 'toast.jumpedAhead': 'JUMPED AHEAD // PRESS T TO SET A DESTINATION',
+      'toast.carrierWing': 'CARRIER WING DEPLOYED', 'toast.carrierLaunch': 'BROOD CARRIER LAUNCHED INTERCEPTORS', 'toast.gateHit': ({ count }) => `GATE HIT // ${count} SHIELD${count === 1 ? '' : 'S'} REMAIN`, 'toast.gateBreached': 'EARTH GATE BREACHED',
+      'toast.slowDock': 'SLOW DOWN TO DOCK', 'toast.stationMax': 'STATION AT MAXIMUM POWER', 'toast.upgradeRequires': 'UPGRADE REQUIRES {cost} SALVAGE CREDITS', 'toast.stationUpgraded': 'STATION UPGRADED // MK {level}',
+      'toast.stationLimit': 'STATION LIMIT REACHED', 'toast.needCredits': 'NEED {cost} SALVAGE CREDITS', 'toast.stationDeployed': 'FRIENDLY DEFENSE STATION DEPLOYED', 'toast.repairField': 'REPAIR FIELD // +{amount} HULL', 'toast.hullStable': 'HULL ALREADY STABLE',
+      'toast.shieldRemaining': '{enemy} // {count} SHIELD CHARGES REMAIN', 'toast.shieldCollapsed': '{enemy} // SHIELD COLLAPSED', 'toast.carrierInterceptorDestroyed': 'CARRIER INTERCEPTOR DESTROYED',
+      'toast.emergencyShield': '{enemy} // EMERGENCY SHIELD ONLINE', 'toast.aegisRecovered': 'AEGIS CORE RECOVERED // GATE +1', 'toast.upgradeInstalled': '{upgrade} INSTALLED',
+      'toast.multipleApproaches': '{sector} // MULTIPLE APPROACH VECTORS', 'toast.trainingComplete': 'TRAINING COMPLETE // GOOD HUNTING', 'toast.trainingSkipped': 'TRAINING SKIPPED',
+      'toast.commandEntering': 'COMMAND SHIP ENTERING THE VOIDLINE', 'toast.stageWave': 'STAGE {stage} // WAVE {wave} OF {total}',
+      'floater.shielded': 'SHIELDED', 'floater.shieldCollapsed': 'SHIELD COLLAPSED', 'floater.shieldBroken': 'SHIELD BROKEN', 'floater.emergencyShield': 'EMERGENCY SHIELD', 'floater.missileIntercepted': 'MISSILE INTERCEPTED',
+      'floater.collision': 'COLLISION', 'floater.hull': '{amount} HULL', 'floater.shield': 'SHIELD {current}/{total}', 'floater.gateShield': '+1 GATE SHIELD',
+      'render.earthGate': 'EARTH GATE', 'render.station': 'DEFENSE STATION // MK {level}', 'render.upgradeAvailable': 'UPGRADE AVAILABLE', 'render.shield': 'SHIELD {amount}', 'render.finalStage': 'FINAL STAGE', 'render.hostileFormation': 'HOSTILE FORMATION DETECTED',
+      'end.secured': 'CORRIDOR SECURED', 'end.pilotLost': 'PILOT SIGNAL LOST', 'end.defenseOffline': 'EARTH DEFENSE OFFLINE', 'end.victoryTitle': 'INVASION REPELLED', 'end.shipLostTitle': 'YOUR SHIP WAS LOST', 'end.gateLostTitle': 'THE GATE HAS FALLEN',
+      'end.victoryCopy': 'Earth is safe. The invasion command signal has gone dark.', 'end.shipLostCopy': 'Your ship was destroyed before the final corridor could be secured.', 'end.gateLostCopy': 'The invasion fleet breached the last defense corridor.',
+      'tutorial.step': 'TRAINING // {step}', 'tutorial.takeControls': 'TAKE THE CONTROLS', 'tutorial.takeControlsCopy': 'Use W, A, S, and D to move through the sector.', 'tutorial.testBlaster': 'TEST THE BLASTER', 'tutorial.testBlasterCopy': 'Press the Up Arrow to fire forward, or hold the left mouse button to aim and fire.',
+      'tutorial.salvage': 'SALVAGE VOID ORE', 'tutorial.salvageCopy': 'Shoot the nearby ore cluster. Destroyed resources give XP for upgrades.', 'tutorial.punchVoid': 'PUNCH THE VOID', 'tutorial.punchVoidCopy': 'Press T to place or replace a jump destination, then Q or Space to teleport there. Hold T to clear it and dash again.',
+      'tutorial.armWarhead': 'ARM THE WARHEAD', 'tutorial.armWarheadCopy': 'Press F. Heavy rockets charge briefly, then deal large blast damage.', 'tutorial.defendGate': 'DEFEND THE GATE', 'tutorial.defendGateCopy': 'Enemies follow the glowing corridor. Stop them before the Earth Gate loses every shield.',
+      'account.adminAccess': 'ADMIN ACCESS', 'account.adminConsole': 'ADMIN CONSOLE', 'account.adminCopy': 'Administrator tools are active. Every sector is unlocked and runs are excluded from highscores.', 'account.signInCopy': 'Sign in with the private administrator account to unlock testing access.',
+      'account.adminPilot': 'ADMIN PILOT · HIGHSCORE DISABLED', 'account.guestPilot': 'GUEST PILOT · DEVICE SESSION', 'account.pending': 'CHANGES PENDING', 'account.syncing': 'SYNCHRONIZING…', 'account.saveCurrent': 'CLOUD SAVE CURRENT', 'account.offlineSaved': 'OFFLINE · SAVED ON DEVICE',
+      'account.offlineDevice': 'OFFLINE · USING DEVICE SAVE', 'account.cloudLoaded': 'CLOUD SAVE LOADED', 'account.uploading': 'UPLOADING DEVICE SAVE…', 'account.deviceLoaded': 'DEVICE SAVE LOADED', 'account.importing': 'IMPORTING EXISTING PROGRESS…', 'account.cloudCreated': 'NEW CLOUD SAVE CREATED',
+      'account.callsignInvalid': 'Use 3–20 letters, numbers, or underscores.', 'account.callsignChanged': 'The callsign could not be changed.', 'account.connectingAs': 'CONNECTING AS {username}…', 'account.localFlight': 'LOCAL FLIGHT · CLOUD SAVE WILL RESUME WHEN AVAILABLE', 'account.guestStartFailed': 'Guest flight could not be started.',
+      'account.networkLoadFailed': 'The pilot network could not be loaded. Check your connection and refresh.', 'account.contacting': 'CONTACTING PILOT NETWORK…', 'account.linkEstablished': 'ADMIN LINK ESTABLISHED', 'account.accessFailed': 'Pilot access failed.', 'account.signOutFailed': 'SIGN OUT FAILED',
+      'account.recordsEmpty': 'NO COMBAT RECORDS YET · SET THE FIRST SCORE', 'account.leaderboardUnavailable': 'LEADERBOARD UNAVAILABLE', 'account.cloudUnavailable': 'CLOUD SAVE UNAVAILABLE · LOCAL FLIGHT READY', 'account.cloudSetup': 'CLOUD SETUP REQUIRED',
+      'level.oneApproach': '1 APPROACH', 'level.approaches': '{count} APPROACHES', 'level.adminAccess': 'ADMIN ACCESS', 'level.cleared': 'CLEARED', 'level.unlocked': 'UNLOCKED', 'level.locked': 'LOCKED', 'level.stagesApproaches': '{stages} STAGES · {paths}', 'level.checkpoint': 'SHIP LVL {level} · {credits} ◈', 'level.oneDescription': 'Single-route frontier defense.', 'level.twoDescription': 'Twin routes and unstable rift entries.', 'level.threeDescription': 'Three converging lanes and deep wormholes.',
+      'leaderboard.detail': '{guest}SECTOR {level} · STAGE {stage} · {kills} KILLS', 'leaderboard.guest': 'GUEST · ',
+    },
+    ko: {
+      'language.label': '언어', 'aria.gameWorld': '보이드라인 인베이전 게임 화면', 'aria.gameStatus': '게임 상태', 'aria.shipStatus': '함선 상태', 'aria.sectorMinimap': '구역 미니맵', 'aria.abilities': '무기 및 능력', 'aria.upgradeTiers': '설치된 함선 업그레이드 단계',
+      'aria.adminAccess': '관리자 접근 열기', 'aria.pause': '게임 일시 정지', 'aria.closeLevelSelect': '구역 선택 닫기', 'aria.closeSettings': '설정 닫기', 'aria.closeAdmin': '관리자 접근 닫기', 'aria.closeLeaderboard': '순위표 닫기',
+      'tooltip.adminAccess': '관리자 접근', 'tooltip.flightSpeed': '비행 속도', 'tooltip.blasterDamage': '블래스터 피해', 'tooltip.fireRate': '연사력', 'tooltip.hullStrength': '선체 내구도', 'tooltip.rocketPower': '로켓 위력', 'tooltip.systemCooling': '시스템 냉각',
+      'hud.hull': '선체', 'hud.level': '레벨', 'hud.earthGate': '지구 관문', 'hud.salvageCredits': '회수 크레딧',
+      'hud.sectorDefense': '구역 방어', 'hud.wave': '웨이브', 'hud.standby': '대기', 'hud.score': '점수', 'hud.best': '최고',
+      'hud.tacticalMap': '전술 지도', 'hud.live': '실시간', 'hud.you': '플레이어', 'hud.hostile': '적', 'hud.gate': '관문',
+      'hud.gateProximity': '관문 근접 경보', 'hud.targetLocked': '표적 고정', 'hud.staticDrain': '정지 신호 // 선체 손상', 'hud.callNextWave': '다음 웨이브 호출', 'hud.shipModules': '함선 모듈',
+      'ability.blaster': '블래스터', 'ability.ready': '준비', 'ability.heavyRocket': '중로켓', 'ability.voidJump': '보이드 점프', 'ability.station': '방어 기지',
+      'menu.beginDefense': '방어 시작', 'menu.trainingRun': '훈련 시작', 'menu.levelSelect': '구역 선택', 'menu.topPilots': '최고 조종사',
+      'menu.intro': '침공 함대와 지구 사이에는 세 개의 구역이 있습니다. 모든 편대를 요격하고, 보이드 광물을 회수하여 지구 최후의 거점을 지키세요.',
+      'menu.callsignAria': '호출부호', 'menu.callsignTitle': '3~20자의 영문자, 숫자 또는 밑줄입니다. 저장과 최고 점수판에 사용됩니다.',
+      'menu.flightBriefing': '비행 브리핑', 'menu.flyFreely': '자유 비행', 'menu.fireBlaster': '블래스터 발사', 'menu.chargeRocket': '중로켓 충전',
+      'menu.placeJump': '점프 목적지 설정', 'menu.voidJumpRecharge': '보이드 점프 — 재충전', 'menu.buildStation': '방어 기지 건설 / 업그레이드', 'menu.precisionFlight': '정밀 비행',
+      'menu.controls': '조작법', 'menu.settings': '설정', 'menu.inspirations': '게임플레이 영감', 'menu.skyRushCredit': 'SkyRush — 개발자의 친구가 제작',
+      'level.archive': '캠페인 기록', 'level.chooseSector': '구역 선택', 'level.copy': '구역을 다시 플레이하면 처음 해금했을 때 저장된 함선과 자원이 복원됩니다.',
+      'pause.kicker': '비행 중단', 'pause.title': '일시 정지', 'pause.resume': '계속', 'pause.settingsControls': '설정 및 조작법', 'pause.restart': '다시 시작', 'pause.quit': '타이틀로',
+      'settings.kicker': '함선 구성', 'settings.title': '설정', 'settings.audioDisplay': '오디오 및 화면', 'settings.music': '음악', 'settings.musicCopy': '절차적으로 생성되는 우주 음악',
+      'settings.sfx': '효과음', 'settings.sfxCopy': '무기, 충돌, 경보', 'settings.shake': '화면 흔들림', 'settings.shakeCopy': '충격 피드백',
+      'settings.controls': '조작법', 'settings.flightVector': '비행 방향', 'settings.fireForward': '전방 발사', 'settings.aimFire': '조준 및 발사',
+      'settings.heavyRocket': '중로켓', 'settings.placeJump': '점프 목적지 설정', 'settings.voidJump': '보이드 점프', 'settings.station': '방어 기지 건설 / 업그레이드', 'settings.callWave': '획득한 다음 웨이브 호출', 'settings.precision': '정밀 비행', 'settings.pause': '일시 정지',
+      'intel.newHostile': '새 적 식별', 'intel.firstContact': '첫 조우 // 적 정보', 'intel.acknowledge': '확인', 'boss.commandSignature': '지휘 신호 감지', 'boss.engage': '교전 시작',
+      'sector.secured': '구역 확보', 'sector.fieldRepair': '현장 수리', 'sector.hullReward': '선체 +35%', 'sector.gateSupport': '관문 지원', 'sector.shieldReward': '방벽 +1', 'sector.next': '다음 구역 진입',
+      'upgrade.kicker': '출력 신호 증가', 'upgrade.title': '업그레이드 선택', 'upgrade.copy': '회수한 모듈 하나를 함선에 안전하게 통합할 수 있습니다.',
+      'end.score': '점수', 'end.progress': '진행', 'end.hostiles': '적', 'end.flyAgain': '다시 비행', 'end.returnTitle': '타이틀로',
+      'auth.kicker': '보이드라인 관리자 콘솔', 'auth.admin': '관리자', 'auth.access': '관리자 접근', 'auth.username': '사용자 이름', 'auth.password': '비밀번호', 'auth.hint': '관리자 플레이는 모든 구역을 해금하며 최고 점수에 등록되지 않습니다.', 'auth.signIn': '관리자로 로그인', 'auth.signOut': '로그아웃',
+      'leaderboard.kicker': '지구 방어 기록', 'leaderboard.title': '최고 조종사', 'leaderboard.copy': '각 조종사의 가장 높은 기록을 표시합니다.', 'leaderboard.connecting': '방어 네트워크 연결 중…', 'tutorial.skip': '훈련 건너뛰기', 'rotate': '최적의 비행 화면을 위해 기기를 가로로 돌리세요.',
+      'sector.one.name': '외곽 방어선', 'sector.one.short': '구역 01', 'sector.one.next': '전방 항로가 갈라졌습니다. 적이 쌍둥이 접근 통로에 재집결하고 있습니다.',
+      'sector.two.name': '쌍둥이 균열', 'sector.two.short': '구역 02', 'sector.two.next': '세 개의 항로와 불안정한 웜홀이 지구로 수렴합니다.',
+      'sector.three.name': '파쇄된 접근로', 'sector.three.short': '구역 03',
+      'enemy.scout.name': '다트 전투기', 'enemy.scout.role': '매우 빠름 // 경장갑', 'enemy.scout.description': '장갑이 거의 없는 빠른 공격기입니다. 빠져나가기 전에 일찍 추적하세요.',
+      'enemy.raider.name': '약탈자', 'enemy.raider.role': '균형형 // 장갑', 'enemy.raider.description': '신뢰할 수 있는 전선 함선입니다. 다트보다 느리지만 지속 사격을 견딥니다.',
+      'enemy.striker.name': '니들', 'enemy.striker.role': '초고속 // 약함', 'enemy.striker.description': '속도에 모든 것을 투자한 소형 요격기입니다. 예측하기 어려운 이동을 합니다.',
+      'enemy.major.name': '시즈브레이커', 'enemy.major.role': '중장갑 // 미사일', 'enemy.major.description': '유도 로켓을 발사하는 느린 강습함입니다. 계속 움직이세요.',
+      'enemy.interceptor.name': '캐리어 요격기', 'enemy.interceptor.role': '발진 // 파괴 가능', 'enemy.interceptor.description': '캐리어에서 발진하는 경량 요격기입니다. 관문에 도달하기 전에 파괴하세요.',
+      'enemy.carrier.name': '브루드 캐리어', 'enemy.carrier.role': '생산함 // 중장갑', 'enemy.carrier.description': '항로를 따라 전투기를 발진시키는 이동식 격납고입니다. 군집이 커지기 전에 파괴하세요.',
+      'enemy.sentinel.name': '이지스 센티널', 'enemy.sentinel.role': '로켓 파괴 방벽', 'enemy.sentinel.description': '경량 블래스터는 방벽을 관통하지 못합니다. 중로켓 두 발로 붕괴시킬 수 있습니다.',
+      'enemy.bossOmega.name': '드레드노트 오메가', 'enemy.bossOmega.role': '미사일 지휘함', 'enemy.bossOmega.description': '첫 번째 침공 지휘관입니다. 유도 탄두로 방어 구역을 포화시킵니다.',
+      'enemy.bossCarrier.name': '할로우 퀸', 'enemy.bossCarrier.role': '균열 캐리어 // 군집 지휘', 'enemy.bossCarrier.description': '쌍둥이 균열에서 호위대를 계속 전개하는 거대한 캐리어입니다.',
+      'enemy.bossTitan.name': '이지스 타이탄', 'enemy.bossTitan.role': '로켓 파괴 방벽 // 최종 지휘', 'enemy.bossTitan.description': '중로켓으로 방벽을 무너뜨리면 지휘함이 노출됩니다.',
+      'upgrade.damage.name': '과충전 볼트', 'upgrade.damage.description': '블래스터 피해가 18% 증가합니다.', 'upgrade.damage.detail': '피해 +18%',
+      'upgrade.rate.name': '플럭스 리피터', 'upgrade.rate.description': '블래스터 연사력이 14% 빨라집니다.', 'upgrade.rate.detail': '연사력 +14%',
+      'upgrade.speed.name': '벡터 추진기', 'upgrade.speed.description': '비행 속도와 가속도가 향상됩니다.', 'upgrade.speed.detail': '속도 +10%',
+      'upgrade.hull.name': '반응 장갑', 'upgrade.hull.description': '최대 선체를 늘리고 선체를 조금 회복합니다.', 'upgrade.hull.detail': '최대 선체 +15',
+      'upgrade.rocket.name': '공성 탄두', 'upgrade.rocket.description': '중로켓 폭발 피해가 증가합니다.', 'upgrade.rocket.detail': '로켓 +22%',
+      'upgrade.cooling.name': '크라이오 매니폴드', 'upgrade.cooling.description': '로켓과 보이드 점프 시스템의 재장전이 빨라집니다.', 'upgrade.cooling.detail': '재사용 대기시간 -10%',
+      'upgrade.salvage.name': '회수 매트릭스', 'upgrade.salvage.description': '보이드 광물에서 더 많은 경험치를 얻습니다.', 'upgrade.salvage.detail': '자원 경험치 +18%',
+      'upgrade.multi.name': '분산 사격 배열', 'upgrade.multi.description': '촘촘한 블래스터 탄환을 하나 추가합니다. 네 레벨마다 제공됩니다.', 'upgrade.multi.detail': '탄환 +1 · 4레벨마다',
+      'upgrade.gate.name': '관문 축전기', 'upgrade.gate.description': '회수한 전하를 지구로 전송합니다.', 'upgrade.gate.detail': '관문 방벽 +1',
+      'label.current': '현재', 'label.upgrade': '업그레이드', 'label.damage': '피해', 'label.fireRate': '연사력', 'label.speed': '속도', 'label.maxHull': '최대 선체', 'label.rocketDamage': '로켓 피해', 'label.rocket': '로켓', 'label.jump': '점프', 'label.resourceXp': '자원 경험치', 'label.shots': '탄환', 'label.gateShields': '관문 방벽',
+      'status.stage': '스테이지 {stage} / {total}', 'status.waveActive': '웨이브 {current}/{total} · 적 {hostiles}', 'status.waveClear': '웨이브 {current}/{total} 완료',
+      'status.charging': '충전 중', 'status.jumpReady': '점프 준비 · T {seconds}초', 'status.replaceClear': 'T 짧게 교체 · 길게 해제', 'status.placeDestination': 'T 목적지 설정',
+      'status.maximumPower': '최대 출력', 'status.stationLimit': '기지 한도', 'status.toUpgrade': '{cost} ◈ 업그레이드', 'status.toBuild': '{cost} ◈ 건설', 'status.portalShields': '관문 방벽 {count}',
+      'toast.trainingLink': '훈련 연결 활성화', 'toast.rapidClear': '신속 격파 // +{xp} XP', 'toast.lockConfirmed': '고정 확인 // {enemy}', 'toast.rocketCharging': '중로켓 충전 // 고정 없음',
+      'toast.destinationSet': '보이드 목적지 설정', 'toast.destinationCleared': '보이드 목적지 해제 // 대시 복원', 'toast.jumpedAhead': '전방 점프 // T로 목적지 설정',
+      'toast.carrierWing': '캐리어 편대 전개', 'toast.carrierLaunch': '브루드 캐리어가 요격기를 발진', 'toast.gateHit': ({ count }) => `관문 피격 // 방벽 ${count}개 남음`, 'toast.gateBreached': '지구 관문 돌파',
+      'toast.slowDock': '도킹하려면 감속하세요', 'toast.stationMax': '기지 최대 출력', 'toast.upgradeRequires': '업그레이드에 회수 크레딧 {cost} 필요', 'toast.stationUpgraded': '기지 업그레이드 // MK {level}',
+      'toast.stationLimit': '기지 한도 도달', 'toast.needCredits': '회수 크레딧 {cost} 필요', 'toast.stationDeployed': '아군 방어 기지 배치', 'toast.repairField': '수리장 // 선체 +{amount}', 'toast.hullStable': '선체가 이미 안정적입니다',
+      'toast.shieldRemaining': '{enemy} // 방벽 충전 {count}개 남음', 'toast.shieldCollapsed': '{enemy} // 방벽 붕괴', 'toast.carrierInterceptorDestroyed': '캐리어 요격기 파괴', 'toast.emergencyShield': '{enemy} // 비상 방벽 가동', 'toast.aegisRecovered': '이지스 코어 회수 // 관문 +1', 'toast.upgradeInstalled': '{upgrade} 설치 완료',
+      'toast.multipleApproaches': '{sector} // 다중 접근 경로', 'toast.trainingComplete': '훈련 완료 // 행운을 빕니다', 'toast.trainingSkipped': '훈련 건너뜀', 'toast.commandEntering': '지휘함이 보이드라인에 진입', 'toast.stageWave': '스테이지 {stage} // 웨이브 {wave}/{total}',
+      'floater.shielded': '방벽', 'floater.shieldCollapsed': '방벽 붕괴', 'floater.shieldBroken': '방벽 파괴', 'floater.emergencyShield': '비상 방벽', 'floater.missileIntercepted': '미사일 요격', 'floater.collision': '충돌', 'floater.hull': '선체 {amount}', 'floater.shield': '방벽 {current}/{total}', 'floater.gateShield': '관문 방벽 +1',
+      'render.earthGate': '지구 관문', 'render.station': '방어 기지 // MK {level}', 'render.upgradeAvailable': '업그레이드 가능', 'render.shield': '방벽 {amount}', 'render.finalStage': '최종 스테이지', 'render.hostileFormation': '적 편대 감지',
+      'end.secured': '통로 확보', 'end.pilotLost': '조종사 신호 소실', 'end.defenseOffline': '지구 방어 오프라인', 'end.victoryTitle': '침공 격퇴', 'end.shipLostTitle': '함선 손실', 'end.gateLostTitle': '관문 함락',
+      'end.victoryCopy': '지구는 안전합니다. 침공 지휘 신호가 사라졌습니다.', 'end.shipLostCopy': '최종 통로를 확보하기 전에 함선이 파괴되었습니다.', 'end.gateLostCopy': '침공 함대가 마지막 방어 통로를 돌파했습니다.',
+      'tutorial.step': '훈련 // {step}', 'tutorial.takeControls': '조작 익히기', 'tutorial.takeControlsCopy': 'W, A, S, D로 구역 안을 이동하세요.', 'tutorial.testBlaster': '블래스터 시험', 'tutorial.testBlasterCopy': '위쪽 화살표로 전방 발사하거나 왼쪽 마우스 버튼을 누른 채 조준해 발사하세요.',
+      'tutorial.salvage': '보이드 광물 회수', 'tutorial.salvageCopy': '근처 광물 덩어리를 쏘세요. 파괴한 자원은 업그레이드 경험치를 제공합니다.', 'tutorial.punchVoid': '보이드 돌파', 'tutorial.punchVoidCopy': 'T를 눌러 점프 목적지를 설정하거나 교체한 뒤 Q 또는 스페이스로 이동하세요. T를 길게 누르면 해제하고 대시로 돌아갑니다.',
+      'tutorial.armWarhead': '탄두 장전', 'tutorial.armWarheadCopy': 'F를 누르세요. 중로켓은 잠시 충전한 뒤 큰 폭발 피해를 줍니다.', 'tutorial.defendGate': '관문 방어', 'tutorial.defendGateCopy': '적은 빛나는 통로를 따라옵니다. 지구 관문 방벽이 모두 사라지기 전에 막으세요.',
+      'account.adminAccess': '관리자 접근', 'account.adminConsole': '관리자 콘솔', 'account.adminCopy': '관리자 도구가 활성화되었습니다. 모든 구역이 해금되며 기록은 최고 점수에 포함되지 않습니다.', 'account.signInCopy': '테스트 접근을 해금하려면 개인 관리자 계정으로 로그인하세요.',
+      'account.adminPilot': '관리자 조종사 · 최고 점수 비활성화', 'account.guestPilot': '게스트 조종사 · 기기 세션', 'account.pending': '변경 사항 대기 중', 'account.syncing': '동기화 중…', 'account.saveCurrent': '클라우드 저장 최신', 'account.offlineSaved': '오프라인 · 기기에 저장됨',
+      'account.offlineDevice': '오프라인 · 기기 저장 사용 중', 'account.cloudLoaded': '클라우드 저장 불러옴', 'account.uploading': '기기 저장 업로드 중…', 'account.deviceLoaded': '기기 저장 불러옴', 'account.importing': '기존 진행도 가져오는 중…', 'account.cloudCreated': '새 클라우드 저장 생성됨',
+      'account.callsignInvalid': '3~20자의 영문자, 숫자 또는 밑줄을 사용하세요.', 'account.callsignChanged': '호출부호를 변경할 수 없습니다.', 'account.connectingAs': '{username}(으)로 연결 중…', 'account.localFlight': '로컬 비행 · 연결되면 클라우드 저장이 재개됩니다.', 'account.guestStartFailed': '게스트 비행을 시작할 수 없습니다.',
+      'account.networkLoadFailed': '조종사 네트워크를 불러올 수 없습니다. 연결을 확인하고 새로고침하세요.', 'account.contacting': '조종사 네트워크 연결 중…', 'account.linkEstablished': '관리자 연결 완료', 'account.accessFailed': '조종사 접근에 실패했습니다.', 'account.signOutFailed': '로그아웃 실패',
+      'account.recordsEmpty': '전투 기록 없음 · 첫 기록을 세우세요', 'account.leaderboardUnavailable': '순위표를 사용할 수 없습니다', 'account.cloudUnavailable': '클라우드 저장 불가 · 로컬 비행 준비됨', 'account.cloudSetup': '클라우드 설정 필요',
+      'level.oneApproach': '접근로 1개', 'level.approaches': '접근로 {count}개', 'level.adminAccess': '관리자 접근', 'level.cleared': '완료', 'level.unlocked': '해금됨', 'level.locked': '잠김', 'level.stagesApproaches': '{stages} 스테이지 · {paths}', 'level.checkpoint': '함선 레벨 {level} · {credits} ◈', 'level.oneDescription': '하나의 경로를 지키는 외곽 방어전입니다.', 'level.twoDescription': '쌍둥이 경로와 불안정한 균열 진입점이 있습니다.', 'level.threeDescription': '세 개의 수렴 항로와 깊은 웜홀이 있습니다.',
+      'leaderboard.detail': '{guest}구역 {level} · 스테이지 {stage} · 처치 {kills}', 'leaderboard.guest': '게스트 · ',
+    },
+  };
+
+  let currentLanguage = TRANSLATIONS[localStorage.getItem(LANGUAGE_STORAGE_KEY)] ? localStorage.getItem(LANGUAGE_STORAGE_KEY) : 'en';
+
+  function t(key, values = {}) {
+    const entry = TRANSLATIONS[currentLanguage]?.[key] ?? TRANSLATIONS.en[key] ?? key;
+    if (typeof entry === 'function') return entry(values);
+    return String(entry).replace(/\{(\w+)\}/g, (_, name) => values[name] ?? `{${name}}`);
+  }
+
+  function translateLevel(level) {
+    return { name: t(level.nameKey), short: t(level.shortKey), next: level.nextKey ? t(level.nextKey) : '' };
+  }
+
+  function translateEnemy(type) {
+    const enemy = ENEMY_TYPES[type];
+    return { name: t(enemy.nameKey), role: t(enemy.roleKey), description: t(enemy.descriptionKey) };
+  }
+
+  function applyStaticTranslations() {
+    document.documentElement.lang = currentLanguage;
+    document.querySelectorAll('[data-i18n]').forEach((element) => { element.textContent = t(element.dataset.i18n); });
+    document.querySelectorAll('[data-i18n-aria-label]').forEach((element) => { element.setAttribute('aria-label', t(element.dataset.i18nAriaLabel)); });
+    document.querySelectorAll('[data-i18n-title]').forEach((element) => { element.title = t(element.dataset.i18nTitle); });
+    [ui.languageSelect, ui.menuLanguageSelect].filter(Boolean).forEach((select) => { select.value = currentLanguage; });
+  }
+
+  function setLanguage(language) {
+    if (!TRANSLATIONS[language]) return;
+    currentLanguage = language;
+    localStorage.setItem(LANGUAGE_STORAGE_KEY, language);
+    applyStaticTranslations();
+    refreshLocalizedUi();
+  }
   // Shared canvas references, world geometry, routes, colors, and UI bindings.
   const canvas = document.querySelector('#gameCanvas');
   const ctx = canvas.getContext('2d', { alpha: false, desynchronized: true });
@@ -25,8 +221,7 @@
 
   const LEVELS = [
     {
-      name: 'OUTER PERIMETER', short: 'SECTOR 01', stages: 6, boss: 'bossOmega', enemyDurability: 1.2,
-      next: 'The route ahead has split. Hostiles are regrouping around twin approach corridors.',
+      nameKey: 'sector.one.name', shortKey: 'sector.one.short', nextKey: 'sector.one.next', stages: 6, boss: 'bossOmega', enemyDurability: 1.2,
       paths: [createPath([
         { x: -120, y: 380 }, { x: 360, y: 430 }, { x: 690, y: 770 }, { x: 1110, y: 690 },
         { x: 1470, y: 1010 }, { x: 1860, y: 1260 }, { x: 2250, y: 1160 }, { x: 2570, y: 850 },
@@ -35,8 +230,7 @@
       wormholes: [],
     },
     {
-      name: 'TWIN RIFT', short: 'SECTOR 02', stages: 7, boss: 'bossCarrier',
-      next: 'A shattered approach lies ahead. Three lanes and unstable wormholes converge on Earth.',
+      nameKey: 'sector.two.name', shortKey: 'sector.two.short', nextKey: 'sector.two.next', stages: 7, boss: 'bossCarrier',
       paths: [
         createPath([{ x: -120, y: 310 }, { x: 440, y: 330 }, { x: 900, y: 600 }, { x: 1380, y: 520 }, { x: 1820, y: 820 }, { x: 2280, y: 760 }, { x: 2670, y: 900 }, { x: PORTAL.x, y: PORTAL.y }]),
         createPath([{ x: -120, y: 1780 }, { x: 420, y: 1670 }, { x: 820, y: 1390 }, { x: 1290, y: 1510 }, { x: 1710, y: 1220 }, { x: 2220, y: 1320 }, { x: 2660, y: 1100 }, { x: PORTAL.x, y: PORTAL.y }]),
@@ -44,8 +238,7 @@
       wormholes: [{ x: 1820, y: 820, pathId: 0, progress: .58 }, { x: 1710, y: 1220, pathId: 1, progress: .54 }],
     },
     {
-      name: 'SHATTERED APPROACH', short: 'SECTOR 03', stages: 8, boss: 'bossTitan',
-      next: '',
+      nameKey: 'sector.three.name', shortKey: 'sector.three.short', stages: 8, boss: 'bossTitan',
       paths: [
         createPath([{ x: -120, y: 220 }, { x: 510, y: 280 }, { x: 980, y: 520 }, { x: 1500, y: 410 }, { x: 1990, y: 660 }, { x: 2510, y: 720 }, { x: PORTAL.x, y: PORTAL.y }]),
         createPath([{ x: -120, y: 1030 }, { x: 490, y: 940 }, { x: 960, y: 1120 }, { x: 1440, y: 920 }, { x: 1940, y: 1080 }, { x: 2470, y: 930 }, { x: PORTAL.x, y: PORTAL.y }]),
@@ -89,7 +282,7 @@
     'staticWarning', 'waveCallButton',
     'authOverlay', 'authTitle', 'authCopy', 'authForm', 'authUsername', 'authPassword',
     'authMessage',
-    'pilotSummary', 'pilotType', 'pilotName', 'pilotSyncState', 'adminButton',
+    'pilotSummary', 'pilotType', 'pilotName', 'pilotSyncState', 'adminButton', 'languageSelect', 'menuLanguageSelect',
     'publicUsername', 'publicUsernameHint', 'menuAdminButton', 'leaderboardOverlay', 'leaderboardList',
   ].forEach((id) => { ui[id] = document.getElementById(id); });
   // Runtime state, local/cloud persistence, and audio services.
@@ -219,7 +412,7 @@
   function scheduleCloudSave() {
     if (!activePilot || !window.VoidlineCloud || cloudSyncSuspended) return;
     clearTimeout(cloudSaveTimer);
-    ui.pilotSyncState.textContent = 'CHANGES PENDING';
+    ui.pilotSyncState.textContent = t('account.pending');
     cloudSaveTimer = setTimeout(syncCloudProgress, 650);
   }
 
@@ -230,12 +423,12 @@
       return;
     }
     cloudBusy = true;
-    ui.pilotSyncState.textContent = 'SYNCHRONIZING…';
+    ui.pilotSyncState.textContent = t('account.syncing');
     try {
       await window.VoidlineCloud.saveProgress(campaignState, isAdminPilot() ? 0 : highScore);
-      ui.pilotSyncState.textContent = 'CLOUD SAVE CURRENT';
+      ui.pilotSyncState.textContent = t('account.saveCurrent');
     } catch (error) {
-      ui.pilotSyncState.textContent = 'OFFLINE · SAVED ON DEVICE';
+      ui.pilotSyncState.textContent = t('account.offlineSaved');
       console.warn('Voidline cloud save:', error);
     } finally {
       cloudBusy = false;
@@ -534,7 +727,7 @@
       updateTutorialCard();
       const rock = resources[0];
       if (rock) { rock.x = player.x + 300; rock.y = player.y - 50; }
-      showToast('TRAINING LINK ACTIVE');
+      showToast(t('toast.trainingLink'));
     } else {
       ui.tutorialCard.classList.remove('active');
       beginWave();
@@ -560,11 +753,11 @@
     const connected = Boolean(activePilot);
     [ui.adminButton, ui.menuAdminButton].forEach((button) => {
       button.classList.toggle('connected', connected && isAdminPilot());
-      button.title = connected && isAdminPilot() ? `Admin: ${activePilot.username}` : 'Admin access';
+      button.title = connected && isAdminPilot() ? `${t('account.adminAccess')}: ${activePilot.username}` : t('tooltip.adminAccess');
     });
     if (activePilot?.isGuest && ui.publicUsername) ui.publicUsername.value = activePilot.username;
     if (!connected) return;
-    ui.pilotType.textContent = isAdminPilot() ? 'ADMIN PILOT · HIGHSCORE DISABLED' : 'GUEST PILOT · DEVICE SESSION';
+    ui.pilotType.textContent = isAdminPilot() ? t('account.adminPilot') : t('account.guestPilot');
     ui.pilotName.textContent = activePilot.username;
   }
 
@@ -589,7 +782,7 @@
       remote = await window.VoidlineCloud.loadProgress();
     } catch (error) {
       cloudSyncSuspended = true;
-      ui.pilotSyncState.textContent = 'OFFLINE · USING DEVICE SAVE';
+      ui.pilotSyncState.textContent = t('account.offlineDevice');
       console.warn('Voidline cloud load:', error);
     }
 
@@ -599,23 +792,23 @@
       highScore = Math.max(0, Number(remote.high_score) || 0);
       saveCampaignState(false, false);
       localStorage.setItem(localUpdatedKey(), remote.updated_at);
-      ui.pilotSyncState.textContent = 'CLOUD SAVE LOADED';
+      ui.pilotSyncState.textContent = t('account.cloudLoaded');
     } else if (cachedCampaign) {
       campaignState = cachedCampaign;
       highScore = cachedHighScore;
-      ui.pilotSyncState.textContent = cloudSyncSuspended ? 'OFFLINE · SAVED ON DEVICE' : remote ? 'UPLOADING DEVICE SAVE…' : 'DEVICE SAVE LOADED';
+      ui.pilotSyncState.textContent = cloudSyncSuspended ? t('account.offlineSaved') : remote ? t('account.uploading') : t('account.deviceLoaded');
       scheduleCloudSave();
     } else if (localStorage.getItem(CAMPAIGN_KEY) && !localStorage.getItem('voidline-legacy-cloud-claimed')) {
       campaignState = readCampaignState(CAMPAIGN_KEY);
       highScore = Number(localStorage.getItem(HIGH_SCORE_KEY) || 0);
       localStorage.setItem('voidline-legacy-cloud-claimed', 'true');
       saveCampaignState();
-      ui.pilotSyncState.textContent = 'IMPORTING EXISTING PROGRESS…';
+      ui.pilotSyncState.textContent = t('account.importing');
     } else {
       campaignState = emptyCampaignState();
       highScore = 0;
       saveCampaignState();
-      ui.pilotSyncState.textContent = 'NEW CLOUD SAVE CREATED';
+      ui.pilotSyncState.textContent = t('account.cloudCreated');
     }
 
     ensureCampaignCheckpoints();
@@ -645,7 +838,7 @@
     const username = String(ui.publicUsername.value || '').trim().toLowerCase() || generateCallsign();
     ui.publicUsername.value = username;
     if (!/^[a-z0-9_]{3,20}$/.test(username)) {
-      throw new Error('Use 3–20 letters, numbers, or underscores.');
+      throw new Error(t('account.callsignInvalid'));
     }
     return username;
   }
@@ -658,10 +851,10 @@
     ui.authMessage.textContent = '';
     ui.authMessage.classList.remove('success');
     ui.authPassword.value = '';
-    ui.authTitle.textContent = signedIn ? 'ADMIN CONSOLE' : 'ADMIN ACCESS';
+    ui.authTitle.textContent = signedIn ? t('account.adminConsole') : t('account.adminAccess');
     ui.authCopy.textContent = signedIn
-      ? 'Administrator tools are active. Every sector is unlocked and runs are excluded from highscores.'
-      : 'Sign in with the private administrator account to unlock testing access.';
+      ? t('account.adminCopy')
+      : t('account.signInCopy');
   }
 
   function openAdminAccess() {
@@ -705,7 +898,7 @@
             activePilot = await window.VoidlineCloud.updateGuestUsername(username);
             updatePilotUi();
           } catch (error) {
-            ui.publicUsernameHint.textContent = error.message || 'The callsign could not be changed.';
+            ui.publicUsernameHint.textContent = error.message || t('account.callsignChanged');
             ui.publicUsernameHint.classList.add('active');
             return;
           } finally {
@@ -728,7 +921,7 @@
     }
     cloudBusy = true;
     ui.publicUsername.disabled = true;
-    ui.publicUsernameHint.textContent = `CONNECTING AS ${username.toUpperCase()}…`;
+    ui.publicUsernameHint.textContent = t('account.connectingAs', { username: username.toUpperCase() });
     ui.publicUsernameHint.classList.add('active');
     try {
       const currentPilot = await window.VoidlineCloud.init();
@@ -738,10 +931,10 @@
       ui.publicUsernameHint.classList.remove('active');
       action();
     } catch (error) {
-      const message = error.message || 'Guest flight could not be started.';
+      const message = error.message || t('account.guestStartFailed');
       if (/unreachable|network|setup|required|connecting|loaded|anonymous sign-ins/i.test(message)) {
         await activatePilot({ id: null, username, isGuest: true, isAdmin: false });
-        ui.publicUsernameHint.textContent = 'LOCAL FLIGHT · CLOUD SAVE WILL RESUME WHEN AVAILABLE';
+        ui.publicUsernameHint.textContent = t('account.localFlight');
         ui.publicUsernameHint.classList.add('active');
         action();
       } else {
@@ -757,7 +950,7 @@
   async function submitAdminForm(event) {
     event.preventDefault();
     if (!window.VoidlineCloud) {
-      ui.authMessage.textContent = 'The pilot network could not be loaded. Check your connection and refresh.';
+      ui.authMessage.textContent = t('account.networkLoadFailed');
       return;
     }
     if (cloudBusy) return;
@@ -765,16 +958,16 @@
     const password = ui.authPassword.value;
     cloudBusy = true;
     ui.authForm.classList.add('busy');
-    ui.authMessage.textContent = 'CONTACTING PILOT NETWORK…';
+    ui.authMessage.textContent = t('account.contacting');
     try {
       await window.VoidlineCloud.init();
       const pilot = await window.VoidlineCloud.signInAdmin(username, password);
       await activatePilot(pilot);
-      ui.authMessage.textContent = 'ADMIN LINK ESTABLISHED';
+      ui.authMessage.textContent = t('account.linkEstablished');
       ui.authMessage.classList.add('success');
       setTimeout(closeAdminAccess, 260);
     } catch (error) {
-      ui.authMessage.textContent = error.message || 'Pilot access failed.';
+      ui.authMessage.textContent = error.message || t('account.accessFailed');
     } finally {
       cloudBusy = false;
       ui.authForm.classList.remove('busy');
@@ -790,7 +983,7 @@
       prepareDefaultCallsign();
       renderAdminPanel();
     } catch (error) {
-      ui.pilotSyncState.textContent = error.message || 'SIGN OUT FAILED';
+      ui.pilotSyncState.textContent = error.message || t('account.signOutFailed');
     } finally {
       cloudBusy = false;
     }
@@ -802,12 +995,12 @@
     hideOverlays();
     ui.crosshair.style.opacity = '0';
     ui.leaderboardOverlay.classList.add('active');
-    ui.leaderboardList.innerHTML = '<p class="leaderboard-empty">CONTACTING DEFENSE NETWORK…</p>';
+    ui.leaderboardList.innerHTML = `<p class="leaderboard-empty">${t('leaderboard.connecting')}</p>`;
     try {
       const entries = await window.VoidlineCloud.getLeaderboard(12);
       ui.leaderboardList.replaceChildren();
       if (!entries.length) {
-        ui.leaderboardList.innerHTML = '<p class="leaderboard-empty">NO COMBAT RECORDS YET · SET THE FIRST SCORE</p>';
+        ui.leaderboardList.innerHTML = `<p class="leaderboard-empty">${t('account.recordsEmpty')}</p>`;
         return;
       }
       for (const entry of entries) {
@@ -821,7 +1014,7 @@
         const name = document.createElement('strong');
         name.textContent = entry.username;
         const detail = document.createElement('small');
-        detail.textContent = `${entry.is_guest ? 'GUEST · ' : ''}SECTOR ${entry.level_reached} · STAGE ${entry.stage_reached} · ${entry.kills} KILLS`;
+        detail.textContent = t('leaderboard.detail', { guest: entry.is_guest ? t('leaderboard.guest') : '', level: entry.level_reached, stage: entry.stage_reached, kills: entry.kills });
         pilotCell.append(name, detail);
         const value = document.createElement('span');
         value.className = 'leaderboard-score';
@@ -833,7 +1026,7 @@
       ui.leaderboardList.innerHTML = '';
       const message = document.createElement('p');
       message.className = 'leaderboard-empty';
-      message.textContent = error.message || 'LEADERBOARD UNAVAILABLE';
+      message.textContent = error.message || t('account.leaderboardUnavailable');
       ui.leaderboardList.append(message);
     }
   }
@@ -855,9 +1048,9 @@
       await activatePilot(pilot);
       if (ui.authOverlay.classList.contains('active')) renderAdminPanel();
     } catch (error) {
-      ui.publicUsernameHint.textContent = 'CLOUD SAVE UNAVAILABLE · LOCAL FLIGHT READY';
+      ui.publicUsernameHint.textContent = t('account.cloudUnavailable');
       ui.publicUsernameHint.classList.add('active');
-      ui.pilotSyncState.textContent = 'CLOUD SETUP REQUIRED';
+      ui.pilotSyncState.textContent = t('account.cloudSetup');
       console.warn('Voidline pilot network:', error);
     }
   }
@@ -871,17 +1064,19 @@
       const unlocked = adminAccess || index <= campaignState.highestUnlocked;
       const completed = !adminAccess && (index < campaignState.highestUnlocked || (index === LEVELS.length - 1 && campaignState.completedCampaigns > 0));
       const checkpoint = campaignState.checkpoints[index] || expectedCheckpoint(index);
-      const paths = level.paths.length === 1 ? '1 APPROACH' : `${level.paths.length} APPROACHES`;
+      const localizedLevel = translateLevel(level);
+      const paths = level.paths.length === 1 ? t('level.oneApproach') : t('level.approaches', { count: level.paths.length });
+      const descriptionKey = index === 0 ? 'level.oneDescription' : index === 1 ? 'level.twoDescription' : 'level.threeDescription';
       const card = document.createElement('button');
       card.type = 'button';
       card.className = `level-card${unlocked ? '' : ' locked'}`;
       card.dataset.index = String(index + 1).padStart(2, '0');
       card.disabled = !unlocked;
       card.innerHTML = `
-        <span class="level-status">${adminAccess ? 'ADMIN ACCESS' : unlocked ? completed ? 'CLEARED' : 'UNLOCKED' : 'LOCKED'}</span>
-        <h3>${level.name}</h3>
-        <p>${index === 0 ? 'Single-route frontier defense.' : index === 1 ? 'Twin routes and unstable rift entries.' : 'Three converging lanes and deep wormholes.'}</p>
-        <footer><span>${level.stages} STAGES · ${paths}</span><span class="checkpoint-note">SHIP LVL ${checkpoint.level || 1} · ${checkpoint.credits || 0} ◈</span></footer>`;
+        <span class="level-status">${adminAccess ? t('level.adminAccess') : unlocked ? completed ? t('level.cleared') : t('level.unlocked') : t('level.locked')}</span>
+        <h3>${localizedLevel.name}</h3>
+        <p>${t(descriptionKey)}</p>
+        <footer><span>${t('level.stagesApproaches', { stages: level.stages, paths })}</span><span class="checkpoint-note">${t('level.checkpoint', { level: checkpoint.level || 1, credits: checkpoint.credits || 0 })}</span></footer>`;
       if (unlocked) card.addEventListener('click', () => startGame(false, index));
       ui.levelChoices.append(card);
     });
@@ -1008,16 +1203,16 @@
   }
 
   const ENEMY_TYPES = {
-    scout: { name: 'DART FIGHTER', role: 'VERY FAST // LIGHT HULL', description: 'Quick attack craft with very little armor. Track it early before it slips through.', radius: 12, hp: 42, speed: 138, score: 100, xp: 10, color: '#ff8b72' },
-    raider: { name: 'MARAUDER', role: 'BALANCED // ARMORED', description: 'Reliable frontline ship. Slower than a Dart, but it can absorb sustained blaster fire.', radius: 19, hp: 105, speed: 88, score: 170, xp: 16, color: '#ffb35c' },
-    striker: { name: 'NEEDLE', role: 'EXTREME SPEED // FRAGILE', description: 'A tiny interceptor built entirely around speed. Its erratic lane changes make it hard to track.', radius: 10, hp: 48, speed: 178, score: 220, xp: 18, color: '#c885ff' },
-    major: { name: 'SIEGEBREAKER', role: 'HEAVY HULL // MISSILES', description: 'A slow assault vessel that launches guided rockets at your ship. Keep moving.', radius: 32, hp: 390, speed: 55.1, score: 700, xp: 48, color: '#ff6f61', major: true },
-    interceptor: { name: 'CARRIER INTERCEPTOR', role: 'LAUNCHED // DESTRUCTIBLE', description: 'A light interceptor launched by carrier vessels. Its reinforced light hull can be destroyed by focused blaster fire before it reaches the gate.', radius: 10, hp: 34, speed: 148, score: 80, xp: 7, color: '#ff9f88', interceptor: true },
-    carrier: { name: 'BROOD CARRIER', role: 'SPAWNER // HEAVY HULL', description: 'A mobile hangar that launches smaller fighters along the route. Destroy it before the swarm grows.', radius: 37, hp: 520, speed: 49, score: 920, xp: 60, color: '#f071c8', major: true, carrier: true },
-    sentinel: { name: 'AEGIS SENTINEL', role: 'ROCKET-BREAK SHIELD', description: 'Light blasters cannot pierce its barrier. Two heavy-rocket impacts collapse the barrier, regardless of rocket level.', radius: 29, hp: 310, shield: 0, shieldCharges: 2, speed: 62, score: 840, xp: 58, color: '#aeb8c0', major: true, shielded: true },
-    bossOmega: { name: 'DREADNOUGHT OMEGA', role: 'MISSILE COMMAND SHIP', description: 'The first invasion commander. It saturates the defense zone with guided warheads.', radius: 66, hp: 2850, speed: 34, score: 5400, xp: 260, color: '#ff506b', major: true, boss: true, bossSkill: 'rockets' },
-    bossCarrier: { name: 'THE HOLLOW QUEEN', role: 'RIFT CARRIER // SWARM COMMAND', description: 'A vast carrier that continuously deploys escort wings through the twin rift. Its emergency shield activates if it is damaged too early.', radius: 74, hp: 4600, speed: 29, score: 7600, xp: 340, color: '#ef67d1', major: true, boss: true, carrier: true, bossSkill: 'swarm', emergencyShield: true },
-    bossTitan: { name: 'AEGIS TITAN', role: 'ROCKET-BREAK SHIELD // FINAL COMMAND', description: 'The final gatebreaker. Heavy rockets collapse its shield and leave the command ship exposed.', radius: 82, hp: 2520, shield: 330, speed: 26, score: 12000, xp: 500, color: '#aeb8c0', major: true, boss: true, shielded: true, bossSkill: 'titan' },
+    scout: { nameKey: 'enemy.scout.name', roleKey: 'enemy.scout.role', descriptionKey: 'enemy.scout.description', radius: 12, hp: 42, speed: 138, score: 100, xp: 10, color: '#ff8b72' },
+    raider: { nameKey: 'enemy.raider.name', roleKey: 'enemy.raider.role', descriptionKey: 'enemy.raider.description', radius: 19, hp: 105, speed: 88, score: 170, xp: 16, color: '#ffb35c' },
+    striker: { nameKey: 'enemy.striker.name', roleKey: 'enemy.striker.role', descriptionKey: 'enemy.striker.description', radius: 10, hp: 48, speed: 178, score: 220, xp: 18, color: '#c885ff' },
+    major: { nameKey: 'enemy.major.name', roleKey: 'enemy.major.role', descriptionKey: 'enemy.major.description', radius: 32, hp: 390, speed: 55.1, score: 700, xp: 48, color: '#ff6f61', major: true },
+    interceptor: { nameKey: 'enemy.interceptor.name', roleKey: 'enemy.interceptor.role', descriptionKey: 'enemy.interceptor.description', radius: 10, hp: 34, speed: 148, score: 80, xp: 7, color: '#ff9f88', interceptor: true },
+    carrier: { nameKey: 'enemy.carrier.name', roleKey: 'enemy.carrier.role', descriptionKey: 'enemy.carrier.description', radius: 37, hp: 520, speed: 49, score: 920, xp: 60, color: '#f071c8', major: true, carrier: true },
+    sentinel: { nameKey: 'enemy.sentinel.name', roleKey: 'enemy.sentinel.role', descriptionKey: 'enemy.sentinel.description', radius: 29, hp: 310, shield: 0, shieldCharges: 2, speed: 62, score: 840, xp: 58, color: '#aeb8c0', major: true, shielded: true },
+    bossOmega: { nameKey: 'enemy.bossOmega.name', roleKey: 'enemy.bossOmega.role', descriptionKey: 'enemy.bossOmega.description', radius: 66, hp: 2850, speed: 34, score: 5400, xp: 260, color: '#ff506b', major: true, boss: true, bossSkill: 'rockets' },
+    bossCarrier: { nameKey: 'enemy.bossCarrier.name', roleKey: 'enemy.bossCarrier.role', descriptionKey: 'enemy.bossCarrier.description', radius: 74, hp: 4600, speed: 29, score: 7600, xp: 340, color: '#ef67d1', major: true, boss: true, carrier: true, bossSkill: 'swarm', emergencyShield: true },
+    bossTitan: { nameKey: 'enemy.bossTitan.name', roleKey: 'enemy.bossTitan.role', descriptionKey: 'enemy.bossTitan.description', radius: 82, hp: 2520, shield: 330, speed: 26, score: 12000, xp: 500, color: '#aeb8c0', major: true, boss: true, shielded: true, bossSkill: 'titan' },
   };
 
   function activateWave() {
@@ -1035,7 +1230,7 @@
     waveCallEligible = false;
     setWaveCallAvailable(false);
     const bossFormation = wave === LEVELS[currentLevel].stages && formation === formationsInStage;
-    showToast(bossFormation ? 'COMMAND SHIP ENTERING THE VOIDLINE' : `STAGE ${String(wave).padStart(2, '0')} // WAVE ${formation} OF ${formationsInStage}`);
+    showToast(bossFormation ? t('toast.commandEntering') : t('toast.stageWave', { stage: String(wave).padStart(2, '0'), wave: formation, total: formationsInStage }));
     audio.tone(bossFormation ? 82 : 128, .42, 'sawtooth', .08, bossFormation ? -35 : 110);
     ui.crosshair.style.opacity = '1';
     if (pendingLevelUps > 0) showUpgradeChoices();
@@ -1044,7 +1239,8 @@
   function showNextIntel() {
     if (!introQueue.length) { activateWave(); return; }
     const type = introQueue.shift();
-    const intel = ENEMY_TYPES[type];
+    const firstContact = !seenEnemyTypes.has(type);
+    const intel = translateEnemy(type);
     seenEnemyTypes.add(type);
     campaignState.seenEnemyTypes = [...seenEnemyTypes];
     saveCampaignState();
@@ -1053,20 +1249,20 @@
     ui.intelTitle.textContent = intel.name;
     ui.intelRole.textContent = intel.role;
     ui.intelText.textContent = intel.description;
-    ui.intelKicker.textContent = currentLevel === 0 && wave === 1 ? 'FIRST CONTACT // HOSTILE PROFILE' : 'NEW HOSTILE IDENTIFIED';
+    ui.intelKicker.textContent = t(firstContact ? 'intel.firstContact' : 'intel.newHostile');
     ui.intelOverlay.querySelector('.intel-panel').dataset.enemy = type;
     drawIntelShip(type);
     ui.intelOverlay.classList.add('active');
   }
 
   function showBossIntro(type) {
-    const boss = ENEMY_TYPES[type];
+    const boss = translateEnemy(type);
     mode = 'cutscene';
     bossIntroTimer = 4.2;
     ui.crosshair.style.opacity = '0';
     ui.bossTitle.textContent = boss.name;
     ui.bossText.textContent = boss.role;
-    ui.bossKicker.textContent = `${LEVELS[currentLevel].short} // COMMAND SIGNATURE DETECTED`;
+    ui.bossKicker.textContent = `${translateLevel(LEVELS[currentLevel]).short} // ${t('boss.commandSignature')}`;
     ui.bossOverlay.classList.add('active');
     audio.tone(48, .9, 'sawtooth', .12, 34);
   }
@@ -1357,7 +1553,7 @@
     if (mode !== 'playing' || !waveReady || !waveCallEligible) return;
     const bonus = Math.round((6 + wave * 2 + currentLevel * 3) * (1 + formation * .15));
     grantXp(bonus, true);
-    showToast(`RAPID CLEAR // +${bonus} XP`);
+    showToast(t('toast.rapidClear', { xp: bonus }));
     advanceAfterClear();
   }
 
@@ -1460,7 +1656,7 @@
     if (mode !== 'playing' || player.rocketCooldown > 0 || player.rocketCharge > 0) return;
     player.rocketCharge = .62;
     player.rocketTarget = lockedTarget && !lockedTarget.dead ? lockedTarget : null;
-    showToast(player.rocketTarget ? `LOCK CONFIRMED // ${ENEMY_TYPES[player.rocketTarget.type].name}` : 'HEAVY ROCKET CHARGING // NO LOCK');
+    showToast(player.rocketTarget ? t('toast.lockConfirmed', { enemy: translateEnemy(player.rocketTarget.type).name }) : t('toast.rocketCharging'));
     audio.tone(96, .55, 'sawtooth', .05, 260);
   }
 
@@ -1510,7 +1706,7 @@
     player.jumpDestinationY = clamp(targetY, 70, WORLD.height - 70);
     player.jumpDestinationCooldown = player.jumpDestinationMax;
     burst(player.jumpDestinationX, player.jumpDestinationY, COLORS.purple, 12, 120);
-    showToast('VOID DESTINATION SET');
+    showToast(t('toast.destinationSet'));
     audio.tone(340, .16, 'sine', .07, 520);
   }
 
@@ -1518,7 +1714,7 @@
     player.jumpDestinationX = null;
     player.jumpDestinationY = null;
     player.jumpDestinationCooldown = 0;
-    showToast('VOID DESTINATION CLEARED // DASH RESTORED');
+    showToast(t('toast.destinationCleared'));
     audio.tone(220, .14, 'sine', .06, -280);
   }
 
@@ -1539,7 +1735,7 @@
       const length = Math.hypot(dx, dy) || 1;
       targetX = clamp(player.x + (dx / length) * 410, 45, WORLD.width - 45);
       targetY = clamp(player.y + (dy / length) * 410, 45, WORLD.height - 45);
-      showToast('JUMPED AHEAD // PRESS T TO SET A DESTINATION');
+      showToast(t('toast.jumpedAhead'));
     } else {
       targetX = clamp(targetX, 45, WORLD.width - 45);
       targetY = clamp(targetY, 45, WORLD.height - 45);
@@ -1662,7 +1858,7 @@
           }
           enemy.spawnTimer = enemy.bossSkill === 'swarm' ? rand(2.9, 4.2) : rand(4.2, 5.9);
           burst(enemy.x, enemy.y, enemy.color, 10, 110);
-          showToast(enemy.boss ? 'CARRIER WING DEPLOYED' : 'BROOD CARRIER LAUNCHED INTERCEPTORS');
+          showToast(enemy.boss ? t('toast.carrierWing') : t('toast.carrierLaunch'));
         }
       }
 
@@ -1672,7 +1868,7 @@
         camera.shake = Math.max(camera.shake, 16);
         burst(PORTAL.x, PORTAL.y, COLORS.coral, 30, 320);
         audio.tone(58, .5, 'sawtooth', .11, -28);
-        showToast(gateShields > 0 ? `GATE HIT // ${gateShields} SHIELD${gateShields === 1 ? '' : 'S'} REMAIN` : 'EARTH GATE BREACHED');
+        showToast(gateShields > 0 ? t('toast.gateHit', { count: gateShields }) : t('toast.gateBreached'));
         if (gateShields <= 0) finishRun(false, 'gate');
       }
     });
@@ -1716,10 +1912,10 @@
     if (mode !== 'playing') return;
     const docked = nearestStation(110);
     if (docked) {
-      if (Math.hypot(player.vx, player.vy) > 150) { showToast('SLOW DOWN TO DOCK'); return; }
-      if (docked.level >= 4) { showToast('STATION AT MAXIMUM POWER'); return; }
+      if (Math.hypot(player.vx, player.vy) > 150) { showToast(t('toast.slowDock')); return; }
+      if (docked.level >= 4) { showToast(t('toast.stationMax')); return; }
       const cost = 90 + docked.level * 80;
-      if (player.credits < cost) { showToast(`UPGRADE REQUIRES ${cost} SALVAGE CREDITS`); return; }
+      if (player.credits < cost) { showToast(t('toast.upgradeRequires', { cost })); return; }
       player.credits -= cost;
       docked.level += 1;
       docked.range += 72;
@@ -1727,17 +1923,17 @@
       docked.fireRate *= .86;
       player.hp = Math.min(player.maxHp, player.hp + 12);
       burst(docked.x, docked.y, COLORS.amber, 24, 180);
-      showToast(`STATION UPGRADED // MK ${docked.level}`);
+      showToast(t('toast.stationUpgraded', { level: docked.level }));
       audio.tone(420, .36, 'sine', .07, 280);
       return;
     }
-    if (stations.length >= 3) { showToast('STATION LIMIT REACHED'); return; }
+    if (stations.length >= 3) { showToast(t('toast.stationLimit')); return; }
     const cost = stationBuildCost();
-    if (player.credits < cost) { showToast(`NEED ${cost} SALVAGE CREDITS`); return; }
+    if (player.credits < cost) { showToast(t('toast.needCredits', { cost })); return; }
     player.credits -= cost;
     stations.push({ x: player.x, y: player.y, radius: 30, level: 1, range: 470, damage: 17, fireRate: .8, fireTimer: .25, angle: 0, target: null });
     burst(player.x, player.y, COLORS.amber, 28, 210);
-    showToast('FRIENDLY DEFENSE STATION DEPLOYED');
+    showToast(t('toast.stationDeployed'));
     audio.tone(230, .5, 'triangle', .075, 310);
   }
 
@@ -1888,7 +2084,7 @@
         const angle = Math.atan2(player.y - rock.y, player.x - rock.x);
         player.vx += Math.cos(angle) * (260 + rock.radius * 4);
         player.vy += Math.sin(angle) * (260 + rock.radius * 4);
-        addFloater(rock.x, rock.y - rock.radius, 'COLLISION', COLORS.coral);
+        addFloater(rock.x, rock.y - rock.radius, t('floater.collision'), COLORS.coral);
       }
     }
 
@@ -1901,7 +2097,7 @@
     if (enemy.shieldCharges > 0) {
       enemy.shieldHitTimer = .16;
       if (!heavy) {
-        if (Math.random() < .18) addFloater(enemy.x, enemy.y - enemy.radius, 'SHIELDED', '#79a8ff');
+        if (Math.random() < .18) addFloater(enemy.x, enemy.y - enemy.radius, t('floater.shielded'), '#79a8ff');
         addParticle(x, y, { vx: rand(-60, 60), vy: rand(-60, 60), color: '#79a8ff', life: .34, size: 2.5 });
         audio.tone(780, .045, 'sine', .022, -100);
         return;
@@ -1909,17 +2105,17 @@
       enemy.shieldCharges -= 1;
       burst(x, y, '#79a8ff', 14, 160);
       if (enemy.shieldCharges > 0) {
-        showToast(`${ENEMY_TYPES[enemy.type].name} // ${enemy.shieldCharges} SHIELD CHARGES REMAIN`);
-        addFloater(enemy.x, enemy.y - enemy.radius, `SHIELD ${enemy.shieldCharges}/${enemy.maxShieldCharges}`, '#9acbff');
+        showToast(t('toast.shieldRemaining', { enemy: translateEnemy(enemy.type).name, count: enemy.shieldCharges }));
+        addFloater(enemy.x, enemy.y - enemy.radius, t('floater.shield', { current: enemy.shieldCharges, total: enemy.maxShieldCharges }), '#9acbff');
         return;
       }
       amount *= .72;
-      showToast(`${ENEMY_TYPES[enemy.type].name} // SHIELD COLLAPSED`);
-      addFloater(enemy.x, enemy.y - enemy.radius, 'SHIELD COLLAPSED', COLORS.amber);
+      showToast(t('toast.shieldCollapsed', { enemy: translateEnemy(enemy.type).name }));
+      addFloater(enemy.x, enemy.y - enemy.radius, t('floater.shieldCollapsed'), COLORS.amber);
     } else if (enemy.shieldHp > 0) {
       enemy.shieldHitTimer = .16;
       if (!heavy) {
-        if (enemy.shieldHitTimer <= .17 && Math.random() < .18) addFloater(enemy.x, enemy.y - enemy.radius, 'SHIELDED', '#79a8ff');
+        if (enemy.shieldHitTimer <= .17 && Math.random() < .18) addFloater(enemy.x, enemy.y - enemy.radius, t('floater.shielded'), '#79a8ff');
         addParticle(x, y, { vx: rand(-60, 60), vy: rand(-60, 60), color: '#79a8ff', life: .34, size: 2.5 });
         audio.tone(780, .045, 'sine', .022, -100);
         return;
@@ -1928,12 +2124,12 @@
       burst(x, y, '#79a8ff', 14, 160);
       if (enemy.shieldHp > 0) return;
       amount *= .72;
-      showToast(`${ENEMY_TYPES[enemy.type].name} // SHIELD COLLAPSED`);
-      addFloater(enemy.x, enemy.y - enemy.radius, 'SHIELD BROKEN', COLORS.amber);
+      showToast(t('toast.shieldCollapsed', { enemy: translateEnemy(enemy.type).name }));
+      addFloater(enemy.x, enemy.y - enemy.radius, t('floater.shieldBroken'), COLORS.amber);
     }
     enemy.hp -= amount;
     enemy.hitFlash = .08;
-    if (enemy.interceptor) addFloater(enemy.x, enemy.y - enemy.radius, `${Math.max(1, Math.round(enemy.hp))} HULL`, enemy.color);
+    if (enemy.interceptor) addFloater(enemy.x, enemy.y - enemy.radius, t('floater.hull', { amount: Math.max(1, Math.round(enemy.hp)) }), enemy.color);
     addParticle(x, y, { vx: rand(-80, 80), vy: rand(-80, 80), color: enemy.color, life: .28, size: 2.2 });
     if (enemy.hp <= 0 && !enemy.dead) {
       enemy.dead = true;
@@ -1942,7 +2138,7 @@
       grantXp(enemy.xp);
       burst(enemy.x, enemy.y, enemy.color, enemy.boss ? 60 : enemy.major ? 30 : 14, enemy.boss ? 520 : 240);
       addFloater(enemy.x, enemy.y - enemy.radius, `+${enemy.score}`, enemy.boss ? COLORS.amber : COLORS.cyan);
-      if (enemy.interceptor) showToast('CARRIER INTERCEPTOR DESTROYED');
+      if (enemy.interceptor) showToast(t('toast.carrierInterceptorDestroyed'));
       camera.shake = Math.max(camera.shake, enemy.boss ? 22 : enemy.major ? 9 : 3.5);
       audio.tone(enemy.boss ? 48 : enemy.major ? 72 : 130, enemy.boss ? .75 : .16, 'sawtooth', enemy.boss ? .14 : .05, -35);
       if (enemy.major && Math.random() < .28) spawnPickupAt('repair', enemy.x, enemy.y);
@@ -1952,8 +2148,8 @@
       enemy.maxShield = enemy.maxHp * .2;
       enemy.shieldHp = enemy.maxShield;
       enemy.shieldHitTimer = .45;
-      showToast(`${ENEMY_TYPES[enemy.type].name} // EMERGENCY SHIELD ONLINE`);
-      addFloater(enemy.x, enemy.y - enemy.radius, 'EMERGENCY SHIELD', '#9acbff');
+      showToast(t('toast.emergencyShield', { enemy: translateEnemy(enemy.type).name }));
+      addFloater(enemy.x, enemy.y - enemy.radius, t('floater.emergencyShield'), '#9acbff');
       burst(enemy.x, enemy.y, '#79a8ff', 34, 280);
     }
   }
@@ -1966,11 +2162,11 @@
     if (rocket.hp <= 0) {
       rocket.dead = true;
       burst(rocket.x, rocket.y, COLORS.coral, 11, 190);
-      addFloater(rocket.x, rocket.y - 13, 'MISSILE INTERCEPTED', COLORS.cyan);
+      addFloater(rocket.x, rocket.y - 13, t('floater.missileIntercepted'), COLORS.cyan);
       camera.shake = Math.max(camera.shake, 2.5);
       audio.tone(190, .1, 'square', .035, -70);
     } else {
-      addFloater(rocket.x, rocket.y - 11, `${Math.ceil(rocket.hp)} HULL`, COLORS.coral);
+      addFloater(rocket.x, rocket.y - 11, t('floater.hull', { amount: Math.ceil(rocket.hp) }), COLORS.coral);
       audio.tone(520, .035, 'square', .018, -80);
     }
   }
@@ -2018,7 +2214,7 @@
     player.invulnerable = .5;
     camera.shake = Math.max(camera.shake, 12);
     burst(player.x, player.y, COLORS.coral, 14, 240);
-    addFloater(player.x, player.y - 28, `-${Math.round(amount)} HULL`, COLORS.coral);
+    addFloater(player.x, player.y - 28, t('floater.hull', { amount: `-${Math.round(amount)}` }), COLORS.coral);
     audio.tone(94, .28, 'sawtooth', .09, -54);
     if (player.hp <= 0) finishRun(false, 'ship');
   }
@@ -2028,12 +2224,12 @@
     if (item.kind === 'repair') {
       const healed = Math.min(36, player.maxHp - player.hp);
       player.hp += healed;
-      showToast(healed > 0 ? `REPAIR FIELD // +${Math.round(healed)} HULL` : 'HULL ALREADY STABLE');
-      addFloater(item.x, item.y, `+${Math.round(healed)} HP`, COLORS.cyan);
+      showToast(healed > 0 ? t('toast.repairField', { amount: Math.round(healed) }) : t('toast.hullStable'));
+      addFloater(item.x, item.y, t('floater.hull', { amount: `+${Math.round(healed)}` }), COLORS.cyan);
     } else {
       gateShields = Math.min(5, gateShields + 1);
-      showToast('AEGIS CORE RECOVERED // GATE +1');
-      addFloater(item.x, item.y, '+1 GATE SHIELD', COLORS.amber);
+      showToast(t('toast.aegisRecovered'));
+      addFloater(item.x, item.y, t('floater.gateShield'), COLORS.amber);
     }
     burst(item.x, item.y, item.kind === 'repair' ? COLORS.cyan : COLORS.amber, 20, 170);
     audio.tone(item.kind === 'repair' ? 660 : 420, .35, 'sine', .065, 240);
@@ -2055,29 +2251,29 @@
   }
   // Upgrade choices, campaign completion, and tutorial flow.
   const UPGRADES = [
-    { id: 'damage', tier: 'damageTier', icon: '◆', name: 'Overcharged Bolts', description: 'Blaster damage increases by 18%.', detail: 'DAMAGE +18%', apply: () => { player.damage *= 1.18; player.damageTier += 1; } },
-    { id: 'rate', tier: 'rateTier', icon: '≋', name: 'Flux Repeater', description: 'Blaster cycles 14% faster.', detail: 'FIRE RATE +14%', apply: () => { player.fireRate *= 1.14; player.rateTier += 1; } },
-    { id: 'speed', tier: 'speedTier', icon: '»', name: 'Vector Thrusters', description: 'Flight speed and acceleration improve.', detail: 'SPEED +10%', apply: () => { player.speed *= 1.1; player.acceleration *= 1.07; player.speedTier += 1; } },
-    { id: 'hull', tier: 'hullTier', icon: '⬡', name: 'Reactive Plating', description: 'Increase maximum hull and restore a little hull.', detail: 'MAX HULL +15', apply: () => { player.maxHp += 15; player.hp = Math.min(player.maxHp, player.hp + 15); player.hullTier += 1; } },
-    { id: 'rocket', tier: 'rocketTier', icon: '▲', name: 'Siege Warhead', description: 'Heavy rockets deal more blast damage.', detail: 'ROCKET +22%', apply: () => { player.rocketDamage *= 1.22; player.rocketTier += 1; } },
-    { id: 'cooling', tier: 'coolingTier', icon: '❄', name: 'Cryo Manifold', description: 'Rocket and void jump systems reload faster.', detail: 'COOLDOWNS -10%', apply: () => { player.rocketMax *= .9; player.boostMax *= .9; player.coolingTier += 1; } },
-    { id: 'salvage', icon: 'XP', name: 'Salvage Matrix', description: 'Void ore yields more experience.', detail: 'RESOURCE XP +18%', apply: () => { player.salvage *= 1.18; } },
-    { id: 'multi', icon: 'III', name: 'Splitfire Array', description: 'Add a tightly grouped blaster shot. Offered every four levels.', detail: '+1 SHOT · EVERY 4 LVL', apply: () => { player.multiShot = Math.min(3, player.multiShot + 1); player.multiUpgradeLevel = Math.floor(player.level / 4) * 4; } },
-    { id: 'gate', icon: 'AEG', name: 'Gate Capacitor', description: 'Send a recovered charge to Earth.', detail: 'GATE SHIELD +1', apply: () => { gateShields = Math.min(5, gateShields + 1); } },
+    { id: 'damage', tier: 'damageTier', icon: '◆', nameKey: 'upgrade.damage.name', descriptionKey: 'upgrade.damage.description', detailKey: 'upgrade.damage.detail', apply: () => { player.damage *= 1.18; player.damageTier += 1; } },
+    { id: 'rate', tier: 'rateTier', icon: '≋', nameKey: 'upgrade.rate.name', descriptionKey: 'upgrade.rate.description', detailKey: 'upgrade.rate.detail', apply: () => { player.fireRate *= 1.14; player.rateTier += 1; } },
+    { id: 'speed', tier: 'speedTier', icon: '»', nameKey: 'upgrade.speed.name', descriptionKey: 'upgrade.speed.description', detailKey: 'upgrade.speed.detail', apply: () => { player.speed *= 1.1; player.acceleration *= 1.07; player.speedTier += 1; } },
+    { id: 'hull', tier: 'hullTier', icon: '⬡', nameKey: 'upgrade.hull.name', descriptionKey: 'upgrade.hull.description', detailKey: 'upgrade.hull.detail', apply: () => { player.maxHp += 15; player.hp = Math.min(player.maxHp, player.hp + 15); player.hullTier += 1; } },
+    { id: 'rocket', tier: 'rocketTier', icon: '▲', nameKey: 'upgrade.rocket.name', descriptionKey: 'upgrade.rocket.description', detailKey: 'upgrade.rocket.detail', apply: () => { player.rocketDamage *= 1.22; player.rocketTier += 1; } },
+    { id: 'cooling', tier: 'coolingTier', icon: '❄', nameKey: 'upgrade.cooling.name', descriptionKey: 'upgrade.cooling.description', detailKey: 'upgrade.cooling.detail', apply: () => { player.rocketMax *= .9; player.boostMax *= .9; player.coolingTier += 1; } },
+    { id: 'salvage', icon: 'XP', nameKey: 'upgrade.salvage.name', descriptionKey: 'upgrade.salvage.description', detailKey: 'upgrade.salvage.detail', apply: () => { player.salvage *= 1.18; } },
+    { id: 'multi', icon: 'III', nameKey: 'upgrade.multi.name', descriptionKey: 'upgrade.multi.description', detailKey: 'upgrade.multi.detail', apply: () => { player.multiShot = Math.min(3, player.multiShot + 1); player.multiUpgradeLevel = Math.floor(player.level / 4) * 4; } },
+    { id: 'gate', icon: 'AEG', nameKey: 'upgrade.gate.name', descriptionKey: 'upgrade.gate.description', detailKey: 'upgrade.gate.detail', apply: () => { gateShields = Math.min(5, gateShields + 1); } },
   ];
 
   function upgradeSummary(upgrade) {
     switch (upgrade.id) {
-      case 'damage': return { current: `DAMAGE ${player.damage.toFixed(1)}`, effect: `→ ${(player.damage * 1.18).toFixed(1)} · +18%` };
-      case 'rate': return { current: `FIRE RATE ${player.fireRate.toFixed(1)}/S`, effect: `→ ${(player.fireRate * 1.14).toFixed(1)}/S · +14%` };
-      case 'speed': return { current: `SPEED ${Math.round(player.speed)}`, effect: `→ ${Math.round(player.speed * 1.1)} · +10%` };
-      case 'hull': return { current: `MAX HULL ${Math.round(player.maxHp)}`, effect: `→ ${Math.round(player.maxHp + 15)} · +15` };
-      case 'rocket': return { current: `ROCKET DMG ${Math.round(player.rocketDamage)}`, effect: `→ ${Math.round(player.rocketDamage * 1.22)} · +22%` };
-      case 'cooling': return { current: `ROCKET ${player.rocketMax.toFixed(1)}S · JUMP ${player.boostMax.toFixed(1)}S`, effect: `→ ${(player.rocketMax * .9).toFixed(1)}S · ${(player.boostMax * .9).toFixed(1)}S · -10%` };
-      case 'salvage': return { current: `RESOURCE XP ×${player.salvage.toFixed(2)}`, effect: `→ ×${(player.salvage * 1.18).toFixed(2)} · +18%` };
-      case 'multi': return { current: `SHOTS ${player.multiShot}`, effect: `→ ${player.multiShot + 1} · +1 SHOT` };
-      case 'gate': return { current: `GATE SHIELDS ${gateShields}/5`, effect: `→ ${Math.min(5, gateShields + 1)}/5 · +1` };
-      default: return { current: '', effect: upgrade.detail };
+      case 'damage': return { current: `${t('label.damage')} ${player.damage.toFixed(1)}`, effect: `→ ${(player.damage * 1.18).toFixed(1)} · +18%` };
+      case 'rate': return { current: `${t('label.fireRate')} ${player.fireRate.toFixed(1)}/S`, effect: `→ ${(player.fireRate * 1.14).toFixed(1)}/S · +14%` };
+      case 'speed': return { current: `${t('label.speed')} ${Math.round(player.speed)}`, effect: `→ ${Math.round(player.speed * 1.1)} · +10%` };
+      case 'hull': return { current: `${t('label.maxHull')} ${Math.round(player.maxHp)}`, effect: `→ ${Math.round(player.maxHp + 15)} · +15` };
+      case 'rocket': return { current: `${t('label.rocketDamage')} ${Math.round(player.rocketDamage)}`, effect: `→ ${Math.round(player.rocketDamage * 1.22)} · +22%` };
+      case 'cooling': return { current: `${t('label.rocket')} ${player.rocketMax.toFixed(1)}S · ${t('label.jump')} ${player.boostMax.toFixed(1)}S`, effect: `→ ${(player.rocketMax * .9).toFixed(1)}S · ${(player.boostMax * .9).toFixed(1)}S · -10%` };
+      case 'salvage': return { current: `${t('label.resourceXp')} ×${player.salvage.toFixed(2)}`, effect: `→ ×${(player.salvage * 1.18).toFixed(2)} · +18%` };
+      case 'multi': return { current: `${t('label.shots')} ${player.multiShot}`, effect: `→ ${player.multiShot + 1} · +1` };
+      case 'gate': return { current: `${t('label.gateShields')} ${gateShields}/5`, effect: `→ ${Math.min(5, gateShields + 1)}/5 · +1` };
+      default: return { current: '', effect: t(upgrade.detailKey) };
     }
   }
 
@@ -2102,7 +2298,7 @@
       const summary = upgradeSummary(upgrade);
       button.className = 'upgrade-choice';
       button.type = 'button';
-      button.innerHTML = `<span class="upgrade-icon">${upgrade.icon}</span><strong>${upgrade.name}</strong><p>${upgrade.description}</p><small><span>CURRENT // ${summary.current}</span><b>UPGRADE // ${summary.effect}</b></small>`;
+      button.innerHTML = `<span class="upgrade-icon">${upgrade.icon}</span><strong>${t(upgrade.nameKey)}</strong><p>${t(upgrade.descriptionKey)}</p><small><span>${t('label.current')} // ${summary.current}</span><b>${t('label.upgrade')} // ${summary.effect}</b></small>`;
       button.addEventListener('click', () => selectUpgrade(upgrade));
       ui.upgradeChoices.append(button);
     });
@@ -2115,7 +2311,7 @@
     lastSelectedUpgradeId = upgrade.id;
     pendingLevelUps -= 1;
     ui.upgradeOverlay.classList.remove('active');
-    showToast(`${upgrade.name.toUpperCase()} INSTALLED`);
+    showToast(t('toast.upgradeInstalled', { upgrade: t(upgrade.nameKey) }));
     if (pendingLevelUps > 0) {
       setTimeout(showUpgradeChoices, 80);
     } else {
@@ -2156,8 +2352,9 @@
     saveCampaignState();
     mode = 'sector';
     ui.crosshair.style.opacity = '0';
-    ui.sectorTitle.textContent = LEVELS[currentLevel].name;
-    ui.sectorCopy.textContent = LEVELS[currentLevel].next;
+    const completedLevel = translateLevel(LEVELS[currentLevel]);
+    ui.sectorTitle.textContent = completedLevel.name;
+    ui.sectorCopy.textContent = completedLevel.next;
     ui.sectorOverlay.classList.add('active');
     audio.tone(220, .7, 'sine', .09, 440);
   }
@@ -2185,7 +2382,7 @@
     camera.x = clamp(player.x - screenWidth / 2, 0, WORLD.width - screenWidth);
     camera.y = clamp(player.y - screenHeight / 2, 0, WORLD.height - screenHeight);
     mode = 'playing';
-    showToast(`${LEVELS[currentLevel].name} // MULTIPLE APPROACH VECTORS`);
+    showToast(t('toast.multipleApproaches', { sector: translateLevel(LEVELS[currentLevel]).name }));
     beginWave();
   }
 
@@ -2204,35 +2401,35 @@
     ui.portalWarning.classList.remove('active');
     ui.lockReadout.classList.remove('active');
     ui.tutorialCard.classList.remove('active');
-    ui.endKicker.textContent = victory ? 'CORRIDOR SECURED' : reason === 'ship' ? 'PILOT SIGNAL LOST' : 'EARTH DEFENSE OFFLINE';
-    ui.endTitle.textContent = victory ? 'INVASION REPELLED' : reason === 'ship' ? 'YOUR SHIP WAS LOST' : 'THE GATE HAS FALLEN';
+    ui.endKicker.textContent = victory ? t('end.secured') : reason === 'ship' ? t('end.pilotLost') : t('end.defenseOffline');
+    ui.endTitle.textContent = victory ? t('end.victoryTitle') : reason === 'ship' ? t('end.shipLostTitle') : t('end.gateLostTitle');
     ui.endCopy.textContent = victory
-      ? 'The flagship is gone and the surviving fleet has broken formation. Earth holds.'
+      ? t('end.victoryCopy')
       : reason === 'ship'
-        ? 'Your ship could not hold the line. The defense network is ready for another run.'
-        : 'The invasion fleet breached the last defense corridor.';
+        ? t('end.shipLostCopy')
+        : t('end.gateLostCopy');
     ui.finalScore.textContent = formatScore(score);
-    ui.finalWave.textContent = `L${currentLevel + 1} · ${wave}`;
+    ui.finalWave.textContent = `${translateLevel(LEVELS[currentLevel]).short} · ${wave}`;
     ui.finalKills.textContent = String(kills);
     ui.endOverlay.classList.add('active');
     audio.tone(victory ? 220 : 55, .8, victory ? 'sine' : 'sawtooth', .1, victory ? 440 : -25);
   }
 
   const tutorialSteps = [
-    { title: 'TAKE THE CONTROLS', text: 'Use W, A, S, and D to move through the sector.' },
-    { title: 'TEST THE BLASTER', text: 'Press the Up Arrow to fire forward, or hold the left mouse button to aim and fire.' },
-    { title: 'SALVAGE VOID ORE', text: 'Shoot the nearby ore cluster. Destroyed resources give XP for upgrades.' },
-    { title: 'PUNCH THE VOID', text: 'Press T to place or replace a jump destination, then Q or right-click to teleport there. Hold T to clear it and dash again.' },
-    { title: 'ARM THE WARHEAD', text: 'Press F. Heavy rockets charge briefly, then deal large blast damage.' },
-    { title: 'DEFEND THE GATE', text: 'Enemies follow the glowing corridor. Stop them before the Earth Gate loses every shield.' },
+    { titleKey: 'tutorial.takeControls', textKey: 'tutorial.takeControlsCopy' },
+    { titleKey: 'tutorial.testBlaster', textKey: 'tutorial.testBlasterCopy' },
+    { titleKey: 'tutorial.salvage', textKey: 'tutorial.salvageCopy' },
+    { titleKey: 'tutorial.punchVoid', textKey: 'tutorial.punchVoidCopy' },
+    { titleKey: 'tutorial.armWarhead', textKey: 'tutorial.armWarheadCopy' },
+    { titleKey: 'tutorial.defendGate', textKey: 'tutorial.defendGateCopy' },
   ];
 
   function updateTutorialCard() {
     const step = tutorialSteps[tutorialIndex];
     if (!step) return;
-    ui.tutorialStep.textContent = `TRAINING // ${String(tutorialIndex + 1).padStart(2, '0')}`;
-    ui.tutorialTitle.textContent = step.title;
-    ui.tutorialText.textContent = step.text;
+    ui.tutorialStep.textContent = t('tutorial.step', { step: String(tutorialIndex + 1).padStart(2, '0') });
+    ui.tutorialTitle.textContent = t(step.titleKey);
+    ui.tutorialText.textContent = t(step.textKey);
     ui.tutorialProgress.innerHTML = tutorialSteps.map((_, index) => `<i class="${index <= tutorialIndex ? 'done' : ''}"></i>`).join('');
   }
 
@@ -2257,7 +2454,7 @@
     if (tutorialDelay <= 0) {
       tutorialMode = false;
       ui.tutorialCard.classList.remove('active');
-      showToast('TRAINING COMPLETE // GOOD HUNTING');
+      showToast(t('toast.trainingComplete'));
     }
   }
   // Canvas rendering, minimap, HUD synchronization, and visual effects.
@@ -2507,7 +2704,7 @@
     ctx.fillStyle = COLORS.pale;
     ctx.font = '700 10px "Space Mono", monospace';
     ctx.textAlign = 'center';
-    ctx.fillText('EARTH GATE', 0, 57);
+    ctx.fillText(t('render.earthGate'), 0, 57);
     ctx.restore();
   }
 
@@ -2601,7 +2798,7 @@
     ctx.fillStyle = COLORS.amber;
     ctx.font = '700 9px "Space Mono", monospace';
     ctx.textAlign = 'center';
-    ctx.fillText(`DEFENSE STATION // MK ${station.level}`, station.x, station.y - 46);
+    ctx.fillText(t('render.station', { level: station.level }), station.x, station.y - 46);
     ctx.restore();
     const upgradeCost = 90 + station.level * 80;
     if (station.level < 4 && player.credits >= upgradeCost) {
@@ -2610,7 +2807,7 @@
       ctx.globalAlpha = pulse;
       ctx.font = '700 8px "Space Mono", monospace';
       ctx.textAlign = 'center';
-      const label = 'UPGRADE AVAILABLE';
+      const label = t('render.upgradeAvailable');
       const width = ctx.measureText(label).width + 14;
       ctx.fillStyle = 'rgba(255,179,92,.16)';
       ctx.strokeStyle = COLORS.amber;
@@ -2737,7 +2934,7 @@
       ctx.fillStyle = '#9acbff';
       ctx.font = '700 8px "Space Mono", monospace';
       ctx.textAlign = 'center';
-      ctx.fillText(chargeShield ? `SHIELD ${enemy.shieldCharges}/${enemy.maxShieldCharges}` : `SHIELD ${Math.ceil(enemy.shieldHp)}`, enemy.x, shieldBarY - 4);
+      ctx.fillText(t('render.shield', { amount: chargeShield ? `${enemy.shieldCharges}/${enemy.maxShieldCharges}` : Math.ceil(enemy.shieldHp) }), enemy.x, shieldBarY - 4);
       ctx.restore();
       ctx.save();
       ctx.translate(enemy.x, enemy.y);
@@ -2756,7 +2953,7 @@
       ctx.fillStyle = COLORS.coral;
       ctx.font = '700 10px "Space Mono", monospace';
       ctx.textAlign = 'center';
-      ctx.fillText(ENEMY_TYPES[enemy.type].name, enemy.x, enemy.y - enemy.radius - 25);
+      ctx.fillText(translateEnemy(enemy.type).name, enemy.x, enemy.y - enemy.radius - 25);
       ctx.restore();
     }
   }
@@ -2884,10 +3081,10 @@
       const bossStage = wave === LEVELS[currentLevel].stages;
       ctx.fillStyle = bossStage ? COLORS.coral : COLORS.pale;
       ctx.font = `700 ${Math.min(48, screenWidth * .045)}px "Chakra Petch", sans-serif`;
-      ctx.fillText(bossStage ? 'FINAL STAGE' : `STAGE ${String(wave).padStart(2, '0')}`, screenWidth / 2, screenHeight * .36);
+      ctx.fillText(bossStage ? t('render.finalStage') : t('status.stage', { stage: String(wave).padStart(2, '0'), total: LEVELS[currentLevel].stages }), screenWidth / 2, screenHeight * .36);
       ctx.fillStyle = COLORS.muted || '#8ca9aa';
       ctx.font = '700 10px "Space Mono", monospace';
-      ctx.fillText(bossStage ? 'COMMAND SHIP ENTERING THE CORRIDOR' : 'HOSTILE FORMATION DETECTED', screenWidth / 2, screenHeight * .36 + 26);
+      ctx.fillText(bossStage ? t('toast.commandEntering') : t('render.hostileFormation'), screenWidth / 2, screenHeight * .36 + 26);
       ctx.restore();
     }
   }
@@ -2961,11 +3158,12 @@
   function syncUi() {
     if (!player) return;
     const level = LEVELS[currentLevel];
-    ui.sectorText.textContent = `${level.short} // ${level.name}`;
-    ui.waveText.textContent = `STAGE ${wave ? String(wave).padStart(2, '0') : '—'} / ${level.stages}`;
+    const localizedLevel = translateLevel(level);
+    ui.sectorText.textContent = `${localizedLevel.short} // ${localizedLevel.name}`;
+    ui.waveText.textContent = t('status.stage', { stage: wave ? String(wave).padStart(2, '0') : '—', total: level.stages });
     ui.waveState.textContent = spawnQueue.length || enemies.length
-      ? `WAVE ${formation}/${formationsInStage} · ${spawnQueue.length + enemies.length} HOSTILES`
-      : wave ? `WAVE ${formation}/${formationsInStage} CLEAR` : 'STANDBY';
+      ? t('status.waveActive', { current: formation, total: formationsInStage, hostiles: spawnQueue.length + enemies.length })
+      : wave ? t('status.waveClear', { current: formation, total: formationsInStage }) : t('hud.standby');
     ui.scoreText.textContent = formatScore(score);
     ui.bestText.textContent = formatScore(isAdminPilot() ? 0 : Math.max(highScore, score));
     const healthRatio = clamp(player.hp / player.maxHp, 0, 1);
@@ -2983,18 +3181,18 @@
     ui.rocketTierText.textContent = `${player.rocketTier}/7`;
     ui.coolingTierText.textContent = `${player.coolingTier}/7`;
     ui.shieldPips.innerHTML = Array.from({ length: 5 }, (_, index) => `<i class="${index >= gateShields ? 'empty' : ''}"></i>`).join('');
-    ui.shieldPips.setAttribute('aria-label', `${gateShields} portal shields`);
+    ui.shieldPips.setAttribute('aria-label', t('status.portalShields', { count: gateShields }));
 
     const rocketProgress = player.rocketCharge > 0 ? 1 - player.rocketCharge / .62 : 1 - player.rocketCooldown / player.rocketMax;
     ui.rocketCooldown.style.width = `${clamp(rocketProgress, 0, 1) * 100}%`;
-    ui.rocketState.textContent = player.rocketCharge > 0 ? 'CHARGING' : player.rocketCooldown > 0 ? `${player.rocketCooldown.toFixed(1)}S` : 'READY';
+    ui.rocketState.textContent = player.rocketCharge > 0 ? t('status.charging') : player.rocketCooldown > 0 ? `${player.rocketCooldown.toFixed(1)}S` : t('ability.ready');
     ui.rocketCooldown.closest('.ability-card').classList.toggle('cooling', player.rocketCooldown > 0 || player.rocketCharge > 0);
 
     const boostProgress = 1 - player.boostCooldown / player.boostMax;
     ui.boostCooldown.style.width = `${clamp(boostProgress, 0, 1) * 100}%`;
     if (player.boostCooldown > 0) ui.boostState.textContent = `${player.boostCooldown.toFixed(1)}S`;
-    else if (player.jumpDestinationCooldown > 0) ui.boostState.textContent = `JUMP READY · T ${player.jumpDestinationCooldown.toFixed(1)}S`;
-    else ui.boostState.textContent = Number.isFinite(player.jumpDestinationX) ? 'T TAP REPLACE · HOLD CLEAR' : 'T PLACE DEST';
+    else if (player.jumpDestinationCooldown > 0) ui.boostState.textContent = t('status.jumpReady', { seconds: player.jumpDestinationCooldown.toFixed(1) });
+    else ui.boostState.textContent = Number.isFinite(player.jumpDestinationX) ? t('status.replaceClear') : t('status.placeDestination');
     ui.boostCooldown.closest('.ability-card').classList.toggle('cooling', player.boostCooldown > 0);
 
     const docked = nearestStation(110);
@@ -3002,10 +3200,10 @@
     let stationAffordable = false;
     if (docked) {
       const upgradeCost = 90 + docked.level * 80;
-      ui.stationState.textContent = docked.level >= 4 ? 'MAXIMUM POWER' : `${upgradeCost} ◈ TO UPGRADE`;
+      ui.stationState.textContent = docked.level >= 4 ? t('status.maximumPower') : t('status.toUpgrade', { cost: upgradeCost });
       stationAffordable = docked.level < 4 && player.credits >= upgradeCost;
     } else {
-      ui.stationState.textContent = stations.length >= 3 ? 'STATION LIMIT' : `${buildCost} ◈ TO BUILD`;
+      ui.stationState.textContent = stations.length >= 3 ? t('status.stationLimit') : t('status.toBuild', { cost: buildCost });
       stationAffordable = stations.length < 3 && player.credits >= buildCost;
     }
     ui.stationButton.disabled = false;
@@ -3092,6 +3290,9 @@
   }
 
   function bindUi() {
+    [ui.languageSelect, ui.menuLanguageSelect].filter(Boolean).forEach((select) => {
+      select.addEventListener('change', (event) => setLanguage(event.target.value));
+    });
     document.getElementById('startButton').addEventListener('click', () => requirePilot(() => startGame(false)));
     document.getElementById('tutorialButton').addEventListener('click', () => requirePilot(() => startGame(true)));
     document.getElementById('levelSelectButton').addEventListener('click', () => requirePilot(openLevelSelect));
@@ -3122,7 +3323,7 @@
       tutorialMode = false;
       ui.tutorialCard.classList.remove('active');
       if (wave === 0) beginWave();
-      showToast('TRAINING SKIPPED');
+      showToast(t('toast.trainingSkipped'));
     });
 
     const musicToggle = document.getElementById('musicToggle');
@@ -3165,6 +3366,7 @@
   canvas.addEventListener('pointerleave', () => { input.pointerDown = false; });
   canvas.addEventListener('contextmenu', (event) => event.preventDefault());
 
+  applyStaticTranslations();
   bindUi();
   prepareDefaultCallsign();
   renderAdminPanel();
@@ -3181,4 +3383,16 @@
   }
   initializeCloud();
   requestAnimationFrame(frame);
+
+  function refreshLocalizedUi() {
+    updatePilotUi();
+    if (player) syncUi();
+    if (mode === 'levelSelect') renderLevelSelect();
+    if (mode === 'sector') {
+      const completedLevel = translateLevel(LEVELS[currentLevel]);
+      ui.sectorTitle.textContent = completedLevel.name;
+      ui.sectorCopy.textContent = completedLevel.next;
+    }
+    if (tutorialMode) updateTutorialCard();
+  }
 })();

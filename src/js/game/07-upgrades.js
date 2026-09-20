@@ -1,28 +1,28 @@
   // Upgrade choices, campaign completion, and tutorial flow.
   const UPGRADES = [
-    { id: 'damage', tier: 'damageTier', icon: '◆', name: 'Overcharged Bolts', description: 'Blaster damage increases by 18%.', detail: 'DAMAGE +18%', apply: () => { player.damage *= 1.18; player.damageTier += 1; } },
-    { id: 'rate', tier: 'rateTier', icon: '≋', name: 'Flux Repeater', description: 'Blaster cycles 14% faster.', detail: 'FIRE RATE +14%', apply: () => { player.fireRate *= 1.14; player.rateTier += 1; } },
-    { id: 'speed', tier: 'speedTier', icon: '»', name: 'Vector Thrusters', description: 'Flight speed and acceleration improve.', detail: 'SPEED +10%', apply: () => { player.speed *= 1.1; player.acceleration *= 1.07; player.speedTier += 1; } },
-    { id: 'hull', tier: 'hullTier', icon: '⬡', name: 'Reactive Plating', description: 'Increase maximum hull and restore a little hull.', detail: 'MAX HULL +15', apply: () => { player.maxHp += 15; player.hp = Math.min(player.maxHp, player.hp + 15); player.hullTier += 1; } },
-    { id: 'rocket', tier: 'rocketTier', icon: '▲', name: 'Siege Warhead', description: 'Heavy rockets deal more blast damage.', detail: 'ROCKET +22%', apply: () => { player.rocketDamage *= 1.22; player.rocketTier += 1; } },
-    { id: 'cooling', tier: 'coolingTier', icon: '❄', name: 'Cryo Manifold', description: 'Rocket and void jump systems reload faster.', detail: 'COOLDOWNS -10%', apply: () => { player.rocketMax *= .9; player.boostMax *= .9; player.coolingTier += 1; } },
-    { id: 'salvage', icon: 'XP', name: 'Salvage Matrix', description: 'Void ore yields more experience.', detail: 'RESOURCE XP +18%', apply: () => { player.salvage *= 1.18; } },
-    { id: 'multi', icon: 'III', name: 'Splitfire Array', description: 'Add a tightly grouped blaster shot. Offered every four levels.', detail: '+1 SHOT · EVERY 4 LVL', apply: () => { player.multiShot = Math.min(3, player.multiShot + 1); player.multiUpgradeLevel = Math.floor(player.level / 4) * 4; } },
-    { id: 'gate', icon: 'AEG', name: 'Gate Capacitor', description: 'Send a recovered charge to Earth.', detail: 'GATE SHIELD +1', apply: () => { gateShields = Math.min(5, gateShields + 1); } },
+    { id: 'damage', tier: 'damageTier', icon: '◆', nameKey: 'upgrade.damage.name', descriptionKey: 'upgrade.damage.description', detailKey: 'upgrade.damage.detail', apply: () => { player.damage *= 1.18; player.damageTier += 1; } },
+    { id: 'rate', tier: 'rateTier', icon: '≋', nameKey: 'upgrade.rate.name', descriptionKey: 'upgrade.rate.description', detailKey: 'upgrade.rate.detail', apply: () => { player.fireRate *= 1.14; player.rateTier += 1; } },
+    { id: 'speed', tier: 'speedTier', icon: '»', nameKey: 'upgrade.speed.name', descriptionKey: 'upgrade.speed.description', detailKey: 'upgrade.speed.detail', apply: () => { player.speed *= 1.1; player.acceleration *= 1.07; player.speedTier += 1; } },
+    { id: 'hull', tier: 'hullTier', icon: '⬡', nameKey: 'upgrade.hull.name', descriptionKey: 'upgrade.hull.description', detailKey: 'upgrade.hull.detail', apply: () => { player.maxHp += 15; player.hp = Math.min(player.maxHp, player.hp + 15); player.hullTier += 1; } },
+    { id: 'rocket', tier: 'rocketTier', icon: '▲', nameKey: 'upgrade.rocket.name', descriptionKey: 'upgrade.rocket.description', detailKey: 'upgrade.rocket.detail', apply: () => { player.rocketDamage *= 1.22; player.rocketTier += 1; } },
+    { id: 'cooling', tier: 'coolingTier', icon: '❄', nameKey: 'upgrade.cooling.name', descriptionKey: 'upgrade.cooling.description', detailKey: 'upgrade.cooling.detail', apply: () => { player.rocketMax *= .9; player.boostMax *= .9; player.coolingTier += 1; } },
+    { id: 'salvage', icon: 'XP', nameKey: 'upgrade.salvage.name', descriptionKey: 'upgrade.salvage.description', detailKey: 'upgrade.salvage.detail', apply: () => { player.salvage *= 1.18; } },
+    { id: 'multi', icon: 'III', nameKey: 'upgrade.multi.name', descriptionKey: 'upgrade.multi.description', detailKey: 'upgrade.multi.detail', apply: () => { player.multiShot = Math.min(3, player.multiShot + 1); player.multiUpgradeLevel = Math.floor(player.level / 4) * 4; } },
+    { id: 'gate', icon: 'AEG', nameKey: 'upgrade.gate.name', descriptionKey: 'upgrade.gate.description', detailKey: 'upgrade.gate.detail', apply: () => { gateShields = Math.min(5, gateShields + 1); } },
   ];
 
   function upgradeSummary(upgrade) {
     switch (upgrade.id) {
-      case 'damage': return { current: `DAMAGE ${player.damage.toFixed(1)}`, effect: `→ ${(player.damage * 1.18).toFixed(1)} · +18%` };
-      case 'rate': return { current: `FIRE RATE ${player.fireRate.toFixed(1)}/S`, effect: `→ ${(player.fireRate * 1.14).toFixed(1)}/S · +14%` };
-      case 'speed': return { current: `SPEED ${Math.round(player.speed)}`, effect: `→ ${Math.round(player.speed * 1.1)} · +10%` };
-      case 'hull': return { current: `MAX HULL ${Math.round(player.maxHp)}`, effect: `→ ${Math.round(player.maxHp + 15)} · +15` };
-      case 'rocket': return { current: `ROCKET DMG ${Math.round(player.rocketDamage)}`, effect: `→ ${Math.round(player.rocketDamage * 1.22)} · +22%` };
-      case 'cooling': return { current: `ROCKET ${player.rocketMax.toFixed(1)}S · JUMP ${player.boostMax.toFixed(1)}S`, effect: `→ ${(player.rocketMax * .9).toFixed(1)}S · ${(player.boostMax * .9).toFixed(1)}S · -10%` };
-      case 'salvage': return { current: `RESOURCE XP ×${player.salvage.toFixed(2)}`, effect: `→ ×${(player.salvage * 1.18).toFixed(2)} · +18%` };
-      case 'multi': return { current: `SHOTS ${player.multiShot}`, effect: `→ ${player.multiShot + 1} · +1 SHOT` };
-      case 'gate': return { current: `GATE SHIELDS ${gateShields}/5`, effect: `→ ${Math.min(5, gateShields + 1)}/5 · +1` };
-      default: return { current: '', effect: upgrade.detail };
+      case 'damage': return { current: `${t('label.damage')} ${player.damage.toFixed(1)}`, effect: `→ ${(player.damage * 1.18).toFixed(1)} · +18%` };
+      case 'rate': return { current: `${t('label.fireRate')} ${player.fireRate.toFixed(1)}/S`, effect: `→ ${(player.fireRate * 1.14).toFixed(1)}/S · +14%` };
+      case 'speed': return { current: `${t('label.speed')} ${Math.round(player.speed)}`, effect: `→ ${Math.round(player.speed * 1.1)} · +10%` };
+      case 'hull': return { current: `${t('label.maxHull')} ${Math.round(player.maxHp)}`, effect: `→ ${Math.round(player.maxHp + 15)} · +15` };
+      case 'rocket': return { current: `${t('label.rocketDamage')} ${Math.round(player.rocketDamage)}`, effect: `→ ${Math.round(player.rocketDamage * 1.22)} · +22%` };
+      case 'cooling': return { current: `${t('label.rocket')} ${player.rocketMax.toFixed(1)}S · ${t('label.jump')} ${player.boostMax.toFixed(1)}S`, effect: `→ ${(player.rocketMax * .9).toFixed(1)}S · ${(player.boostMax * .9).toFixed(1)}S · -10%` };
+      case 'salvage': return { current: `${t('label.resourceXp')} ×${player.salvage.toFixed(2)}`, effect: `→ ×${(player.salvage * 1.18).toFixed(2)} · +18%` };
+      case 'multi': return { current: `${t('label.shots')} ${player.multiShot}`, effect: `→ ${player.multiShot + 1} · +1` };
+      case 'gate': return { current: `${t('label.gateShields')} ${gateShields}/5`, effect: `→ ${Math.min(5, gateShields + 1)}/5 · +1` };
+      default: return { current: '', effect: t(upgrade.detailKey) };
     }
   }
 
@@ -47,7 +47,7 @@
       const summary = upgradeSummary(upgrade);
       button.className = 'upgrade-choice';
       button.type = 'button';
-      button.innerHTML = `<span class="upgrade-icon">${upgrade.icon}</span><strong>${upgrade.name}</strong><p>${upgrade.description}</p><small><span>CURRENT // ${summary.current}</span><b>UPGRADE // ${summary.effect}</b></small>`;
+      button.innerHTML = `<span class="upgrade-icon">${upgrade.icon}</span><strong>${t(upgrade.nameKey)}</strong><p>${t(upgrade.descriptionKey)}</p><small><span>${t('label.current')} // ${summary.current}</span><b>${t('label.upgrade')} // ${summary.effect}</b></small>`;
       button.addEventListener('click', () => selectUpgrade(upgrade));
       ui.upgradeChoices.append(button);
     });
@@ -60,7 +60,7 @@
     lastSelectedUpgradeId = upgrade.id;
     pendingLevelUps -= 1;
     ui.upgradeOverlay.classList.remove('active');
-    showToast(`${upgrade.name.toUpperCase()} INSTALLED`);
+    showToast(t('toast.upgradeInstalled', { upgrade: t(upgrade.nameKey) }));
     if (pendingLevelUps > 0) {
       setTimeout(showUpgradeChoices, 80);
     } else {
@@ -101,8 +101,9 @@
     saveCampaignState();
     mode = 'sector';
     ui.crosshair.style.opacity = '0';
-    ui.sectorTitle.textContent = LEVELS[currentLevel].name;
-    ui.sectorCopy.textContent = LEVELS[currentLevel].next;
+    const completedLevel = translateLevel(LEVELS[currentLevel]);
+    ui.sectorTitle.textContent = completedLevel.name;
+    ui.sectorCopy.textContent = completedLevel.next;
     ui.sectorOverlay.classList.add('active');
     audio.tone(220, .7, 'sine', .09, 440);
   }
@@ -130,7 +131,7 @@
     camera.x = clamp(player.x - screenWidth / 2, 0, WORLD.width - screenWidth);
     camera.y = clamp(player.y - screenHeight / 2, 0, WORLD.height - screenHeight);
     mode = 'playing';
-    showToast(`${LEVELS[currentLevel].name} // MULTIPLE APPROACH VECTORS`);
+    showToast(t('toast.multipleApproaches', { sector: translateLevel(LEVELS[currentLevel]).name }));
     beginWave();
   }
 
@@ -149,35 +150,35 @@
     ui.portalWarning.classList.remove('active');
     ui.lockReadout.classList.remove('active');
     ui.tutorialCard.classList.remove('active');
-    ui.endKicker.textContent = victory ? 'CORRIDOR SECURED' : reason === 'ship' ? 'PILOT SIGNAL LOST' : 'EARTH DEFENSE OFFLINE';
-    ui.endTitle.textContent = victory ? 'INVASION REPELLED' : reason === 'ship' ? 'YOUR SHIP WAS LOST' : 'THE GATE HAS FALLEN';
+    ui.endKicker.textContent = victory ? t('end.secured') : reason === 'ship' ? t('end.pilotLost') : t('end.defenseOffline');
+    ui.endTitle.textContent = victory ? t('end.victoryTitle') : reason === 'ship' ? t('end.shipLostTitle') : t('end.gateLostTitle');
     ui.endCopy.textContent = victory
-      ? 'The flagship is gone and the surviving fleet has broken formation. Earth holds.'
+      ? t('end.victoryCopy')
       : reason === 'ship'
-        ? 'Your ship could not hold the line. The defense network is ready for another run.'
-        : 'The invasion fleet breached the last defense corridor.';
+        ? t('end.shipLostCopy')
+        : t('end.gateLostCopy');
     ui.finalScore.textContent = formatScore(score);
-    ui.finalWave.textContent = `L${currentLevel + 1} · ${wave}`;
+    ui.finalWave.textContent = `${translateLevel(LEVELS[currentLevel]).short} · ${wave}`;
     ui.finalKills.textContent = String(kills);
     ui.endOverlay.classList.add('active');
     audio.tone(victory ? 220 : 55, .8, victory ? 'sine' : 'sawtooth', .1, victory ? 440 : -25);
   }
 
   const tutorialSteps = [
-    { title: 'TAKE THE CONTROLS', text: 'Use W, A, S, and D to move through the sector.' },
-    { title: 'TEST THE BLASTER', text: 'Press the Up Arrow to fire forward, or hold the left mouse button to aim and fire.' },
-    { title: 'SALVAGE VOID ORE', text: 'Shoot the nearby ore cluster. Destroyed resources give XP for upgrades.' },
-    { title: 'PUNCH THE VOID', text: 'Press T to place or replace a jump destination, then Q or right-click to teleport there. Hold T to clear it and dash again.' },
-    { title: 'ARM THE WARHEAD', text: 'Press F. Heavy rockets charge briefly, then deal large blast damage.' },
-    { title: 'DEFEND THE GATE', text: 'Enemies follow the glowing corridor. Stop them before the Earth Gate loses every shield.' },
+    { titleKey: 'tutorial.takeControls', textKey: 'tutorial.takeControlsCopy' },
+    { titleKey: 'tutorial.testBlaster', textKey: 'tutorial.testBlasterCopy' },
+    { titleKey: 'tutorial.salvage', textKey: 'tutorial.salvageCopy' },
+    { titleKey: 'tutorial.punchVoid', textKey: 'tutorial.punchVoidCopy' },
+    { titleKey: 'tutorial.armWarhead', textKey: 'tutorial.armWarheadCopy' },
+    { titleKey: 'tutorial.defendGate', textKey: 'tutorial.defendGateCopy' },
   ];
 
   function updateTutorialCard() {
     const step = tutorialSteps[tutorialIndex];
     if (!step) return;
-    ui.tutorialStep.textContent = `TRAINING // ${String(tutorialIndex + 1).padStart(2, '0')}`;
-    ui.tutorialTitle.textContent = step.title;
-    ui.tutorialText.textContent = step.text;
+    ui.tutorialStep.textContent = t('tutorial.step', { step: String(tutorialIndex + 1).padStart(2, '0') });
+    ui.tutorialTitle.textContent = t(step.titleKey);
+    ui.tutorialText.textContent = t(step.textKey);
     ui.tutorialProgress.innerHTML = tutorialSteps.map((_, index) => `<i class="${index <= tutorialIndex ? 'done' : ''}"></i>`).join('');
   }
 
@@ -202,6 +203,6 @@
     if (tutorialDelay <= 0) {
       tutorialMode = false;
       ui.tutorialCard.classList.remove('active');
-      showToast('TRAINING COMPLETE // GOOD HUNTING');
+      showToast(t('toast.trainingComplete'));
     }
   }

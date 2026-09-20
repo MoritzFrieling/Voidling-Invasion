@@ -79,6 +79,9 @@
   }
 
   function bindUi() {
+    [ui.languageSelect, ui.menuLanguageSelect].filter(Boolean).forEach((select) => {
+      select.addEventListener('change', (event) => setLanguage(event.target.value));
+    });
     document.getElementById('startButton').addEventListener('click', () => requirePilot(() => startGame(false)));
     document.getElementById('tutorialButton').addEventListener('click', () => requirePilot(() => startGame(true)));
     document.getElementById('levelSelectButton').addEventListener('click', () => requirePilot(openLevelSelect));
@@ -109,7 +112,7 @@
       tutorialMode = false;
       ui.tutorialCard.classList.remove('active');
       if (wave === 0) beginWave();
-      showToast('TRAINING SKIPPED');
+      showToast(t('toast.trainingSkipped'));
     });
 
     const musicToggle = document.getElementById('musicToggle');

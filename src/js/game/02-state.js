@@ -125,7 +125,7 @@
   function scheduleCloudSave() {
     if (!activePilot || !window.VoidlineCloud || cloudSyncSuspended) return;
     clearTimeout(cloudSaveTimer);
-    ui.pilotSyncState.textContent = 'CHANGES PENDING';
+    ui.pilotSyncState.textContent = t('account.pending');
     cloudSaveTimer = setTimeout(syncCloudProgress, 650);
   }
 
@@ -136,12 +136,12 @@
       return;
     }
     cloudBusy = true;
-    ui.pilotSyncState.textContent = 'SYNCHRONIZING…';
+    ui.pilotSyncState.textContent = t('account.syncing');
     try {
       await window.VoidlineCloud.saveProgress(campaignState, isAdminPilot() ? 0 : highScore);
-      ui.pilotSyncState.textContent = 'CLOUD SAVE CURRENT';
+      ui.pilotSyncState.textContent = t('account.saveCurrent');
     } catch (error) {
-      ui.pilotSyncState.textContent = 'OFFLINE · SAVED ON DEVICE';
+      ui.pilotSyncState.textContent = t('account.offlineSaved');
       console.warn('Voidline cloud save:', error);
     } finally {
       cloudBusy = false;

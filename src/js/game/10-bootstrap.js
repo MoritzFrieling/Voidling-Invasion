@@ -9,6 +9,7 @@
   canvas.addEventListener('pointerleave', () => { input.pointerDown = false; });
   canvas.addEventListener('contextmenu', (event) => event.preventDefault());
 
+  applyStaticTranslations();
   bindUi();
   prepareDefaultCallsign();
   renderAdminPanel();
@@ -25,3 +26,15 @@
   }
   initializeCloud();
   requestAnimationFrame(frame);
+
+  function refreshLocalizedUi() {
+    updatePilotUi();
+    if (player) syncUi();
+    if (mode === 'levelSelect') renderLevelSelect();
+    if (mode === 'sector') {
+      const completedLevel = translateLevel(LEVELS[currentLevel]);
+      ui.sectorTitle.textContent = completedLevel.name;
+      ui.sectorCopy.textContent = completedLevel.next;
+    }
+    if (tutorialMode) updateTutorialCard();
+  }

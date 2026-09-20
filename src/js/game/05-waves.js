@@ -106,16 +106,16 @@
   }
 
   const ENEMY_TYPES = {
-    scout: { name: 'DART FIGHTER', role: 'VERY FAST // LIGHT HULL', description: 'Quick attack craft with very little armor. Track it early before it slips through.', radius: 12, hp: 42, speed: 138, score: 100, xp: 10, color: '#ff8b72' },
-    raider: { name: 'MARAUDER', role: 'BALANCED // ARMORED', description: 'Reliable frontline ship. Slower than a Dart, but it can absorb sustained blaster fire.', radius: 19, hp: 105, speed: 88, score: 170, xp: 16, color: '#ffb35c' },
-    striker: { name: 'NEEDLE', role: 'EXTREME SPEED // FRAGILE', description: 'A tiny interceptor built entirely around speed. Its erratic lane changes make it hard to track.', radius: 10, hp: 48, speed: 178, score: 220, xp: 18, color: '#c885ff' },
-    major: { name: 'SIEGEBREAKER', role: 'HEAVY HULL // MISSILES', description: 'A slow assault vessel that launches guided rockets at your ship. Keep moving.', radius: 32, hp: 390, speed: 55.1, score: 700, xp: 48, color: '#ff6f61', major: true },
-    interceptor: { name: 'CARRIER INTERCEPTOR', role: 'LAUNCHED // DESTRUCTIBLE', description: 'A light interceptor launched by carrier vessels. Its reinforced light hull can be destroyed by focused blaster fire before it reaches the gate.', radius: 10, hp: 34, speed: 148, score: 80, xp: 7, color: '#ff9f88', interceptor: true },
-    carrier: { name: 'BROOD CARRIER', role: 'SPAWNER // HEAVY HULL', description: 'A mobile hangar that launches smaller fighters along the route. Destroy it before the swarm grows.', radius: 37, hp: 520, speed: 49, score: 920, xp: 60, color: '#f071c8', major: true, carrier: true },
-    sentinel: { name: 'AEGIS SENTINEL', role: 'ROCKET-BREAK SHIELD', description: 'Light blasters cannot pierce its barrier. Two heavy-rocket impacts collapse the barrier, regardless of rocket level.', radius: 29, hp: 310, shield: 0, shieldCharges: 2, speed: 62, score: 840, xp: 58, color: '#aeb8c0', major: true, shielded: true },
-    bossOmega: { name: 'DREADNOUGHT OMEGA', role: 'MISSILE COMMAND SHIP', description: 'The first invasion commander. It saturates the defense zone with guided warheads.', radius: 66, hp: 2850, speed: 34, score: 5400, xp: 260, color: '#ff506b', major: true, boss: true, bossSkill: 'rockets' },
-    bossCarrier: { name: 'THE HOLLOW QUEEN', role: 'RIFT CARRIER // SWARM COMMAND', description: 'A vast carrier that continuously deploys escort wings through the twin rift. Its emergency shield activates if it is damaged too early.', radius: 74, hp: 4600, speed: 29, score: 7600, xp: 340, color: '#ef67d1', major: true, boss: true, carrier: true, bossSkill: 'swarm', emergencyShield: true },
-    bossTitan: { name: 'AEGIS TITAN', role: 'ROCKET-BREAK SHIELD // FINAL COMMAND', description: 'The final gatebreaker. Heavy rockets collapse its shield and leave the command ship exposed.', radius: 82, hp: 2520, shield: 330, speed: 26, score: 12000, xp: 500, color: '#aeb8c0', major: true, boss: true, shielded: true, bossSkill: 'titan' },
+    scout: { nameKey: 'enemy.scout.name', roleKey: 'enemy.scout.role', descriptionKey: 'enemy.scout.description', radius: 12, hp: 42, speed: 138, score: 100, xp: 10, color: '#ff8b72' },
+    raider: { nameKey: 'enemy.raider.name', roleKey: 'enemy.raider.role', descriptionKey: 'enemy.raider.description', radius: 19, hp: 105, speed: 88, score: 170, xp: 16, color: '#ffb35c' },
+    striker: { nameKey: 'enemy.striker.name', roleKey: 'enemy.striker.role', descriptionKey: 'enemy.striker.description', radius: 10, hp: 48, speed: 178, score: 220, xp: 18, color: '#c885ff' },
+    major: { nameKey: 'enemy.major.name', roleKey: 'enemy.major.role', descriptionKey: 'enemy.major.description', radius: 32, hp: 390, speed: 55.1, score: 700, xp: 48, color: '#ff6f61', major: true },
+    interceptor: { nameKey: 'enemy.interceptor.name', roleKey: 'enemy.interceptor.role', descriptionKey: 'enemy.interceptor.description', radius: 10, hp: 34, speed: 148, score: 80, xp: 7, color: '#ff9f88', interceptor: true },
+    carrier: { nameKey: 'enemy.carrier.name', roleKey: 'enemy.carrier.role', descriptionKey: 'enemy.carrier.description', radius: 37, hp: 520, speed: 49, score: 920, xp: 60, color: '#f071c8', major: true, carrier: true },
+    sentinel: { nameKey: 'enemy.sentinel.name', roleKey: 'enemy.sentinel.role', descriptionKey: 'enemy.sentinel.description', radius: 29, hp: 310, shield: 0, shieldCharges: 2, speed: 62, score: 840, xp: 58, color: '#aeb8c0', major: true, shielded: true },
+    bossOmega: { nameKey: 'enemy.bossOmega.name', roleKey: 'enemy.bossOmega.role', descriptionKey: 'enemy.bossOmega.description', radius: 66, hp: 2850, speed: 34, score: 5400, xp: 260, color: '#ff506b', major: true, boss: true, bossSkill: 'rockets' },
+    bossCarrier: { nameKey: 'enemy.bossCarrier.name', roleKey: 'enemy.bossCarrier.role', descriptionKey: 'enemy.bossCarrier.description', radius: 74, hp: 4600, speed: 29, score: 7600, xp: 340, color: '#ef67d1', major: true, boss: true, carrier: true, bossSkill: 'swarm', emergencyShield: true },
+    bossTitan: { nameKey: 'enemy.bossTitan.name', roleKey: 'enemy.bossTitan.role', descriptionKey: 'enemy.bossTitan.description', radius: 82, hp: 2520, shield: 330, speed: 26, score: 12000, xp: 500, color: '#aeb8c0', major: true, boss: true, shielded: true, bossSkill: 'titan' },
   };
 
   function activateWave() {
@@ -133,7 +133,7 @@
     waveCallEligible = false;
     setWaveCallAvailable(false);
     const bossFormation = wave === LEVELS[currentLevel].stages && formation === formationsInStage;
-    showToast(bossFormation ? 'COMMAND SHIP ENTERING THE VOIDLINE' : `STAGE ${String(wave).padStart(2, '0')} // WAVE ${formation} OF ${formationsInStage}`);
+    showToast(bossFormation ? t('toast.commandEntering') : t('toast.stageWave', { stage: String(wave).padStart(2, '0'), wave: formation, total: formationsInStage }));
     audio.tone(bossFormation ? 82 : 128, .42, 'sawtooth', .08, bossFormation ? -35 : 110);
     ui.crosshair.style.opacity = '1';
     if (pendingLevelUps > 0) showUpgradeChoices();
@@ -142,7 +142,8 @@
   function showNextIntel() {
     if (!introQueue.length) { activateWave(); return; }
     const type = introQueue.shift();
-    const intel = ENEMY_TYPES[type];
+    const firstContact = !seenEnemyTypes.has(type);
+    const intel = translateEnemy(type);
     seenEnemyTypes.add(type);
     campaignState.seenEnemyTypes = [...seenEnemyTypes];
     saveCampaignState();
@@ -151,20 +152,20 @@
     ui.intelTitle.textContent = intel.name;
     ui.intelRole.textContent = intel.role;
     ui.intelText.textContent = intel.description;
-    ui.intelKicker.textContent = currentLevel === 0 && wave === 1 ? 'FIRST CONTACT // HOSTILE PROFILE' : 'NEW HOSTILE IDENTIFIED';
+    ui.intelKicker.textContent = t(firstContact ? 'intel.firstContact' : 'intel.newHostile');
     ui.intelOverlay.querySelector('.intel-panel').dataset.enemy = type;
     drawIntelShip(type);
     ui.intelOverlay.classList.add('active');
   }
 
   function showBossIntro(type) {
-    const boss = ENEMY_TYPES[type];
+    const boss = translateEnemy(type);
     mode = 'cutscene';
     bossIntroTimer = 4.2;
     ui.crosshair.style.opacity = '0';
     ui.bossTitle.textContent = boss.name;
     ui.bossText.textContent = boss.role;
-    ui.bossKicker.textContent = `${LEVELS[currentLevel].short} // COMMAND SIGNATURE DETECTED`;
+    ui.bossKicker.textContent = `${translateLevel(LEVELS[currentLevel]).short} // ${t('boss.commandSignature')}`;
     ui.bossOverlay.classList.add('active');
     audio.tone(48, .9, 'sawtooth', .12, 34);
   }

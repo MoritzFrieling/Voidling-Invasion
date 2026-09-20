@@ -1,5 +1,5 @@
 /* Design tokens and global foundations. */
-@import url('https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=Noto+Sans+KR:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap');
 
 :root {
   color-scheme: dark;
@@ -15,8 +15,8 @@
   --amber: #ffb35c;
   --coral: #ff6f61;
   --purple: #a88cff;
-  --display: 'Chakra Petch', system-ui, sans-serif;
-  --mono: 'Space Mono', ui-monospace, monospace;
+  --display: 'Chakra Petch', 'Noto Sans KR', system-ui, sans-serif;
+  --mono: 'Space Mono', 'Noto Sans KR', ui-monospace, monospace;
 }
 
 * { box-sizing: border-box; }

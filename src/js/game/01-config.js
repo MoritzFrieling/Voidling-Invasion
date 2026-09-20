@@ -22,8 +22,7 @@
 
   const LEVELS = [
     {
-      name: 'OUTER PERIMETER', short: 'SECTOR 01', stages: 6, boss: 'bossOmega', enemyDurability: 1.2,
-      next: 'The route ahead has split. Hostiles are regrouping around twin approach corridors.',
+      nameKey: 'sector.one.name', shortKey: 'sector.one.short', nextKey: 'sector.one.next', stages: 6, boss: 'bossOmega', enemyDurability: 1.2,
       paths: [createPath([
         { x: -120, y: 380 }, { x: 360, y: 430 }, { x: 690, y: 770 }, { x: 1110, y: 690 },
         { x: 1470, y: 1010 }, { x: 1860, y: 1260 }, { x: 2250, y: 1160 }, { x: 2570, y: 850 },
@@ -32,8 +31,7 @@
       wormholes: [],
     },
     {
-      name: 'TWIN RIFT', short: 'SECTOR 02', stages: 7, boss: 'bossCarrier',
-      next: 'A shattered approach lies ahead. Three lanes and unstable wormholes converge on Earth.',
+      nameKey: 'sector.two.name', shortKey: 'sector.two.short', nextKey: 'sector.two.next', stages: 7, boss: 'bossCarrier',
       paths: [
         createPath([{ x: -120, y: 310 }, { x: 440, y: 330 }, { x: 900, y: 600 }, { x: 1380, y: 520 }, { x: 1820, y: 820 }, { x: 2280, y: 760 }, { x: 2670, y: 900 }, { x: PORTAL.x, y: PORTAL.y }]),
         createPath([{ x: -120, y: 1780 }, { x: 420, y: 1670 }, { x: 820, y: 1390 }, { x: 1290, y: 1510 }, { x: 1710, y: 1220 }, { x: 2220, y: 1320 }, { x: 2660, y: 1100 }, { x: PORTAL.x, y: PORTAL.y }]),
@@ -41,8 +39,7 @@
       wormholes: [{ x: 1820, y: 820, pathId: 0, progress: .58 }, { x: 1710, y: 1220, pathId: 1, progress: .54 }],
     },
     {
-      name: 'SHATTERED APPROACH', short: 'SECTOR 03', stages: 8, boss: 'bossTitan',
-      next: '',
+      nameKey: 'sector.three.name', shortKey: 'sector.three.short', stages: 8, boss: 'bossTitan',
       paths: [
         createPath([{ x: -120, y: 220 }, { x: 510, y: 280 }, { x: 980, y: 520 }, { x: 1500, y: 410 }, { x: 1990, y: 660 }, { x: 2510, y: 720 }, { x: PORTAL.x, y: PORTAL.y }]),
         createPath([{ x: -120, y: 1030 }, { x: 490, y: 940 }, { x: 960, y: 1120 }, { x: 1440, y: 920 }, { x: 1940, y: 1080 }, { x: 2470, y: 930 }, { x: PORTAL.x, y: PORTAL.y }]),
@@ -86,6 +83,6 @@
     'staticWarning', 'waveCallButton',
     'authOverlay', 'authTitle', 'authCopy', 'authForm', 'authUsername', 'authPassword',
     'authMessage',
-    'pilotSummary', 'pilotType', 'pilotName', 'pilotSyncState', 'adminButton',
+    'pilotSummary', 'pilotType', 'pilotName', 'pilotSyncState', 'adminButton', 'languageSelect', 'menuLanguageSelect',
     'publicUsername', 'publicUsernameHint', 'menuAdminButton', 'leaderboardOverlay', 'leaderboardList',
   ].forEach((id) => { ui[id] = document.getElementById(id); });

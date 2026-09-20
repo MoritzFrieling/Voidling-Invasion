@@ -7,6 +7,7 @@ const src = resolve(root, 'src');
 const dist = resolve(root, 'dist');
 
 const gameSources = [
+  'js/game/00-i18n.js',
   'js/game/01-config.js',
   'js/game/02-state.js',
   'js/game/03-progression.js',
