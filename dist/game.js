@@ -1090,10 +1090,8 @@
       pathId,
       pathLength: path.length,
       progress,
-      lane: rand(-58, 58),
+      lane: type === 'striker' ? rand(-210, 210) : rand(-58, 58),
       wobble: rand(0, Math.PI * 2),
-      needlePhase: rand(0, Math.PI * 2),
-      needleDrift: rand(135, 175),
       radius: blueprint.radius,
       hp: maxHp,
       maxHp,
@@ -1630,15 +1628,12 @@
   function updateEnemies(dt) {
     enemies.forEach((enemy) => {
       enemy.progress += enemy.speed * dt;
-      enemy.wobble += dt * (enemy.type === 'striker' ? 3.3 : 1.7);
+      enemy.wobble += dt * (enemy.type === 'striker' ? 1.15 : 1.7);
       enemy.hitFlash = Math.max(0, enemy.hitFlash - dt);
       enemy.shieldHitTimer = Math.max(0, enemy.shieldHitTimer - dt);
       const point = getPathPoint(enemy.progress, enemy.pathId);
-      const needleTaper = clamp((enemy.pathLength - enemy.progress) / 420, 0, 1);
-      const needleWander = enemy.type === 'striker'
-        ? (Math.sin(enemy.wobble) * enemy.needleDrift + Math.sin(enemy.wobble * .47 + enemy.needlePhase) * 68) * needleTaper
-        : 0;
-      const sway = enemy.lane + Math.sin(enemy.wobble) * (enemy.boss ? 22 : 13) + needleWander;
+      const laneTaper = enemy.type === 'striker' ? clamp((enemy.pathLength - enemy.progress) / 420, 0, 1) : 1;
+      const sway = enemy.lane * laneTaper + Math.sin(enemy.wobble) * (enemy.boss ? 22 : 13);
       enemy.x = point.x + point.nx * sway;
       enemy.y = point.y + point.ny * sway;
       enemy.angle = point.angle + Math.cos(enemy.wobble * .8) * .08;
@@ -2069,6 +2064,21 @@
     { id: 'gate', icon: 'AEG', name: 'Gate Capacitor', description: 'Send a recovered charge to Earth.', detail: 'GATE SHIELD +1', apply: () => { gateShields = Math.min(5, gateShields + 1); } },
   ];
 
+  function upgradeCurrentStat(upgrade) {
+    switch (upgrade.id) {
+      case 'damage': return `CURRENT DAMAGE ${player.damage.toFixed(1)}`;
+      case 'rate': return `CURRENT FIRE RATE ${player.fireRate.toFixed(1)}/S`;
+      case 'speed': return `CURRENT SPEED ${Math.round(player.speed)}`;
+      case 'hull': return `CURRENT MAX HULL ${Math.round(player.maxHp)}`;
+      case 'rocket': return `CURRENT ROCKET DMG ${Math.round(player.rocketDamage)}`;
+      case 'cooling': return `ROCKET CD ${player.rocketMax.toFixed(1)}S · JUMP CD ${player.boostMax.toFixed(1)}S`;
+      case 'salvage': return `CURRENT RESOURCE XP ×${player.salvage.toFixed(2)}`;
+      case 'multi': return `CURRENT SHOTS ${player.multiShot}`;
+      case 'gate': return `CURRENT GATE SHIELDS ${gateShields}/5`;
+      default: return upgrade.detail;
+    }
+  }
+
   function showUpgradeChoices() {
     mode = 'upgrade';
     ui.crosshair.style.opacity = '0';
@@ -2079,11 +2089,11 @@
     const choices = [];
     while (choices.length < 3 && pool.length) choices.push(pool.splice((Math.random() * pool.length) | 0, 1)[0]);
     ui.upgradeChoices.replaceChildren();
-    choices.forEach((upgrade, index) => {
+    choices.forEach((upgrade) => {
       const button = document.createElement('button');
       button.className = 'upgrade-choice';
       button.type = 'button';
-      button.innerHTML = `<span class="upgrade-icon">${upgrade.icon}</span><strong>${upgrade.name}</strong><p>${upgrade.description}</p><small>${index + 1} // ${upgrade.detail}</small>`;
+      button.innerHTML = `<span class="upgrade-icon">${upgrade.icon}</span><strong>${upgrade.name}</strong><p>${upgrade.description}</p><small>${upgradeCurrentStat(upgrade)}</small>`;
       button.addEventListener('click', () => selectUpgrade(upgrade));
       ui.upgradeChoices.append(button);
     });
@@ -2583,6 +2593,24 @@
     ctx.textAlign = 'center';
     ctx.fillText(`DEFENSE STATION // MK ${station.level}`, station.x, station.y - 46);
     ctx.restore();
+    const upgradeCost = 90 + station.level * 80;
+    if (station.level < 4 && player.credits >= upgradeCost) {
+      const pulse = .72 + Math.sin(elapsed * 4.5) * .22;
+      ctx.save();
+      ctx.globalAlpha = pulse;
+      ctx.font = '700 8px "Space Mono", monospace';
+      ctx.textAlign = 'center';
+      const label = 'UPGRADE AVAILABLE';
+      const width = ctx.measureText(label).width + 14;
+      ctx.fillStyle = 'rgba(255,179,92,.16)';
+      ctx.strokeStyle = COLORS.amber;
+      ctx.lineWidth = 1;
+      ctx.fillRect(station.x - width / 2, station.y - 70, width, 16);
+      ctx.strokeRect(station.x - width / 2, station.y - 70, width, 16);
+      ctx.fillStyle = COLORS.amber;
+      ctx.fillText(label, station.x, station.y - 59);
+      ctx.restore();
+    }
   }
 
   function drawTargetLock() {

@@ -451,15 +451,12 @@
   function updateEnemies(dt) {
     enemies.forEach((enemy) => {
       enemy.progress += enemy.speed * dt;
-      enemy.wobble += dt * (enemy.type === 'striker' ? 3.3 : 1.7);
+      enemy.wobble += dt * (enemy.type === 'striker' ? 1.15 : 1.7);
       enemy.hitFlash = Math.max(0, enemy.hitFlash - dt);
       enemy.shieldHitTimer = Math.max(0, enemy.shieldHitTimer - dt);
       const point = getPathPoint(enemy.progress, enemy.pathId);
-      const needleTaper = clamp((enemy.pathLength - enemy.progress) / 420, 0, 1);
-      const needleWander = enemy.type === 'striker'
-        ? (Math.sin(enemy.wobble) * enemy.needleDrift + Math.sin(enemy.wobble * .47 + enemy.needlePhase) * 68) * needleTaper
-        : 0;
-      const sway = enemy.lane + Math.sin(enemy.wobble) * (enemy.boss ? 22 : 13) + needleWander;
+      const laneTaper = enemy.type === 'striker' ? clamp((enemy.pathLength - enemy.progress) / 420, 0, 1) : 1;
+      const sway = enemy.lane * laneTaper + Math.sin(enemy.wobble) * (enemy.boss ? 22 : 13);
       enemy.x = point.x + point.nx * sway;
       enemy.y = point.y + point.ny * sway;
       enemy.angle = point.angle + Math.cos(enemy.wobble * .8) * .08;

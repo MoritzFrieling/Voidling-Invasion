@@ -11,6 +11,21 @@
     { id: 'gate', icon: 'AEG', name: 'Gate Capacitor', description: 'Send a recovered charge to Earth.', detail: 'GATE SHIELD +1', apply: () => { gateShields = Math.min(5, gateShields + 1); } },
   ];
 
+  function upgradeCurrentStat(upgrade) {
+    switch (upgrade.id) {
+      case 'damage': return `CURRENT DAMAGE ${player.damage.toFixed(1)}`;
+      case 'rate': return `CURRENT FIRE RATE ${player.fireRate.toFixed(1)}/S`;
+      case 'speed': return `CURRENT SPEED ${Math.round(player.speed)}`;
+      case 'hull': return `CURRENT MAX HULL ${Math.round(player.maxHp)}`;
+      case 'rocket': return `CURRENT ROCKET DMG ${Math.round(player.rocketDamage)}`;
+      case 'cooling': return `ROCKET CD ${player.rocketMax.toFixed(1)}S · JUMP CD ${player.boostMax.toFixed(1)}S`;
+      case 'salvage': return `CURRENT RESOURCE XP ×${player.salvage.toFixed(2)}`;
+      case 'multi': return `CURRENT SHOTS ${player.multiShot}`;
+      case 'gate': return `CURRENT GATE SHIELDS ${gateShields}/5`;
+      default: return upgrade.detail;
+    }
+  }
+
   function showUpgradeChoices() {
     mode = 'upgrade';
     ui.crosshair.style.opacity = '0';
@@ -21,11 +36,11 @@
     const choices = [];
     while (choices.length < 3 && pool.length) choices.push(pool.splice((Math.random() * pool.length) | 0, 1)[0]);
     ui.upgradeChoices.replaceChildren();
-    choices.forEach((upgrade, index) => {
+    choices.forEach((upgrade) => {
       const button = document.createElement('button');
       button.className = 'upgrade-choice';
       button.type = 'button';
-      button.innerHTML = `<span class="upgrade-icon">${upgrade.icon}</span><strong>${upgrade.name}</strong><p>${upgrade.description}</p><small>${index + 1} // ${upgrade.detail}</small>`;
+      button.innerHTML = `<span class="upgrade-icon">${upgrade.icon}</span><strong>${upgrade.name}</strong><p>${upgrade.description}</p><small>${upgradeCurrentStat(upgrade)}</small>`;
       button.addEventListener('click', () => selectUpgrade(upgrade));
       ui.upgradeChoices.append(button);
     });

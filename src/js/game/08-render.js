@@ -341,6 +341,24 @@
     ctx.textAlign = 'center';
     ctx.fillText(`DEFENSE STATION // MK ${station.level}`, station.x, station.y - 46);
     ctx.restore();
+    const upgradeCost = 90 + station.level * 80;
+    if (station.level < 4 && player.credits >= upgradeCost) {
+      const pulse = .72 + Math.sin(elapsed * 4.5) * .22;
+      ctx.save();
+      ctx.globalAlpha = pulse;
+      ctx.font = '700 8px "Space Mono", monospace';
+      ctx.textAlign = 'center';
+      const label = 'UPGRADE AVAILABLE';
+      const width = ctx.measureText(label).width + 14;
+      ctx.fillStyle = 'rgba(255,179,92,.16)';
+      ctx.strokeStyle = COLORS.amber;
+      ctx.lineWidth = 1;
+      ctx.fillRect(station.x - width / 2, station.y - 70, width, 16);
+      ctx.strokeRect(station.x - width / 2, station.y - 70, width, 16);
+      ctx.fillStyle = COLORS.amber;
+      ctx.fillText(label, station.x, station.y - 59);
+      ctx.restore();
+    }
   }
 
   function drawTargetLock() {
