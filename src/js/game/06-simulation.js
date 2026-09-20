@@ -70,9 +70,27 @@
     player.y = clamp(player.y + player.vy * dt, 45, WORLD.height - 45);
 
     if (!magnitude && speed < 55) stationaryTime += dt;
-    else stationaryTime = Math.max(0, stationaryTime - dt * 2.4);
-    staticPressure = clamp((stationaryTime - 1.2) / 3.5, 0, 1);
-    ui.staticWarning.classList.toggle('active', staticPressure > .28 && enemies.length > 0);
+    else {
+      stationaryTime = 0;
+      staticDamageTimer = 0;
+    }
+    const staticDamageActive = stationaryTime >= 1.25 && (enemies.length > 0 || spawnQueue.length > 0);
+    ui.staticWarning.classList.toggle('active', staticDamageActive);
+    if (staticDamageActive) {
+      staticDamageTimer += dt;
+      if (staticDamageTimer >= .65) {
+        staticDamageTimer = 0;
+        damagePlayer(2);
+      }
+    }
+
+    if (input.keys.has('KeyT') && jumpDestinationCancelArmed) {
+      jumpDestinationHold += dt;
+      if (jumpDestinationHold >= .75) {
+        clearJumpDestination();
+        jumpDestinationCancelArmed = false;
+      }
+    }
 
     if (!isPointerAiming()) {
       const autoTarget = nearestEnemy(720);
@@ -113,7 +131,7 @@
     if (tutorialMode && wave === 0) beginWave();
 
     if (spawnQueue.length) {
-      spawnTimer -= dt * (1 + staticPressure * .25);
+      spawnTimer -= dt;
       if (spawnTimer <= 0) {
         spawnEnemy(spawnQueue.shift());
         const openingBuffer = wave <= 2 ? .12 : 0;
@@ -317,6 +335,14 @@
     audio.tone(340, .16, 'sine', .07, 520);
   }
 
+  function clearJumpDestination() {
+    player.jumpDestinationX = null;
+    player.jumpDestinationY = null;
+    player.jumpDestinationCooldown = 0;
+    showToast('VOID DESTINATION CLEARED // DASH RESTORED');
+    audio.tone(220, .14, 'sine', .06, -280);
+  }
+
   function triggerBoost() {
     if (mode !== 'playing' || player.boostCooldown > 0) return;
     const startX = player.x;
@@ -424,19 +450,22 @@
 
   function updateEnemies(dt) {
     enemies.forEach((enemy) => {
-      const pressureMultiplier = 1 + staticPressure * .22;
-      enemy.progress += enemy.speed * dt * pressureMultiplier;
+      enemy.progress += enemy.speed * dt;
       enemy.wobble += dt * (enemy.type === 'striker' ? 3.3 : 1.7);
       enemy.hitFlash = Math.max(0, enemy.hitFlash - dt);
       enemy.shieldHitTimer = Math.max(0, enemy.shieldHitTimer - dt);
       const point = getPathPoint(enemy.progress, enemy.pathId);
-      const sway = enemy.lane + Math.sin(enemy.wobble) * (enemy.boss ? 22 : 13);
+      const needleTaper = clamp((enemy.pathLength - enemy.progress) / 420, 0, 1);
+      const needleWander = enemy.type === 'striker'
+        ? (Math.sin(enemy.wobble) * enemy.needleDrift + Math.sin(enemy.wobble * .47 + enemy.needlePhase) * 68) * needleTaper
+        : 0;
+      const sway = enemy.lane + Math.sin(enemy.wobble) * (enemy.boss ? 22 : 13) + needleWander;
       enemy.x = point.x + point.nx * sway;
       enemy.y = point.y + point.ny * sway;
       enemy.angle = point.angle + Math.cos(enemy.wobble * .8) * .08;
 
       if (enemy.major) {
-        enemy.rocketTimer -= dt * (1 + staticPressure * .65);
+        enemy.rocketTimer -= dt;
         const playerDistance = Math.hypot(player.x - enemy.x, player.y - enemy.y);
         if (enemy.rocketTimer <= 0 && playerDistance < (enemy.boss ? 1200 : 820)) {
           fireEnemyRocket(enemy);
@@ -750,16 +779,6 @@
       showToast(`${ENEMY_TYPES[enemy.type].name} // EMERGENCY SHIELD ONLINE`);
       addFloater(enemy.x, enemy.y - enemy.radius, 'EMERGENCY SHIELD', '#9acbff');
       burst(enemy.x, enemy.y, '#79a8ff', 34, 280);
-    } else if (enemy.bossSkill === 'titan') {
-      const ratio = enemy.hp / enemy.maxHp;
-      enemy.shieldPhase ??= 0;
-      const nextPhase = ratio < .34 ? 2 : ratio < .67 ? 1 : 0;
-      if (nextPhase > enemy.shieldPhase) {
-        enemy.shieldPhase = nextPhase;
-        enemy.shieldHp = enemy.maxShield * .68;
-        showToast(`AEGIS TITAN // PHASE ${nextPhase + 1} SHIELD ONLINE`);
-        burst(enemy.x, enemy.y, '#79a8ff', 30, 250);
-      }
     }
   }
 

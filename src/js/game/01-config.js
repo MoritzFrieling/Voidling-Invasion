@@ -22,7 +22,7 @@
 
   const LEVELS = [
     {
-      name: 'OUTER PERIMETER', short: 'SECTOR 01', stages: 6, boss: 'bossOmega',
+      name: 'OUTER PERIMETER', short: 'SECTOR 01', stages: 6, boss: 'bossOmega', enemyDurability: 1.2,
       next: 'The route ahead has split. Hostiles are regrouping around twin approach corridors.',
       paths: [createPath([
         { x: -120, y: 380 }, { x: 360, y: 430 }, { x: 690, y: 770 }, { x: 1110, y: 690 },

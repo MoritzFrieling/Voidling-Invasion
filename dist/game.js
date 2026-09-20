@@ -25,7 +25,7 @@
 
   const LEVELS = [
     {
-      name: 'OUTER PERIMETER', short: 'SECTOR 01', stages: 6, boss: 'bossOmega',
+      name: 'OUTER PERIMETER', short: 'SECTOR 01', stages: 6, boss: 'bossOmega', enemyDurability: 1.2,
       next: 'The route ahead has split. Hostiles are regrouping around twin approach corridors.',
       paths: [createPath([
         { x: -120, y: 380 }, { x: 360, y: 430 }, { x: 690, y: 770 }, { x: 1110, y: 690 },
@@ -138,7 +138,9 @@
   let waveReady = false;
   let waveCallEligible = false;
   let stationaryTime = 0;
-  let staticPressure = 0;
+  let staticDamageTimer = 0;
+  let jumpDestinationHold = 0;
+  let jumpDestinationCancelArmed = false;
   let announcementTimer = 0;
   let toastTimer = 0;
   let resourceTimer = 1;
@@ -351,7 +353,7 @@
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   }
   // Player defaults, progression checkpoints, campaign setup, and pilot activation.
-  const BASE_ROCKET_DAMAGE = 125 * 1.15;
+  const BASE_ROCKET_DAMAGE = 125 * 1.15 * 1.05;
 
   function resetPlayer() {
     return {
@@ -426,8 +428,15 @@
       const value = Number(checkpoint[key]);
       if (Number.isFinite(value)) player[key] = value;
     }
-    if (!Number.isFinite(Number(checkpoint.rocketDamageBase)) && Number.isFinite(player.rocketDamage)) {
-      player.rocketDamage *= 1.15;
+    const savedRocketDamageBase = Number(checkpoint.rocketDamageBase);
+    if (Number.isFinite(player.rocketDamage)) {
+      if (Number.isFinite(savedRocketDamageBase) && savedRocketDamageBase !== BASE_ROCKET_DAMAGE) {
+        player.rocketDamage *= BASE_ROCKET_DAMAGE / savedRocketDamageBase;
+        checkpoint.rocketDamageBase = BASE_ROCKET_DAMAGE;
+      } else if (!Number.isFinite(savedRocketDamageBase)) {
+        player.rocketDamage *= BASE_ROCKET_DAMAGE / 125;
+        checkpoint.rocketDamageBase = BASE_ROCKET_DAMAGE;
+      }
     }
     if (legacyCheckpoint) {
       player.speed *= 310 / 355;
@@ -484,7 +493,9 @@
     waveReady = false;
     waveCallEligible = false;
     stationaryTime = 0;
-    staticPressure = 0;
+    staticDamageTimer = 0;
+    jumpDestinationHold = 0;
+    jumpDestinationCancelArmed = false;
     resourceTimer = .7;
     repairTimer = 11;
     spawnTimer = 0;
@@ -1004,7 +1015,7 @@
     sentinel: { name: 'AEGIS SENTINEL', role: 'ROCKET-BREAK SHIELD', description: 'Light blasters cannot pierce its barrier. Two heavy-rocket impacts collapse the barrier, regardless of rocket level.', radius: 29, hp: 310, shield: 0, shieldCharges: 2, speed: 62, score: 840, xp: 58, color: '#aeb8c0', major: true, shielded: true },
     bossOmega: { name: 'DREADNOUGHT OMEGA', role: 'MISSILE COMMAND SHIP', description: 'The first invasion commander. It saturates the defense zone with guided warheads.', radius: 66, hp: 2850, speed: 34, score: 5400, xp: 260, color: '#ff506b', major: true, boss: true, bossSkill: 'rockets' },
     bossCarrier: { name: 'THE HOLLOW QUEEN', role: 'RIFT CARRIER // SWARM COMMAND', description: 'A vast carrier that continuously deploys escort wings through the twin rift. Its emergency shield activates if it is damaged too early.', radius: 74, hp: 4600, speed: 29, score: 7600, xp: 340, color: '#ef67d1', major: true, boss: true, carrier: true, bossSkill: 'swarm', emergencyShield: true },
-    bossTitan: { name: 'AEGIS TITAN', role: 'PHASE SHIELD // FINAL COMMAND', description: 'The final gatebreaker. Heavy rockets are required; several may be needed to collapse each regenerating shield phase.', radius: 82, hp: 7200, shield: 900, speed: 26, score: 12000, xp: 500, color: '#aeb8c0', major: true, boss: true, shielded: true, bossSkill: 'titan' },
+    bossTitan: { name: 'AEGIS TITAN', role: 'ROCKET-BREAK SHIELD // FINAL COMMAND', description: 'The final gatebreaker. Heavy rockets collapse its shield and leave the command ship exposed.', radius: 82, hp: 7200, shield: 330, speed: 26, score: 12000, xp: 500, color: '#aeb8c0', major: true, boss: true, shielded: true, bossSkill: 'titan' },
   };
 
   function activateWave() {
@@ -1070,7 +1081,7 @@
     const rampStage = Math.max(0, campaignStage - 1);
     const hpVariance = rand(.86, 1.28);
     const speedVariance = rand(.86, 1.17);
-    const difficultyScale = 1.05 + rampStage * .125 + currentLevel * .16;
+    const difficultyScale = (1.05 + rampStage * .125 + currentLevel * .16) * (LEVELS[currentLevel].enemyDurability || 1);
     const maxHp = blueprint.hp * difficultyScale * hpVariance;
     const enemy = {
       type,
@@ -1081,6 +1092,8 @@
       progress,
       lane: rand(-58, 58),
       wobble: rand(0, Math.PI * 2),
+      needlePhase: rand(0, Math.PI * 2),
+      needleDrift: rand(135, 175),
       radius: blueprint.radius,
       hp: maxHp,
       maxHp,
@@ -1236,9 +1249,27 @@
     player.y = clamp(player.y + player.vy * dt, 45, WORLD.height - 45);
 
     if (!magnitude && speed < 55) stationaryTime += dt;
-    else stationaryTime = Math.max(0, stationaryTime - dt * 2.4);
-    staticPressure = clamp((stationaryTime - 1.2) / 3.5, 0, 1);
-    ui.staticWarning.classList.toggle('active', staticPressure > .28 && enemies.length > 0);
+    else {
+      stationaryTime = 0;
+      staticDamageTimer = 0;
+    }
+    const staticDamageActive = stationaryTime >= 1.25 && (enemies.length > 0 || spawnQueue.length > 0);
+    ui.staticWarning.classList.toggle('active', staticDamageActive);
+    if (staticDamageActive) {
+      staticDamageTimer += dt;
+      if (staticDamageTimer >= .65) {
+        staticDamageTimer = 0;
+        damagePlayer(2);
+      }
+    }
+
+    if (input.keys.has('KeyT') && jumpDestinationCancelArmed) {
+      jumpDestinationHold += dt;
+      if (jumpDestinationHold >= .75) {
+        clearJumpDestination();
+        jumpDestinationCancelArmed = false;
+      }
+    }
 
     if (!isPointerAiming()) {
       const autoTarget = nearestEnemy(720);
@@ -1279,7 +1310,7 @@
     if (tutorialMode && wave === 0) beginWave();
 
     if (spawnQueue.length) {
-      spawnTimer -= dt * (1 + staticPressure * .25);
+      spawnTimer -= dt;
       if (spawnTimer <= 0) {
         spawnEnemy(spawnQueue.shift());
         const openingBuffer = wave <= 2 ? .12 : 0;
@@ -1483,6 +1514,14 @@
     audio.tone(340, .16, 'sine', .07, 520);
   }
 
+  function clearJumpDestination() {
+    player.jumpDestinationX = null;
+    player.jumpDestinationY = null;
+    player.jumpDestinationCooldown = 0;
+    showToast('VOID DESTINATION CLEARED // DASH RESTORED');
+    audio.tone(220, .14, 'sine', .06, -280);
+  }
+
   function triggerBoost() {
     if (mode !== 'playing' || player.boostCooldown > 0) return;
     const startX = player.x;
@@ -1590,19 +1629,22 @@
 
   function updateEnemies(dt) {
     enemies.forEach((enemy) => {
-      const pressureMultiplier = 1 + staticPressure * .22;
-      enemy.progress += enemy.speed * dt * pressureMultiplier;
+      enemy.progress += enemy.speed * dt;
       enemy.wobble += dt * (enemy.type === 'striker' ? 3.3 : 1.7);
       enemy.hitFlash = Math.max(0, enemy.hitFlash - dt);
       enemy.shieldHitTimer = Math.max(0, enemy.shieldHitTimer - dt);
       const point = getPathPoint(enemy.progress, enemy.pathId);
-      const sway = enemy.lane + Math.sin(enemy.wobble) * (enemy.boss ? 22 : 13);
+      const needleTaper = clamp((enemy.pathLength - enemy.progress) / 420, 0, 1);
+      const needleWander = enemy.type === 'striker'
+        ? (Math.sin(enemy.wobble) * enemy.needleDrift + Math.sin(enemy.wobble * .47 + enemy.needlePhase) * 68) * needleTaper
+        : 0;
+      const sway = enemy.lane + Math.sin(enemy.wobble) * (enemy.boss ? 22 : 13) + needleWander;
       enemy.x = point.x + point.nx * sway;
       enemy.y = point.y + point.ny * sway;
       enemy.angle = point.angle + Math.cos(enemy.wobble * .8) * .08;
 
       if (enemy.major) {
-        enemy.rocketTimer -= dt * (1 + staticPressure * .65);
+        enemy.rocketTimer -= dt;
         const playerDistance = Math.hypot(player.x - enemy.x, player.y - enemy.y);
         if (enemy.rocketTimer <= 0 && playerDistance < (enemy.boss ? 1200 : 820)) {
           fireEnemyRocket(enemy);
@@ -1916,16 +1958,6 @@
       showToast(`${ENEMY_TYPES[enemy.type].name} // EMERGENCY SHIELD ONLINE`);
       addFloater(enemy.x, enemy.y - enemy.radius, 'EMERGENCY SHIELD', '#9acbff');
       burst(enemy.x, enemy.y, '#79a8ff', 34, 280);
-    } else if (enemy.bossSkill === 'titan') {
-      const ratio = enemy.hp / enemy.maxHp;
-      enemy.shieldPhase ??= 0;
-      const nextPhase = ratio < .34 ? 2 : ratio < .67 ? 1 : 0;
-      if (nextPhase > enemy.shieldPhase) {
-        enemy.shieldPhase = nextPhase;
-        enemy.shieldHp = enemy.maxShield * .68;
-        showToast(`AEGIS TITAN // PHASE ${nextPhase + 1} SHIELD ONLINE`);
-        burst(enemy.x, enemy.y, '#79a8ff', 30, 250);
-      }
     }
   }
 
@@ -2170,7 +2202,7 @@
     { title: 'TAKE THE CONTROLS', text: 'Use W, A, S, and D to move through the sector.' },
     { title: 'TEST THE BLASTER', text: 'Press the Up Arrow to fire forward, or hold the left mouse button to aim and fire.' },
     { title: 'SALVAGE VOID ORE', text: 'Shoot the nearby ore cluster. Destroyed resources give XP for upgrades.' },
-    { title: 'PUNCH THE VOID', text: 'Press T to place a jump destination, then Q or right-click to teleport there. T has its own short recharge.' },
+    { title: 'PUNCH THE VOID', text: 'Press T to place or replace a jump destination, then Q or right-click to teleport there. Hold T to clear it and dash again.' },
     { title: 'ARM THE WARHEAD', text: 'Press F. Heavy rockets charge briefly, then deal large blast damage.' },
     { title: 'DEFEND THE GATE', text: 'Enemies follow the glowing corridor. Stop them before the Earth Gate loses every shield.' },
   ];
@@ -2924,7 +2956,7 @@
     ui.boostCooldown.style.width = `${clamp(boostProgress, 0, 1) * 100}%`;
     if (player.boostCooldown > 0) ui.boostState.textContent = `${player.boostCooldown.toFixed(1)}S`;
     else if (player.jumpDestinationCooldown > 0) ui.boostState.textContent = `JUMP READY · T ${player.jumpDestinationCooldown.toFixed(1)}S`;
-    else ui.boostState.textContent = Number.isFinite(player.jumpDestinationX) ? 'JUMP READY · T REPLACE' : 'T PLACE DEST';
+    else ui.boostState.textContent = Number.isFinite(player.jumpDestinationX) ? 'T TAP REPLACE · HOLD CLEAR' : 'T PLACE DEST';
     ui.boostCooldown.closest('.ability-card').classList.toggle('cooling', player.boostCooldown > 0);
 
     const docked = nearestStation(110);
@@ -2962,7 +2994,11 @@
     if (event.code === 'KeyF') beginRocketCharge();
     if (event.code === 'KeyB') useStation();
     if (event.code === 'KeyR') callNextWave();
-    if (event.code === 'KeyT' && mode === 'playing') placeJumpDestination();
+    if (event.code === 'KeyT' && mode === 'playing') {
+      jumpDestinationHold = 0;
+      jumpDestinationCancelArmed = Number.isFinite(player.jumpDestinationX) && Number.isFinite(player.jumpDestinationY);
+      if (!jumpDestinationCancelArmed) placeJumpDestination();
+    }
     if (event.code === 'Escape') {
       if (ui.authOverlay.classList.contains('active')) closeAdminAccess();
       else if (ui.leaderboardOverlay.classList.contains('active')) closeLeaderboard();
@@ -2986,6 +3022,11 @@
 
   function keyUp(event) {
     input.keys.delete(event.code);
+    if (event.code === 'KeyT') {
+      if (mode === 'playing' && jumpDestinationCancelArmed) placeJumpDestination();
+      jumpDestinationHold = 0;
+      jumpDestinationCancelArmed = false;
+    }
   }
 
   function pointerMove(event) {

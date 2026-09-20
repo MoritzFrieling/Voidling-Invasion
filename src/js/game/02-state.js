@@ -44,7 +44,9 @@
   let waveReady = false;
   let waveCallEligible = false;
   let stationaryTime = 0;
-  let staticPressure = 0;
+  let staticDamageTimer = 0;
+  let jumpDestinationHold = 0;
+  let jumpDestinationCancelArmed = false;
   let announcementTimer = 0;
   let toastTimer = 0;
   let resourceTimer = 1;

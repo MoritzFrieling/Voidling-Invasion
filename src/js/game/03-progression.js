@@ -1,5 +1,5 @@
   // Player defaults, progression checkpoints, campaign setup, and pilot activation.
-  const BASE_ROCKET_DAMAGE = 125 * 1.15;
+  const BASE_ROCKET_DAMAGE = 125 * 1.15 * 1.05;
 
   function resetPlayer() {
     return {
@@ -74,8 +74,15 @@
       const value = Number(checkpoint[key]);
       if (Number.isFinite(value)) player[key] = value;
     }
-    if (!Number.isFinite(Number(checkpoint.rocketDamageBase)) && Number.isFinite(player.rocketDamage)) {
-      player.rocketDamage *= 1.15;
+    const savedRocketDamageBase = Number(checkpoint.rocketDamageBase);
+    if (Number.isFinite(player.rocketDamage)) {
+      if (Number.isFinite(savedRocketDamageBase) && savedRocketDamageBase !== BASE_ROCKET_DAMAGE) {
+        player.rocketDamage *= BASE_ROCKET_DAMAGE / savedRocketDamageBase;
+        checkpoint.rocketDamageBase = BASE_ROCKET_DAMAGE;
+      } else if (!Number.isFinite(savedRocketDamageBase)) {
+        player.rocketDamage *= BASE_ROCKET_DAMAGE / 125;
+        checkpoint.rocketDamageBase = BASE_ROCKET_DAMAGE;
+      }
     }
     if (legacyCheckpoint) {
       player.speed *= 310 / 355;
@@ -132,7 +139,9 @@
     waveReady = false;
     waveCallEligible = false;
     stationaryTime = 0;
-    staticPressure = 0;
+    staticDamageTimer = 0;
+    jumpDestinationHold = 0;
+    jumpDestinationCancelArmed = false;
     resourceTimer = .7;
     repairTimer = 11;
     spawnTimer = 0;

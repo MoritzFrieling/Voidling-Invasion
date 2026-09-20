@@ -115,7 +115,7 @@
     sentinel: { name: 'AEGIS SENTINEL', role: 'ROCKET-BREAK SHIELD', description: 'Light blasters cannot pierce its barrier. Two heavy-rocket impacts collapse the barrier, regardless of rocket level.', radius: 29, hp: 310, shield: 0, shieldCharges: 2, speed: 62, score: 840, xp: 58, color: '#aeb8c0', major: true, shielded: true },
     bossOmega: { name: 'DREADNOUGHT OMEGA', role: 'MISSILE COMMAND SHIP', description: 'The first invasion commander. It saturates the defense zone with guided warheads.', radius: 66, hp: 2850, speed: 34, score: 5400, xp: 260, color: '#ff506b', major: true, boss: true, bossSkill: 'rockets' },
     bossCarrier: { name: 'THE HOLLOW QUEEN', role: 'RIFT CARRIER // SWARM COMMAND', description: 'A vast carrier that continuously deploys escort wings through the twin rift. Its emergency shield activates if it is damaged too early.', radius: 74, hp: 4600, speed: 29, score: 7600, xp: 340, color: '#ef67d1', major: true, boss: true, carrier: true, bossSkill: 'swarm', emergencyShield: true },
-    bossTitan: { name: 'AEGIS TITAN', role: 'PHASE SHIELD // FINAL COMMAND', description: 'The final gatebreaker. Heavy rockets are required; several may be needed to collapse each regenerating shield phase.', radius: 82, hp: 7200, shield: 900, speed: 26, score: 12000, xp: 500, color: '#aeb8c0', major: true, boss: true, shielded: true, bossSkill: 'titan' },
+    bossTitan: { name: 'AEGIS TITAN', role: 'ROCKET-BREAK SHIELD // FINAL COMMAND', description: 'The final gatebreaker. Heavy rockets collapse its shield and leave the command ship exposed.', radius: 82, hp: 7200, shield: 330, speed: 26, score: 12000, xp: 500, color: '#aeb8c0', major: true, boss: true, shielded: true, bossSkill: 'titan' },
   };
 
   function activateWave() {
@@ -181,7 +181,7 @@
     const rampStage = Math.max(0, campaignStage - 1);
     const hpVariance = rand(.86, 1.28);
     const speedVariance = rand(.86, 1.17);
-    const difficultyScale = 1.05 + rampStage * .125 + currentLevel * .16;
+    const difficultyScale = (1.05 + rampStage * .125 + currentLevel * .16) * (LEVELS[currentLevel].enemyDurability || 1);
     const maxHp = blueprint.hp * difficultyScale * hpVariance;
     const enemy = {
       type,
@@ -192,6 +192,8 @@
       progress,
       lane: rand(-58, 58),
       wobble: rand(0, Math.PI * 2),
+      needlePhase: rand(0, Math.PI * 2),
+      needleDrift: rand(135, 175),
       radius: blueprint.radius,
       hp: maxHp,
       maxHp,

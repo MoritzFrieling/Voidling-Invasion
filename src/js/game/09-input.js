@@ -19,7 +19,11 @@
     if (event.code === 'KeyF') beginRocketCharge();
     if (event.code === 'KeyB') useStation();
     if (event.code === 'KeyR') callNextWave();
-    if (event.code === 'KeyT' && mode === 'playing') placeJumpDestination();
+    if (event.code === 'KeyT' && mode === 'playing') {
+      jumpDestinationHold = 0;
+      jumpDestinationCancelArmed = Number.isFinite(player.jumpDestinationX) && Number.isFinite(player.jumpDestinationY);
+      if (!jumpDestinationCancelArmed) placeJumpDestination();
+    }
     if (event.code === 'Escape') {
       if (ui.authOverlay.classList.contains('active')) closeAdminAccess();
       else if (ui.leaderboardOverlay.classList.contains('active')) closeLeaderboard();
@@ -43,6 +47,11 @@
 
   function keyUp(event) {
     input.keys.delete(event.code);
+    if (event.code === 'KeyT') {
+      if (mode === 'playing' && jumpDestinationCancelArmed) placeJumpDestination();
+      jumpDestinationHold = 0;
+      jumpDestinationCancelArmed = false;
+    }
   }
 
   function pointerMove(event) {

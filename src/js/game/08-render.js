@@ -714,7 +714,7 @@
     ui.boostCooldown.style.width = `${clamp(boostProgress, 0, 1) * 100}%`;
     if (player.boostCooldown > 0) ui.boostState.textContent = `${player.boostCooldown.toFixed(1)}S`;
     else if (player.jumpDestinationCooldown > 0) ui.boostState.textContent = `JUMP READY · T ${player.jumpDestinationCooldown.toFixed(1)}S`;
-    else ui.boostState.textContent = Number.isFinite(player.jumpDestinationX) ? 'JUMP READY · T REPLACE' : 'T PLACE DEST';
+    else ui.boostState.textContent = Number.isFinite(player.jumpDestinationX) ? 'T TAP REPLACE · HOLD CLEAR' : 'T PLACE DEST';
     ui.boostCooldown.closest('.ability-card').classList.toggle('cooling', player.boostCooldown > 0);
 
     const docked = nearestStation(110);
