@@ -28,6 +28,24 @@
         </div>
       </div>
 
+      <section class="vitals" aria-label="Ship status">
+        <div class="vital-row">
+          <span>HULL</span>
+          <div class="meter"><i id="healthBar"></i></div>
+          <strong id="healthText">50</strong>
+        </div>
+        <div class="vital-row xp-row">
+          <span>LVL <b id="levelText">1</b></span>
+          <div class="meter"><i id="xpBar"></i></div>
+          <strong id="xpText">0 / 60</strong>
+        </div>
+        <div class="gate-row">
+          <span>EARTH GATE</span>
+          <div id="shieldPips" class="shield-pips" aria-label="3 portal shields"></div>
+        </div>
+        <div class="credit-row"><span>SALVAGE CREDITS</span><strong id="creditText">000</strong></div>
+      </section>
+
       <div class="round-readout">
         <span class="eyebrow" id="sectorText">SECTOR DEFENSE</span>
         <strong id="waveText">WAVE —</strong>
@@ -41,24 +59,6 @@
         <button class="icon-button" id="pauseButton" type="button" aria-label="Pause game">Ⅱ</button>
       </div>
     </header>
-
-    <section class="vitals" aria-label="Ship status">
-      <div class="vital-row">
-        <span>HULL</span>
-        <div class="meter"><i id="healthBar"></i></div>
-        <strong id="healthText">50</strong>
-      </div>
-      <div class="vital-row xp-row">
-        <span>LVL <b id="levelText">1</b></span>
-        <div class="meter"><i id="xpBar"></i></div>
-        <strong id="xpText">0 / 60</strong>
-      </div>
-      <div class="gate-row">
-        <span>EARTH GATE</span>
-        <div id="shieldPips" class="shield-pips" aria-label="3 portal shields"></div>
-      </div>
-      <div class="credit-row"><span>SALVAGE CREDITS</span><strong id="creditText">000</strong></div>
-    </section>
 
     <aside class="minimap-wrap" aria-label="Sector minimap">
       <div class="minimap-head"><span>TACTICAL MAP</span><i>LIVE</i></div>

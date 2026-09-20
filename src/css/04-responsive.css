@@ -1,6 +1,7 @@
 
 /* Responsive layout and reduced-motion fallbacks. */
 @media (max-width: 900px) {
+  .topbar { grid-template-columns: auto minmax(280px, 1fr) auto auto; gap: 10px; padding-inline: 14px; }.vitals { width: min(390px, 43vw); grid-template-columns: repeat(2, minmax(128px, 1fr)); }.score-readout { gap: 10px; }
   .minimap-wrap { width: 182px; }.minimap-wrap canvas { width: 180px !important; height: 108px !important; }.map-legend { display: none; }
   .ability-card { min-width: 132px; }.ability-card div strong { font-size: .58rem; }
   .start-grid { grid-template-columns: 1fr; }.start-side { display: none; }.intro { max-width: 560px; }
@@ -11,8 +12,8 @@
 }
 
 @media (max-width: 650px) {
-  .topbar { grid-template-columns: 1fr auto; min-height: 66px; padding: 10px 14px; }.round-readout { display: none; }.score-readout div:first-child { display: none; }
-  .vitals { top: 76px; left: 12px; width: 255px; }.minimap-wrap { top: 76px; right: 12px; width: 142px; }.minimap-wrap canvas { width: 140px !important; height: 84px !important; }
+  .topbar { grid-template-columns: 1fr auto; grid-template-rows: auto auto; min-height: 114px; gap: 6px 10px; padding: 8px 12px; }.round-readout { display: none; }.score-readout div:first-child { display: none; }
+  .vitals { grid-column: 1 / -1; grid-row: 2; width: 100%; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px; }.vital-row, .gate-row, .credit-row { min-height: 24px; padding: 3px 5px; }.minimap-wrap { top: 126px; right: 12px; width: 142px; }.minimap-wrap canvas { width: 140px !important; height: 84px !important; }
   .ability-dock { width: calc(100% - 20px); bottom: 10px; }.ability-card { flex: 1; min-width: 0; padding: 7px; height: 50px; }.ability-card div span { display: none; }.ability-card kbd { min-width: 28px; }
   .upgrade-readout { display: none; }
   .static-warning { right: 12px; bottom: 72px; }.wave-call { bottom: 76px; }
