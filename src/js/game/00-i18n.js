@@ -2,7 +2,7 @@
   const LANGUAGE_STORAGE_KEY = 'voidline-language';
   const TRANSLATIONS = {
     en: {
-      'language.label': 'Language', 'aria.gameWorld': 'Voidline Invasion game world', 'aria.gameStatus': 'Game status', 'aria.shipStatus': 'Ship status', 'aria.sectorMinimap': 'Sector minimap', 'aria.abilities': 'Weapons and abilities', 'aria.upgradeTiers': 'Installed ship upgrade tiers',
+      'language.label': 'Language', 'brand.network': 'EARTH DEFENSE NETWORK - FRONTIER LUNA', 'aria.gameWorld': 'Voidline Invasion game world', 'aria.gameStatus': 'Game status', 'aria.shipStatus': 'Ship status', 'aria.sectorMinimap': 'Sector minimap', 'aria.abilities': 'Weapons and abilities', 'aria.upgradeTiers': 'Installed ship upgrade tiers',
       'aria.adminAccess': 'Open admin access', 'aria.pause': 'Pause game', 'aria.closeLevelSelect': 'Close level selection', 'aria.closeSettings': 'Close settings', 'aria.closeAdmin': 'Close admin access', 'aria.closeLeaderboard': 'Close leaderboard',
       'tooltip.adminAccess': 'Admin access', 'tooltip.flightSpeed': 'Flight speed', 'tooltip.blasterDamage': 'Blaster damage', 'tooltip.fireRate': 'Fire rate', 'tooltip.hullStrength': 'Hull strength', 'tooltip.rocketPower': 'Rocket power', 'tooltip.systemCooling': 'System cooling',
       'hud.hull': 'HULL', 'hud.level': 'LVL', 'hud.earthGate': 'EARTH GATE', 'hud.salvageCredits': 'SALVAGE CREDITS',
@@ -11,7 +11,7 @@
       'hud.gateProximity': 'GATE PROXIMITY ALERT', 'hud.targetLocked': 'TARGET LOCKED', 'hud.staticDrain': 'STATIC SIGNATURE // HULL DRAIN',
       'hud.callNextWave': 'CALL NEXT WAVE', 'hud.shipModules': 'SHIP MODULES',
       'ability.blaster': 'BLASTER', 'ability.ready': 'READY', 'ability.heavyRocket': 'HEAVY ROCKET', 'ability.voidJump': 'VOID JUMP', 'ability.station': 'DEFENSE STATION',
-      'menu.beginDefense': 'BEGIN DEFENSE', 'menu.trainingRun': 'TRAINING RUN', 'menu.levelSelect': 'LEVEL SELECT', 'menu.topPilots': 'TOP PILOTS',
+      'menu.beginDefense': 'BEGIN DEFENSE', 'menu.trainingRun': 'TRAINING RUN', 'menu.levelSelect': 'LEVEL SELECT', 'menu.topPilots': 'TOP PILOTS', 'menu.ranksShortcut': 'RANKS',
       'menu.intro': "Three sectors stand between the invasion fleet and Earth. Intercept every formation, salvage void ore, and protect Earth's last stronghold.",
       'menu.callsignAria': 'Callsign', 'menu.callsignTitle': '3–20 letters, numbers, or underscores. Used for saves and the highscore board.',
       'menu.flightBriefing': 'FLIGHT BRIEFING', 'menu.flyFreely': 'Fly freely', 'menu.fireBlaster': 'Fire blaster', 'menu.chargeRocket': 'Charge heavy rocket',
@@ -85,7 +85,7 @@
       'leaderboard.detail': '{guest}SECTOR {level} · STAGE {stage} · {kills} KILLS', 'leaderboard.guest': 'GUEST · ',
     },
     ko: {
-      'language.label': '언어', 'aria.gameWorld': '보이드라인 인베이전 게임 화면', 'aria.gameStatus': '게임 상태', 'aria.shipStatus': '함선 상태', 'aria.sectorMinimap': '구역 미니맵', 'aria.abilities': '무기 및 능력', 'aria.upgradeTiers': '설치된 함선 업그레이드 단계',
+      'language.label': '언어', 'brand.network': '지구 방어 네트워크 - 프론티어 루나', 'aria.gameWorld': '보이드라인 인베이전 게임 화면', 'aria.gameStatus': '게임 상태', 'aria.shipStatus': '함선 상태', 'aria.sectorMinimap': '구역 미니맵', 'aria.abilities': '무기 및 능력', 'aria.upgradeTiers': '설치된 함선 업그레이드 단계',
       'aria.adminAccess': '관리자 접근 열기', 'aria.pause': '게임 일시 정지', 'aria.closeLevelSelect': '구역 선택 닫기', 'aria.closeSettings': '설정 닫기', 'aria.closeAdmin': '관리자 접근 닫기', 'aria.closeLeaderboard': '순위표 닫기',
       'tooltip.adminAccess': '관리자 접근', 'tooltip.flightSpeed': '비행 속도', 'tooltip.blasterDamage': '블래스터 피해', 'tooltip.fireRate': '연사력', 'tooltip.hullStrength': '선체 내구도', 'tooltip.rocketPower': '로켓 위력', 'tooltip.systemCooling': '시스템 냉각',
       'hud.hull': '선체', 'hud.level': '레벨', 'hud.earthGate': '지구 관문', 'hud.salvageCredits': '회수 크레딧',
@@ -93,7 +93,7 @@
       'hud.tacticalMap': '전술 지도', 'hud.live': '실시간', 'hud.you': '플레이어', 'hud.hostile': '적', 'hud.gate': '관문',
       'hud.gateProximity': '관문 근접 경보', 'hud.targetLocked': '표적 고정', 'hud.staticDrain': '정지 신호 // 선체 손상', 'hud.callNextWave': '다음 웨이브 호출', 'hud.shipModules': '함선 모듈',
       'ability.blaster': '블래스터', 'ability.ready': '준비', 'ability.heavyRocket': '중로켓', 'ability.voidJump': '보이드 점프', 'ability.station': '방어 기지',
-      'menu.beginDefense': '방어 시작', 'menu.trainingRun': '훈련 시작', 'menu.levelSelect': '구역 선택', 'menu.topPilots': '최고 조종사',
+      'menu.beginDefense': '방어 시작', 'menu.trainingRun': '훈련 시작', 'menu.levelSelect': '구역 선택', 'menu.topPilots': '최고 조종사', 'menu.ranksShortcut': '순위',
       'menu.intro': '침공 함대와 지구 사이에는 세 개의 구역이 있습니다. 모든 편대를 요격하고, 보이드 광물을 회수하여 지구 최후의 거점을 지키세요.',
       'menu.callsignAria': '호출부호', 'menu.callsignTitle': '3~20자의 영문자, 숫자 또는 밑줄입니다. 저장과 최고 점수판에 사용됩니다.',
       'menu.flightBriefing': '비행 브리핑', 'menu.flyFreely': '자유 비행', 'menu.fireBlaster': '블래스터 발사', 'menu.chargeRocket': '중로켓 충전',

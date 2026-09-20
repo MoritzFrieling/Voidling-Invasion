@@ -75,7 +75,6 @@ button { color: inherit; }
 .score-readout div { display: grid; }
 .score-readout strong { font: 700 .92rem/1.2 var(--mono); letter-spacing: .08em; }
 .language-select { pointer-events: auto; height: 32px; padding: 0 23px 0 9px; border: 1px solid var(--line-bright); border-radius: 16px; color: var(--cyan); background: rgba(8, 22, 30, .72); font: 700 .58rem var(--mono); letter-spacing: .06em; cursor: pointer; }
-.menu-language-select { position: absolute; z-index: 3; top: 28px; right: 105px; }
 .icon-button { pointer-events: auto; width: 40px; height: 40px; border: 1px solid var(--line-bright); border-radius: 50%; background: rgba(8, 22, 30, .72); cursor: pointer; }
 .icon-button:hover { border-color: var(--cyan); box-shadow: 0 0 18px rgba(109, 247, 232, .14); }
 .admin-button { color: var(--muted); font-size: 1.2rem; opacity: .72; }

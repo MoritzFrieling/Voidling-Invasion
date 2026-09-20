@@ -19,7 +19,9 @@ button { border: 0; }
 .primary-actions { margin-bottom: 12px; }
 .primary-actions .main-button { width: min(390px, 100%); }
 .secondary-actions { margin-top: 17px; }
-.start-admin-button { position: absolute; z-index: 3; top: 24px; right: 24px; height: 40px; display: flex; align-items: center; gap: 8px; padding: 0 13px; border: 1px solid var(--line); background: rgba(4,15,22,.78); color: var(--muted); font: 700 .58rem var(--mono); letter-spacing: .12em; cursor: pointer; opacity: .78; }
+.start-header-actions { position: absolute; z-index: 3; top: 24px; right: 24px; display: flex; align-items: center; gap: 16px; }
+.start-header-actions .language-select { position: static; }
+.start-admin-button { height: 40px; display: flex; align-items: center; gap: 8px; padding: 0 13px; border: 1px solid var(--line); background: rgba(4,15,22,.78); color: var(--muted); font: 700 .58rem var(--mono); letter-spacing: .12em; cursor: pointer; opacity: .78; }
 .start-admin-button span { color: var(--cyan); font-size: 1rem; }
 .start-admin-button:hover { color: var(--text); border-color: var(--cyan); opacity: 1; }
 .start-admin-button.connected { color: var(--amber); border-color: rgba(255,179,92,.55); opacity: 1; }
