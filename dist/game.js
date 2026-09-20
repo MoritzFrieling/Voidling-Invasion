@@ -962,6 +962,21 @@
         spawnQueue.push({ type, pathId, entryProgress, fromWormhole });
       }
     }
+
+    // Sector 3 / Stage 2's second formation has one heavy hull too many.
+    // Break that ship into three smaller raiders to soften the spike without
+    // changing the encounter's overall pacing or route count.
+    if (currentLevel === 2 && wave === 2 && formation === 2) {
+      const heavyIndex = spawnQueue.findIndex((entry) => entry.type === 'major');
+      if (heavyIndex >= 0) {
+        const heavy = spawnQueue[heavyIndex];
+        spawnQueue.splice(heavyIndex, 1,
+          { ...heavy, type: 'raider' },
+          { ...heavy, type: 'raider', pathId: (heavy.pathId + 1) % level.paths.length },
+          { ...heavy, type: 'raider', pathId: (heavy.pathId + 2) % level.paths.length },
+        );
+      }
+    }
     const isBossFormation = wave === level.stages && formation === formationsInStage;
     if (isBossFormation) spawnQueue.push({ type: level.boss, pathId: Math.floor(level.paths.length / 2), entryProgress: 0 });
 
@@ -2018,7 +2033,7 @@
     { id: 'rocket', tier: 'rocketTier', icon: '▲', name: 'Siege Warhead', description: 'Heavy rockets deal more blast damage.', detail: 'ROCKET +22%', apply: () => { player.rocketDamage *= 1.22; player.rocketTier += 1; } },
     { id: 'cooling', tier: 'coolingTier', icon: '❄', name: 'Cryo Manifold', description: 'Rocket and void jump systems reload faster.', detail: 'COOLDOWNS -10%', apply: () => { player.rocketMax *= .9; player.boostMax *= .9; player.coolingTier += 1; } },
     { id: 'salvage', icon: 'XP', name: 'Salvage Matrix', description: 'Void ore yields more experience.', detail: 'RESOURCE XP +18%', apply: () => { player.salvage *= 1.18; } },
-    { id: 'multi', icon: 'III', name: 'Splitfire Array', description: 'Add a tightly grouped blaster shot. Offered every four levels.', detail: '+1 SHOT · EVERY 4 LVL', apply: () => { player.multiShot = Math.min(3, player.multiShot + 1); player.multiUpgradeLevel = player.level; } },
+    { id: 'multi', icon: 'III', name: 'Splitfire Array', description: 'Add a tightly grouped blaster shot. Offered every four levels.', detail: '+1 SHOT · EVERY 4 LVL', apply: () => { player.multiShot = Math.min(3, player.multiShot + 1); player.multiUpgradeLevel = Math.floor(player.level / 4) * 4; } },
     { id: 'gate', icon: 'AEG', name: 'Gate Capacitor', description: 'Send a recovered charge to Earth.', detail: 'GATE SHIELD +1', apply: () => { gateShields = Math.min(5, gateShields + 1); } },
   ];
 
@@ -2026,8 +2041,9 @@
     mode = 'upgrade';
     ui.crosshair.style.opacity = '0';
     ui.lockReadout.classList.remove('active');
+    const nextMultiLevel = Math.max(4, (Math.floor(Number(player.multiUpgradeLevel) / 4) * 4) + 4);
     const pool = [...UPGRADES].filter((upgrade) => (!upgrade.tier || player[upgrade.tier] < 7)
-      && (upgrade.id !== 'multi' || (player.multiShot < 3 && player.level >= 4 && player.level % 4 === 0 && player.multiUpgradeLevel !== player.level)));
+      && (upgrade.id !== 'multi' || (player.multiShot < 3 && player.level >= nextMultiLevel)));
     const choices = [];
     while (choices.length < 3 && pool.length) choices.push(pool.splice((Math.random() * pool.length) | 0, 1)[0]);
     ui.upgradeChoices.replaceChildren();
@@ -2825,6 +2841,28 @@
     for (const rock of resources) {
       mctx.fillStyle = rock.crystal ? 'rgba(168,140,255,.65)' : 'rgba(109,247,232,.25)';
       mctx.fillRect(rock.x * sx, rock.y * sy, 2, 2);
+    }
+    for (const item of pickups) {
+      const x = item.x * sx;
+      const y = item.y * sy;
+      const pulse = 1 + Math.sin(item.pulse) * .18;
+      if (item.kind === 'shield') {
+        mctx.save();
+        mctx.translate(x, y);
+        mctx.scale(pulse, pulse);
+        mctx.strokeStyle = COLORS.amber;
+        mctx.fillStyle = 'rgba(255,179,92,.2)';
+        mctx.lineWidth = 1.2;
+        mctx.beginPath();
+        mctx.moveTo(0, -4.5); mctx.lineTo(4, -2.5); mctx.lineTo(3.2, 2.2);
+        mctx.lineTo(0, 4.8); mctx.lineTo(-3.2, 2.2); mctx.lineTo(-4, -2.5);
+        mctx.closePath();
+        mctx.fill(); mctx.stroke();
+        mctx.restore();
+      } else {
+        mctx.fillStyle = 'rgba(109,247,232,.7)';
+        mctx.fillRect(x - 1.5, y - 1.5, 3, 3);
+      }
     }
     for (const enemy of enemies) {
       const mapColor = enemy.major ? enemy.color : COLORS.coral;

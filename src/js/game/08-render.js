@@ -632,6 +632,28 @@
       mctx.fillStyle = rock.crystal ? 'rgba(168,140,255,.65)' : 'rgba(109,247,232,.25)';
       mctx.fillRect(rock.x * sx, rock.y * sy, 2, 2);
     }
+    for (const item of pickups) {
+      const x = item.x * sx;
+      const y = item.y * sy;
+      const pulse = 1 + Math.sin(item.pulse) * .18;
+      if (item.kind === 'shield') {
+        mctx.save();
+        mctx.translate(x, y);
+        mctx.scale(pulse, pulse);
+        mctx.strokeStyle = COLORS.amber;
+        mctx.fillStyle = 'rgba(255,179,92,.2)';
+        mctx.lineWidth = 1.2;
+        mctx.beginPath();
+        mctx.moveTo(0, -4.5); mctx.lineTo(4, -2.5); mctx.lineTo(3.2, 2.2);
+        mctx.lineTo(0, 4.8); mctx.lineTo(-3.2, 2.2); mctx.lineTo(-4, -2.5);
+        mctx.closePath();
+        mctx.fill(); mctx.stroke();
+        mctx.restore();
+      } else {
+        mctx.fillStyle = 'rgba(109,247,232,.7)';
+        mctx.fillRect(x - 1.5, y - 1.5, 3, 3);
+      }
+    }
     for (const enemy of enemies) {
       const mapColor = enemy.major ? enemy.color : COLORS.coral;
       mctx.fillStyle = mapColor;

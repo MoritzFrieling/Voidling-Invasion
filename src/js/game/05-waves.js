@@ -73,6 +73,21 @@
         spawnQueue.push({ type, pathId, entryProgress, fromWormhole });
       }
     }
+
+    // Sector 3 / Stage 2's second formation has one heavy hull too many.
+    // Break that ship into three smaller raiders to soften the spike without
+    // changing the encounter's overall pacing or route count.
+    if (currentLevel === 2 && wave === 2 && formation === 2) {
+      const heavyIndex = spawnQueue.findIndex((entry) => entry.type === 'major');
+      if (heavyIndex >= 0) {
+        const heavy = spawnQueue[heavyIndex];
+        spawnQueue.splice(heavyIndex, 1,
+          { ...heavy, type: 'raider' },
+          { ...heavy, type: 'raider', pathId: (heavy.pathId + 1) % level.paths.length },
+          { ...heavy, type: 'raider', pathId: (heavy.pathId + 2) % level.paths.length },
+        );
+      }
+    }
     const isBossFormation = wave === level.stages && formation === formationsInStage;
     if (isBossFormation) spawnQueue.push({ type: level.boss, pathId: Math.floor(level.paths.length / 2), entryProgress: 0 });
 
