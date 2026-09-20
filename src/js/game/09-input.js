@@ -65,6 +65,10 @@
   }
 
   function pointerDown(event) {
+    if (event.button === 2) {
+      event.preventDefault();
+      return;
+    }
     if (event.button !== 0 || mode !== 'playing') return;
     input.pointerDown = true;
     audio.init();
