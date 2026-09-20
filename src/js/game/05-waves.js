@@ -43,6 +43,7 @@
     formation = 1;
     formationsInStage = 2;
     waveClearTimer = 0;
+    captureStageCheckpoint();
     prepareFormation();
   }
 

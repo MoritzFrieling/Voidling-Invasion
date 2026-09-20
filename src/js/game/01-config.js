@@ -74,7 +74,7 @@
     'levelText', 'shieldPips', 'rocketState', 'rocketCooldown', 'boostState', 'boostCooldown',
     'startOverlay', 'pauseOverlay', 'settingsOverlay', 'upgradeOverlay', 'endOverlay', 'upgradeChoices',
     'tutorialCard', 'tutorialStep', 'tutorialTitle', 'tutorialText', 'tutorialProgress', 'crosshair',
-    'toast', 'endKicker', 'endTitle', 'endCopy', 'finalScore', 'finalWave', 'finalKills', 'sectorText',
+    'toast', 'endKicker', 'endTitle', 'endCopy', 'finalScore', 'finalWave', 'finalKills', 'playAgainLabel', 'retryStageButton', 'retryStageLabel', 'sectorText',
     'creditText', 'portalWarning', 'lockReadout', 'stationState', 'stationButton', 'intelOverlay', 'intelKicker', 'intelTitle',
     'intelRole', 'intelText', 'intelShip', 'bossOverlay', 'bossKicker', 'bossTitle', 'bossText',
     'sectorOverlay', 'sectorTitle', 'sectorCopy',

@@ -30,7 +30,7 @@
       'intel.newHostile': 'NEW HOSTILE IDENTIFIED', 'intel.firstContact': 'FIRST CONTACT // HOSTILE PROFILE', 'intel.acknowledge': 'ACKNOWLEDGE', 'boss.commandSignature': 'COMMAND SIGNATURE DETECTED', 'boss.engage': 'ENGAGE NOW',
       'sector.secured': 'SECTOR SECURED', 'sector.fieldRepair': 'FIELD REPAIR', 'sector.hullReward': '+35% HULL', 'sector.gateSupport': 'GATE SUPPORT', 'sector.shieldReward': '+1 SHIELD', 'sector.next': 'ENTER NEXT SECTOR',
       'upgrade.kicker': 'POWER SIGNATURE INCREASED', 'upgrade.title': 'CHOOSE AN UPGRADE', 'upgrade.copy': 'Your ship can safely integrate one recovered module.',
-      'end.score': 'SCORE', 'end.progress': 'PROGRESS', 'end.hostiles': 'HOSTILES', 'end.flyAgain': 'FLY AGAIN', 'end.returnTitle': 'RETURN TO TITLE',
+      'end.score': 'SCORE', 'end.progress': 'PROGRESS', 'end.hostiles': 'HOSTILES', 'end.flyAgain': 'FLY AGAIN', 'end.startBeginning': 'START FROM BEGINNING', 'end.retryStage': 'START FROM STAGE {stage}', 'end.returnTitle': 'RETURN TO TITLE',
       'auth.kicker': 'VOIDLINE ADMIN CONSOLE', 'auth.admin': 'ADMIN', 'auth.access': 'ADMIN ACCESS', 'auth.username': 'USERNAME', 'auth.password': 'PASSWORD',
       'auth.hint': 'Admin runs unlock every sector and never submit highscores.', 'auth.signIn': 'SIGN IN AS ADMIN', 'auth.signOut': 'SIGN OUT',
       'leaderboard.kicker': 'EARTH DEFENSE RECORDS', 'leaderboard.title': 'TOP PILOTS', 'leaderboard.copy': 'The strongest run from each pilot is shown.',
@@ -111,7 +111,7 @@
       'intel.newHostile': '새 적 식별', 'intel.firstContact': '첫 조우 // 적 정보', 'intel.acknowledge': '확인', 'boss.commandSignature': '지휘 신호 감지', 'boss.engage': '교전 시작',
       'sector.secured': '구역 확보', 'sector.fieldRepair': '현장 수리', 'sector.hullReward': '선체 +35%', 'sector.gateSupport': '관문 지원', 'sector.shieldReward': '방벽 +1', 'sector.next': '다음 구역 진입',
       'upgrade.kicker': '출력 신호 증가', 'upgrade.title': '업그레이드 선택', 'upgrade.copy': '회수한 모듈 하나를 함선에 안전하게 통합할 수 있습니다.',
-      'end.score': '점수', 'end.progress': '진행', 'end.hostiles': '적', 'end.flyAgain': '다시 비행', 'end.returnTitle': '타이틀로',
+      'end.score': '점수', 'end.progress': '진행', 'end.hostiles': '적', 'end.flyAgain': '다시 비행', 'end.startBeginning': '처음부터 시작', 'end.retryStage': '스테이지 {stage}부터 시작', 'end.returnTitle': '타이틀로',
       'auth.kicker': '보이드라인 관리자 콘솔', 'auth.admin': '관리자', 'auth.access': '관리자 접근', 'auth.username': '사용자 이름', 'auth.password': '비밀번호', 'auth.hint': '관리자 플레이는 모든 구역을 해금하며 최고 점수에 등록되지 않습니다.', 'auth.signIn': '관리자로 로그인', 'auth.signOut': '로그아웃',
       'leaderboard.kicker': '지구 방어 기록', 'leaderboard.title': '최고 조종사', 'leaderboard.copy': '각 조종사의 가장 높은 기록을 표시합니다.', 'leaderboard.connecting': '방어 네트워크 연결 중…', 'tutorial.skip': '훈련 건너뛰기', 'rotate': '최적의 비행 화면을 위해 기기를 가로로 돌리세요.',
       'sector.one.name': '외곽 방어선', 'sector.one.short': '구역 01', 'sector.one.next': '전방 항로가 갈라졌습니다. 적이 쌍둥이 접근 통로에 재집결하고 있습니다.',
@@ -273,7 +273,7 @@
     'levelText', 'shieldPips', 'rocketState', 'rocketCooldown', 'boostState', 'boostCooldown',
     'startOverlay', 'pauseOverlay', 'settingsOverlay', 'upgradeOverlay', 'endOverlay', 'upgradeChoices',
     'tutorialCard', 'tutorialStep', 'tutorialTitle', 'tutorialText', 'tutorialProgress', 'crosshair',
-    'toast', 'endKicker', 'endTitle', 'endCopy', 'finalScore', 'finalWave', 'finalKills', 'sectorText',
+    'toast', 'endKicker', 'endTitle', 'endCopy', 'finalScore', 'finalWave', 'finalKills', 'playAgainLabel', 'retryStageButton', 'retryStageLabel', 'sectorText',
     'creditText', 'portalWarning', 'lockReadout', 'stationState', 'stationButton', 'intelOverlay', 'intelKicker', 'intelTitle',
     'intelRole', 'intelText', 'intelShip', 'bossOverlay', 'bossKicker', 'bossTitle', 'bossText',
     'sectorOverlay', 'sectorTitle', 'sectorCopy',
@@ -353,6 +353,7 @@
   let threatWarningCooldown = 0;
   let lockedTarget = null;
   let lastRunLevel = 0;
+  let stageCheckpoint = null;
   const CAMPAIGN_KEY = 'voidline-campaign-v1';
   const HIGH_SCORE_KEY = 'voidline-highscore';
   let activePilot = null;
@@ -658,6 +659,80 @@
     if (changed) saveCampaignState();
   }
 
+  function captureStageCheckpoint() {
+    if (tutorialMode || wave <= 0) return;
+    const { rocketTarget, ...checkpointPlayer } = player;
+    stageCheckpoint = {
+      level: currentLevel,
+      stage: wave,
+      player: checkpointPlayer,
+      gateShields,
+      score,
+      kills,
+      resources: resources.map((resource) => ({ ...resource })),
+      pickups: pickups.map((pickup) => ({ ...pickup })),
+      stations: stations.map(({ target, ...station }) => ({ ...station })),
+      resourceTimer,
+      repairTimer,
+      lastSelectedUpgradeId,
+    };
+  }
+
+  function retryStageCheckpoint() {
+    if (!stageCheckpoint || stageCheckpoint.level !== currentLevel) return false;
+    const checkpoint = stageCheckpoint;
+    currentLevel = checkpoint.level;
+    activePaths = LEVELS[currentLevel].paths;
+    player = { ...checkpoint.player, rocketTarget: null, invulnerable: 0, collisionTimer: 0, jumpFlash: 0 };
+    gateShields = checkpoint.gateShields;
+    score = checkpoint.score;
+    kills = checkpoint.kills;
+    resources = checkpoint.resources.map((resource) => ({ ...resource }));
+    pickups = checkpoint.pickups.map((pickup) => ({ ...pickup }));
+    stations = checkpoint.stations.map((station) => ({ ...station, target: null }));
+    bullets = [];
+    rockets = [];
+    enemies = [];
+    enemyRockets = [];
+    particles = [];
+    floaters = [];
+    wave = checkpoint.stage - 1;
+    formation = 0;
+    formationsInStage = 1;
+    waveClearTimer = 0;
+    waveReady = false;
+    waveCallEligible = false;
+    resourceTimer = checkpoint.resourceTimer;
+    repairTimer = checkpoint.repairTimer;
+    spawnTimer = 0;
+    spawnQueue = [];
+    pendingLevelUps = 0;
+    lastSelectedUpgradeId = checkpoint.lastSelectedUpgradeId;
+    pendingWaveStart = false;
+    bossIntroTimer = 0;
+    threatWarningCooldown = 0;
+    lockedTarget = null;
+    stationaryTime = 0;
+    staticDamageTimer = 0;
+    jumpDestinationHold = 0;
+    jumpDestinationCancelArmed = false;
+    runFinished = false;
+    lastRunLevel = currentLevel;
+    camera.shake = 0;
+    camera.x = clamp(player.x - screenWidth / 2, 0, WORLD.width - screenWidth);
+    camera.y = clamp(player.y - screenHeight / 2, 0, WORLD.height - screenHeight);
+    ui.staticWarning.classList.remove('active');
+    ui.portalWarning.classList.remove('active');
+    ui.lockReadout.classList.remove('active');
+    setWaveCallAvailable(false);
+    hideOverlays();
+    ui.crosshair.style.opacity = '1';
+    mode = 'playing';
+    beginWave();
+    syncUi();
+    return true;
+  }
+
   function clearRun(levelIndex = 0) {
     player = resetPlayer();
     bullets = [];
@@ -702,6 +777,7 @@
     bossIntroTimer = 0;
     threatWarningCooldown = 0;
     lockedTarget = null;
+    stageCheckpoint = null;
     ui.staticWarning.classList.remove('active');
     setWaveCallAvailable(false);
     runFinished = false;
@@ -1140,6 +1216,7 @@
     formation = 1;
     formationsInStage = 2;
     waveClearTimer = 0;
+    captureStageCheckpoint();
     prepareFormation();
   }
 
@@ -2411,6 +2488,10 @@
     ui.finalScore.textContent = formatScore(score);
     ui.finalWave.textContent = `${translateLevel(LEVELS[currentLevel]).short} · ${wave}`;
     ui.finalKills.textContent = String(kills);
+    const retryAvailable = !victory && stageCheckpoint?.level === currentLevel && stageCheckpoint.stage === wave;
+    ui.playAgainLabel.textContent = victory ? t('end.flyAgain') : t('end.startBeginning');
+    ui.retryStageButton.hidden = !retryAvailable;
+    if (retryAvailable) ui.retryStageLabel.textContent = t('end.retryStage', { stage: String(stageCheckpoint.stage).padStart(2, '0') });
     ui.endOverlay.classList.add('active');
     audio.tone(victory ? 220 : 55, .8, victory ? 'sine' : 'sawtooth', .1, victory ? 440 : -25);
   }
@@ -3305,6 +3386,7 @@
     document.getElementById('restartButton').addEventListener('click', () => startGame(false, currentLevel));
     document.getElementById('quitButton').addEventListener('click', showTitle);
     document.getElementById('playAgainButton').addEventListener('click', () => startGame(false, lastRunLevel));
+    document.getElementById('retryStageButton').addEventListener('click', retryStageCheckpoint);
     document.getElementById('endQuitButton').addEventListener('click', showTitle);
     document.getElementById('closeSettings').addEventListener('click', closeSettings);
     document.getElementById('intelContinue').addEventListener('click', showNextIntel);

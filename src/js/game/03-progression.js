@@ -110,6 +110,80 @@
     if (changed) saveCampaignState();
   }
 
+  function captureStageCheckpoint() {
+    if (tutorialMode || wave <= 0) return;
+    const { rocketTarget, ...checkpointPlayer } = player;
+    stageCheckpoint = {
+      level: currentLevel,
+      stage: wave,
+      player: checkpointPlayer,
+      gateShields,
+      score,
+      kills,
+      resources: resources.map((resource) => ({ ...resource })),
+      pickups: pickups.map((pickup) => ({ ...pickup })),
+      stations: stations.map(({ target, ...station }) => ({ ...station })),
+      resourceTimer,
+      repairTimer,
+      lastSelectedUpgradeId,
+    };
+  }
+
+  function retryStageCheckpoint() {
+    if (!stageCheckpoint || stageCheckpoint.level !== currentLevel) return false;
+    const checkpoint = stageCheckpoint;
+    currentLevel = checkpoint.level;
+    activePaths = LEVELS[currentLevel].paths;
+    player = { ...checkpoint.player, rocketTarget: null, invulnerable: 0, collisionTimer: 0, jumpFlash: 0 };
+    gateShields = checkpoint.gateShields;
+    score = checkpoint.score;
+    kills = checkpoint.kills;
+    resources = checkpoint.resources.map((resource) => ({ ...resource }));
+    pickups = checkpoint.pickups.map((pickup) => ({ ...pickup }));
+    stations = checkpoint.stations.map((station) => ({ ...station, target: null }));
+    bullets = [];
+    rockets = [];
+    enemies = [];
+    enemyRockets = [];
+    particles = [];
+    floaters = [];
+    wave = checkpoint.stage - 1;
+    formation = 0;
+    formationsInStage = 1;
+    waveClearTimer = 0;
+    waveReady = false;
+    waveCallEligible = false;
+    resourceTimer = checkpoint.resourceTimer;
+    repairTimer = checkpoint.repairTimer;
+    spawnTimer = 0;
+    spawnQueue = [];
+    pendingLevelUps = 0;
+    lastSelectedUpgradeId = checkpoint.lastSelectedUpgradeId;
+    pendingWaveStart = false;
+    bossIntroTimer = 0;
+    threatWarningCooldown = 0;
+    lockedTarget = null;
+    stationaryTime = 0;
+    staticDamageTimer = 0;
+    jumpDestinationHold = 0;
+    jumpDestinationCancelArmed = false;
+    runFinished = false;
+    lastRunLevel = currentLevel;
+    camera.shake = 0;
+    camera.x = clamp(player.x - screenWidth / 2, 0, WORLD.width - screenWidth);
+    camera.y = clamp(player.y - screenHeight / 2, 0, WORLD.height - screenHeight);
+    ui.staticWarning.classList.remove('active');
+    ui.portalWarning.classList.remove('active');
+    ui.lockReadout.classList.remove('active');
+    setWaveCallAvailable(false);
+    hideOverlays();
+    ui.crosshair.style.opacity = '1';
+    mode = 'playing';
+    beginWave();
+    syncUi();
+    return true;
+  }
+
   function clearRun(levelIndex = 0) {
     player = resetPlayer();
     bullets = [];
@@ -154,6 +228,7 @@
     bossIntroTimer = 0;
     threatWarningCooldown = 0;
     lockedTarget = null;
+    stageCheckpoint = null;
     ui.staticWarning.classList.remove('active');
     setWaveCallAvailable(false);
     runFinished = false;

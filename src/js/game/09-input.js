@@ -94,6 +94,7 @@
     document.getElementById('restartButton').addEventListener('click', () => startGame(false, currentLevel));
     document.getElementById('quitButton').addEventListener('click', showTitle);
     document.getElementById('playAgainButton').addEventListener('click', () => startGame(false, lastRunLevel));
+    document.getElementById('retryStageButton').addEventListener('click', retryStageCheckpoint);
     document.getElementById('endQuitButton').addEventListener('click', showTitle);
     document.getElementById('closeSettings').addEventListener('click', closeSettings);
     document.getElementById('intelContinue').addEventListener('click', showNextIntel);

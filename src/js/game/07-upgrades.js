@@ -160,6 +160,10 @@
     ui.finalScore.textContent = formatScore(score);
     ui.finalWave.textContent = `${translateLevel(LEVELS[currentLevel]).short} · ${wave}`;
     ui.finalKills.textContent = String(kills);
+    const retryAvailable = !victory && stageCheckpoint?.level === currentLevel && stageCheckpoint.stage === wave;
+    ui.playAgainLabel.textContent = victory ? t('end.flyAgain') : t('end.startBeginning');
+    ui.retryStageButton.hidden = !retryAvailable;
+    if (retryAvailable) ui.retryStageLabel.textContent = t('end.retryStage', { stage: String(stageCheckpoint.stage).padStart(2, '0') });
     ui.endOverlay.classList.add('active');
     audio.tone(victory ? 220 : 55, .8, victory ? 'sine' : 'sawtooth', .1, victory ? 440 : -25);
   }

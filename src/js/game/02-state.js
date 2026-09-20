@@ -66,6 +66,7 @@
   let threatWarningCooldown = 0;
   let lockedTarget = null;
   let lastRunLevel = 0;
+  let stageCheckpoint = null;
   const CAMPAIGN_KEY = 'voidline-campaign-v1';
   const HIGH_SCORE_KEY = 'voidline-highscore';
   let activePilot = null;
