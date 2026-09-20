@@ -11,11 +11,11 @@
       || event.target.isContentEditable;
     if (textEntry && !['Escape', 'Enter'].includes(event.code)) return;
     if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Space'].includes(event.code)) event.preventDefault();
-    if (event.repeat && ['KeyQ', 'KeyF', 'KeyB', 'KeyR', 'KeyT', 'Escape', 'Enter'].includes(event.code)) return;
+    if (event.repeat && ['KeyQ', 'Space', 'KeyF', 'KeyB', 'KeyR', 'KeyT', 'Escape', 'Enter'].includes(event.code)) return;
     input.keys.add(event.code);
     if (tutorialMode && tutorialIndex === 0 && ['KeyW', 'KeyA', 'KeyS', 'KeyD'].includes(event.code)) advanceTutorial();
     if (event.code === 'ArrowUp' && mode === 'playing') fireBlaster(player.angle);
-    if (event.code === 'KeyQ') triggerBoost();
+    if (['KeyQ', 'Space'].includes(event.code)) triggerBoost();
     if (event.code === 'KeyF') beginRocketCharge();
     if (event.code === 'KeyB') useStation();
     if (event.code === 'KeyR') callNextWave();
@@ -65,11 +65,6 @@
   }
 
   function pointerDown(event) {
-    if (event.button === 2) {
-      event.preventDefault();
-      if (mode === 'playing') { audio.init(); triggerBoost(); }
-      return;
-    }
     if (event.button !== 0 || mode !== 'playing') return;
     input.pointerDown = true;
     audio.init();
