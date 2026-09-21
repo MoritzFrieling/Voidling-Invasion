@@ -193,8 +193,8 @@
   function callNextWave() {
     if (mode !== 'playing' || !waveReady || !waveCallEligible) return;
     const bonus = Math.round((6 + wave * 2 + currentLevel * 3) * (1 + formation * .15));
-    grantXp(bonus, true);
-    showToast(t('toast.rapidClear', { xp: bonus }));
+    const earnedXp = grantXp(bonus, true);
+    showToast(t('toast.rapidClear', { xp: earnedXp }));
     advanceAfterClear();
   }
 
@@ -827,12 +827,11 @@
     addParticle(x, y, { vx: rand(-65, 65), vy: rand(-65, 65), color: rock.crystal ? COLORS.purple : COLORS.cyan, life: .34, size: 2 });
     if (rock.hp <= 0 && !rock.dead) {
       rock.dead = true;
-      const xp = Math.round(rock.xpValue * player.salvage);
-      const credits = rock.creditValue;
       const completesTutorialMining = tutorialMode
         && tutorialIndex === TUTORIAL_STEP.salvage
         && rock.tutorialTarget;
-      grantXp(xp, completesTutorialMining);
+      const xp = grantXp(Math.round(rock.xpValue * player.salvage), completesTutorialMining);
+      const credits = rock.creditValue;
       player.credits += credits;
       score += Math.round(rock.radius * (rock.crystal ? 6 : 3));
       burst(rock.x, rock.y, rock.crystal ? COLORS.purple : COLORS.cyan, 16, 170);
@@ -894,7 +893,9 @@
   }
 
   function grantXp(amount, deferUpgrade = false) {
-    player.xp += amount;
+    const xpMultiplier = tutorialMode ? 1 : (LEVELS[currentLevel]?.xpMultiplier || 1);
+    const earnedXp = Math.max(1, Math.round(amount * xpMultiplier));
+    player.xp += earnedXp;
     while (player.xp >= player.xpNext) {
       player.xp -= player.xpNext;
       player.level += 1;
@@ -902,4 +903,5 @@
       pendingLevelUps += 1;
     }
     if (pendingLevelUps > 0 && mode === 'playing' && !deferUpgrade) showUpgradeChoices();
+    return earnedXp;
   }
