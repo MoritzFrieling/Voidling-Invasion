@@ -214,13 +214,10 @@
     if (!step) return;
     ui.tutorialStep.textContent = t('tutorial.step', { step: String(tutorialIndex + 1).padStart(2, '0') });
     ui.tutorialTitle.textContent = t(step.titleKey);
-    const movementStatus = ['W', 'A', 'S', 'D']
-      .map((key) => `${key}${tutorialMovementKeys.has(`Key${key}`) ? ' ✓' : ''}`)
-      .join(' · ');
     const textKey = tutorialIndex === TUTORIAL_STEP.station && tutorialStationBuilt
       ? 'tutorial.stationUpgradeCopy'
       : step.textKey;
-    ui.tutorialText.textContent = t(textKey, { keys: movementStatus });
+    ui.tutorialText.textContent = t(textKey);
     ui.tutorialProgress.innerHTML = tutorialSteps.map((_, index) => `<i class="${index <= tutorialIndex ? 'done' : ''}"></i>`).join('');
   }
 
@@ -237,8 +234,7 @@
     }
     if (tutorialIndex === TUTORIAL_STEP.mining) tutorialDelay = 3.8;
     if (tutorialIndex === TUTORIAL_STEP.station) {
-      const firstUpgradeCost = 90 + 80;
-      player.credits = Math.max(player.credits, stationBuildCost() + firstUpgradeCost);
+      player.credits = Math.max(player.credits, 1000);
     }
     if (tutorialIndex === TUTORIAL_STEP.combat) beginTutorialCombat();
     updateTutorialCard();
