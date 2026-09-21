@@ -5,7 +5,8 @@
   const SUPABASE_URL = 'https://vwmqichhpmikufwqofpn.supabase.co';
   const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_IRxQOVAj6ICYn2ix574fUA_E6_T69KB';
   const GAME_ID = 'voidline-invasion';
-  const USERNAME_PATTERN = /^[a-z0-9_]{3,20}$/;
+  const USERNAME_PATTERN = /^(?:[a-z0-9_]|[가-힣]){2,20}$/u;
+  const ASCII_USERNAME_PATTERN = /^[a-z0-9_]+$/;
 
   let client = null;
   let pilot = null;
@@ -18,8 +19,8 @@
 
   function validateUsername(value) {
     const username = normalizeUsername(value);
-    if (!USERNAME_PATTERN.test(username)) {
-      throw new Error('Use 3–20 letters, numbers, or underscores.');
+    if (!USERNAME_PATTERN.test(username) || (ASCII_USERNAME_PATTERN.test(username) && username.length < 3)) {
+      throw new Error('Use 3–20 characters, or 2–20 when using Korean letters.');
     }
     return username;
   }

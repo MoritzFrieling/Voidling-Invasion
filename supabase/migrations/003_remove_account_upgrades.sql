@@ -16,7 +16,10 @@ begin
   if pilot_id is null or not coalesce((auth.jwt() ->> 'is_anonymous')::boolean, false) then
     raise exception 'Anonymous pilot required';
   end if;
-  if normalized !~ '^[a-z0-9_]{3,20}$' then raise exception 'Invalid callsign'; end if;
+  if not (
+    (normalized ~ '^[a-z0-9_]+$' and length(normalized) between 3 and 20)
+    or (normalized ~ '^[a-z0-9_가-힣]+$' and normalized ~ '[가-힣]' and length(normalized) between 2 and 20)
+  ) then raise exception 'Invalid callsign'; end if;
 
   update public.profiles
   set username = normalized

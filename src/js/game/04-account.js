@@ -15,7 +15,8 @@
   function readCallsign() {
     const username = String(ui.publicUsername.value || '').trim().toLowerCase() || generateCallsign();
     ui.publicUsername.value = username;
-    if (!/^[a-z0-9_]{3,20}$/.test(username)) {
+    const hasKorean = /[가-힣]/u.test(username);
+    if (!/^(?:[a-z0-9_]|[가-힣]){2,20}$/u.test(username) || (!hasKorean && username.length < 3)) {
       throw new Error(t('account.callsignInvalid'));
     }
     return username;

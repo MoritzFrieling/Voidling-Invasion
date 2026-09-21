@@ -3,7 +3,10 @@
 
 create table if not exists public.profiles (
   user_id uuid primary key references auth.users(id) on delete cascade,
-  username text not null check (username ~ '^[a-z0-9_]{3,20}$'),
+  username text not null check (
+    (username ~ '^[a-z0-9_]+$' and length(username) between 3 and 20)
+    or (username ~ '^[a-z0-9_가-힣]+$' and username ~ '[가-힣]' and length(username) between 2 and 20)
+  ),
   is_guest boolean not null default true,
   is_admin boolean not null default false,
   created_at timestamptz not null default now()
@@ -84,7 +87,10 @@ declare
   requested_username text;
 begin
   requested_username := lower(trim(coalesce(new.raw_user_meta_data ->> 'username', '')));
-  if requested_username !~ '^[a-z0-9_]{3,20}$' then
+  if not (
+    (requested_username ~ '^[a-z0-9_]+$' and length(requested_username) between 3 and 20)
+    or (requested_username ~ '^[a-z0-9_가-힣]+$' and requested_username ~ '[가-힣]' and length(requested_username) between 2 and 20)
+  ) then
     requested_username := 'pilot_' || replace(substr(new.id::text, 1, 8), '-', '');
   end if;
 
@@ -113,7 +119,10 @@ begin
   if pilot_id is null or not coalesce((auth.jwt() ->> 'is_anonymous')::boolean, false) then
     raise exception 'Anonymous pilot required';
   end if;
-  if normalized !~ '^[a-z0-9_]{3,20}$' then raise exception 'Invalid callsign'; end if;
+  if not (
+    (normalized ~ '^[a-z0-9_]+$' and length(normalized) between 3 and 20)
+    or (normalized ~ '^[a-z0-9_가-힣]+$' and normalized ~ '[가-힣]' and length(normalized) between 2 and 20)
+  ) then raise exception 'Invalid callsign'; end if;
 
   update public.profiles
   set username = normalized

@@ -133,8 +133,8 @@
             <button class="main-button" id="startButton" type="button"><span data-i18n="menu.beginDefense">BEGIN DEFENSE</span><b>ENTER</b></button>
           </div>
           <div class="callsign-entry">
-            <input id="publicUsername" type="text" minlength="3" maxlength="20" pattern="[A-Za-z0-9_]+"
-              autocomplete="nickname" data-i18n-aria-label="menu.callsignAria" aria-label="Callsign" data-i18n-title="menu.callsignTitle" title="3–20 letters, numbers, or underscores. Used for saves and the highscore board." spellcheck="false" />
+            <input id="publicUsername" type="text" minlength="2" maxlength="20" pattern="[A-Za-z0-9_가-힣]+"
+              autocomplete="nickname" data-i18n-aria-label="menu.callsignAria" aria-label="Callsign" data-i18n-title="menu.callsignTitle" title="3–20 characters, or 2–20 when using Korean letters. Used for saves and the highscore board." spellcheck="false" />
             <small id="publicUsernameHint" aria-live="polite"></small>
           </div>
           <div class="menu-actions secondary-actions">
@@ -308,7 +308,7 @@
 
         <form class="auth-form" id="authForm">
           <label><span data-i18n="auth.username">USERNAME</span><input id="authUsername" name="username" type="text"
-              minlength="3" maxlength="20" pattern="[A-Za-z0-9_]+" autocomplete="username" spellcheck="false"
+              minlength="2" maxlength="20" pattern="[A-Za-z0-9_가-힣]+" autocomplete="username" spellcheck="false"
               required /></label>
           <label><span data-i18n="auth.password">PASSWORD</span><input id="authPassword" name="password" type="password"
               minlength="8" maxlength="72" autocomplete="current-password" required /></label>
