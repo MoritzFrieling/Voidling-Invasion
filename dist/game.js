@@ -221,7 +221,7 @@
 
   const LEVELS = [
     {
-      nameKey: 'sector.one.name', shortKey: 'sector.one.short', nextKey: 'sector.one.next', stages: 6, boss: 'bossOmega', enemyDurability: 1.38,
+      nameKey: 'sector.one.name', shortKey: 'sector.one.short', nextKey: 'sector.one.next', stages: 6, boss: 'bossOmega', enemyDurability: 1.38, enemyTankinessMultiplier: 1.15,
       paths: [createPath([
         { x: -120, y: 380 }, { x: 360, y: 430 }, { x: 690, y: 770 }, { x: 1110, y: 690 },
         { x: 1470, y: 1010 }, { x: 1860, y: 1260 }, { x: 2250, y: 1160 }, { x: 2570, y: 850 },
@@ -1357,7 +1357,9 @@
     const rampStage = Math.max(0, campaignStage - 1);
     const hpVariance = rand(.86, 1.28);
     const speedVariance = rand(.86, 1.17);
-    const difficultyScale = (1.05 + rampStage * .125 + currentLevel * .16) * (LEVELS[currentLevel].enemyDurability || 1);
+    const difficultyScale = (1.05 + rampStage * .125 + currentLevel * .16)
+      * (LEVELS[currentLevel].enemyDurability || 1)
+      * (LEVELS[currentLevel].enemyTankinessMultiplier || 1);
     const maxHp = blueprint.hp * difficultyScale * hpVariance;
     const enemy = {
       type,
