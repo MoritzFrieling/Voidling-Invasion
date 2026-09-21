@@ -36,6 +36,9 @@
     mode = 'upgrade';
     ui.crosshair.style.opacity = '0';
     ui.lockReadout.classList.remove('active');
+    const showTutorialTip = tutorialMode && !tutorialUpgradeTipShown;
+    ui.tutorialUpgradeTip.hidden = !showTutorialTip;
+    if (showTutorialTip) tutorialUpgradeTipShown = true;
     const eligible = eligibleUpgrades();
     const pool = eligible.filter((upgrade) => upgrade.id !== lastSelectedUpgradeId);
     if (!pool.length) pool.push(...eligible);
@@ -56,16 +59,19 @@
   }
 
   function selectUpgrade(upgrade) {
+    const continueTutorial = tutorialMode && tutorialIndex === TUTORIAL_STEP.mining;
     upgrade.apply();
     lastSelectedUpgradeId = upgrade.id;
     pendingLevelUps -= 1;
     ui.upgradeOverlay.classList.remove('active');
+    ui.tutorialUpgradeTip.hidden = true;
     showToast(t('toast.upgradeInstalled', { upgrade: t(upgrade.nameKey) }));
     if (pendingLevelUps > 0) {
       setTimeout(showUpgradeChoices, 80);
     } else {
       mode = 'playing';
       ui.crosshair.style.opacity = '1';
+      if (continueTutorial) advanceTutorial();
     }
   }
 
@@ -168,45 +174,104 @@
     audio.tone(victory ? 220 : 55, .8, victory ? 'sine' : 'sawtooth', .1, victory ? 440 : -25);
   }
 
+  const TUTORIAL_STEP = Object.freeze({
+    controls: 0,
+    blaster: 1,
+    salvage: 2,
+    mining: 3,
+    jump: 4,
+    rocket: 5,
+    station: 6,
+    combat: 7,
+    complete: 8,
+  });
+
   const tutorialSteps = [
     { titleKey: 'tutorial.takeControls', textKey: 'tutorial.takeControlsCopy' },
     { titleKey: 'tutorial.testBlaster', textKey: 'tutorial.testBlasterCopy' },
     { titleKey: 'tutorial.salvage', textKey: 'tutorial.salvageCopy' },
+    { titleKey: 'tutorial.mineToGrow', textKey: 'tutorial.mineToGrowCopy' },
     { titleKey: 'tutorial.punchVoid', textKey: 'tutorial.punchVoidCopy' },
     { titleKey: 'tutorial.armWarhead', textKey: 'tutorial.armWarheadCopy' },
-    { titleKey: 'tutorial.defendGate', textKey: 'tutorial.defendGateCopy' },
+    { titleKey: 'tutorial.station', textKey: 'tutorial.stationCopy' },
+    { titleKey: 'tutorial.liveFire', textKey: 'tutorial.liveFireCopy' },
+    { titleKey: 'tutorial.complete', textKey: 'tutorial.completeCopy' },
   ];
+
+  function resetTutorialFlow() {
+    tutorialMovementKeys = new Set();
+    tutorialStationBuilt = false;
+    tutorialCombatActive = false;
+    tutorialCombatKills = 0;
+    tutorialUpgradeTipShown = false;
+    ui.tutorialActions.hidden = true;
+    ui.skipTutorial.hidden = false;
+    ui.tutorialUpgradeTip.hidden = true;
+  }
 
   function updateTutorialCard() {
     const step = tutorialSteps[tutorialIndex];
     if (!step) return;
     ui.tutorialStep.textContent = t('tutorial.step', { step: String(tutorialIndex + 1).padStart(2, '0') });
     ui.tutorialTitle.textContent = t(step.titleKey);
-    ui.tutorialText.textContent = t(step.textKey);
+    const movementStatus = ['W', 'A', 'S', 'D']
+      .map((key) => `${key}${tutorialMovementKeys.has(`Key${key}`) ? ' ✓' : ''}`)
+      .join(' · ');
+    const textKey = tutorialIndex === TUTORIAL_STEP.station && tutorialStationBuilt
+      ? 'tutorial.stationUpgradeCopy'
+      : step.textKey;
+    ui.tutorialText.textContent = t(textKey, { keys: movementStatus });
     ui.tutorialProgress.innerHTML = tutorialSteps.map((_, index) => `<i class="${index <= tutorialIndex ? 'done' : ''}"></i>`).join('');
   }
 
   function advanceTutorial() {
-    if (!tutorialMode || tutorialIndex >= tutorialSteps.length - 1) return;
+    if (!tutorialMode || tutorialIndex >= TUTORIAL_STEP.complete) return;
     tutorialIndex += 1;
-    if (tutorialIndex === 2) {
+    tutorialDelay = 0;
+    if (tutorialIndex === TUTORIAL_STEP.salvage) {
       const trainingOre = resources[0];
       if (trainingOre) {
         trainingOre.x = clamp(player.x + Math.cos(player.angle) * 245, 90, WORLD.width - 90);
         trainingOre.y = clamp(player.y + Math.sin(player.angle) * 245, 90, WORLD.height - 90);
       }
     }
-    tutorialDelay = tutorialIndex === tutorialSteps.length - 1 ? 5 : 0;
+    if (tutorialIndex === TUTORIAL_STEP.mining) tutorialDelay = 3.8;
+    if (tutorialIndex === TUTORIAL_STEP.station) {
+      const firstUpgradeCost = 90 + 80;
+      player.credits = Math.max(player.credits, stationBuildCost() + firstUpgradeCost);
+    }
+    if (tutorialIndex === TUTORIAL_STEP.combat) beginTutorialCombat();
     updateTutorialCard();
     audio.tone(540, .18, 'sine', .045, 210);
   }
 
   function updateTutorial(dt) {
-    if (!tutorialMode || tutorialIndex !== tutorialSteps.length - 1) return;
+    if (!tutorialMode || tutorialIndex !== TUTORIAL_STEP.mining || mode !== 'playing') return;
     tutorialDelay -= dt;
-    if (tutorialDelay <= 0) {
-      tutorialMode = false;
-      ui.tutorialCard.classList.remove('active');
-      showToast(t('toast.trainingComplete'));
-    }
+    if (tutorialDelay > 0) return;
+    if (pendingLevelUps > 0) showUpgradeChoices();
+    else advanceTutorial();
+  }
+
+  function beginTutorialCombat() {
+    tutorialCombatActive = true;
+    tutorialCombatKills = 0;
+    spawnQueue = [
+      { type: 'scout', pathId: 0, entryProgress: 0, tutorialTarget: true },
+      { type: 'scout', pathId: 0, entryProgress: 0, tutorialTarget: true },
+      { type: 'raider', pathId: 0, entryProgress: 0, tutorialTarget: true },
+    ];
+    spawnTimer = .25;
+  }
+
+  function completeTutorial() {
+    tutorialCombatActive = false;
+    tutorialIndex = TUTORIAL_STEP.complete;
+    mode = 'tutorialComplete';
+    ui.crosshair.style.opacity = '0';
+    ui.lockReadout.classList.remove('active');
+    ui.skipTutorial.hidden = true;
+    ui.tutorialActions.hidden = false;
+    updateTutorialCard();
+    showToast(t('toast.trainingComplete'));
   }

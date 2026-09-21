@@ -13,7 +13,11 @@
     if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Space'].includes(event.code)) event.preventDefault();
     if (event.repeat && ['KeyQ', 'Space', 'KeyF', 'KeyB', 'KeyR', 'KeyT', 'Escape', 'Enter'].includes(event.code)) return;
     input.keys.add(event.code);
-    if (tutorialMode && tutorialIndex === 0 && ['KeyW', 'KeyA', 'KeyS', 'KeyD'].includes(event.code)) advanceTutorial();
+    if (tutorialMode && tutorialIndex === TUTORIAL_STEP.controls && ['KeyW', 'KeyA', 'KeyS', 'KeyD'].includes(event.code)) {
+      tutorialMovementKeys.add(event.code);
+      if (tutorialMovementKeys.size === 4) advanceTutorial();
+      else updateTutorialCard();
+    }
     if (event.code === 'ArrowUp' && mode === 'playing') fireBlaster(player.angle);
     if (['KeyQ', 'Space'].includes(event.code)) triggerBoost();
     if (event.code === 'KeyF') beginRocketCharge();
@@ -109,12 +113,12 @@
     document.getElementById('closeLeaderboard').addEventListener('click', closeLeaderboard);
     document.getElementById('authForm').addEventListener('submit', submitAdminForm);
     document.getElementById('signOutButton').addEventListener('click', signOutAdmin);
-    document.getElementById('skipTutorial').addEventListener('click', () => {
-      tutorialMode = false;
-      ui.tutorialCard.classList.remove('active');
-      if (wave === 0) beginWave();
+    ui.skipTutorial.addEventListener('click', () => {
+      startGame(false, 0);
       showToast(t('toast.trainingSkipped'));
     });
+    ui.repeatTutorial.addEventListener('click', () => startGame(true));
+    ui.startCampaign.addEventListener('click', () => startGame(false, 0));
 
     const musicToggle = document.getElementById('musicToggle');
     const sfxToggle = document.getElementById('sfxToggle');

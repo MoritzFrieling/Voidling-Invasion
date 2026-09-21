@@ -241,19 +241,30 @@
 
   function startGame(withTutorial = false, levelIndex = 0) {
     audio.init();
+    localStorage.setItem(GAME_STARTED_KEY, 'true');
+    document.getElementById('tutorialButton').classList.remove('tutorial-recommended');
     clearRun(withTutorial ? 0 : levelIndex);
     lastRunLevel = currentLevel;
     tutorialMode = withTutorial;
     tutorialIndex = 0;
     tutorialDelay = 0;
+    resetTutorialFlow();
     mode = 'playing';
     hideOverlays();
     ui.crosshair.style.opacity = '1';
     if (tutorialMode) {
+      resources = resources.slice(0, 1);
       ui.tutorialCard.classList.add('active');
       updateTutorialCard();
       const rock = resources[0];
-      if (rock) { rock.x = player.x + 300; rock.y = player.y - 50; }
+      if (rock) {
+        rock.tutorialTarget = true;
+        rock.x = player.x + 300;
+        rock.y = player.y - 50;
+        rock.hp = Math.min(rock.hp, 54);
+        rock.maxHp = rock.hp;
+        rock.xpValue = Math.ceil((player.xpNext - player.xp) / player.salvage);
+      }
       showToast(t('toast.trainingLink'));
     } else {
       ui.tutorialCard.classList.remove('active');

@@ -274,6 +274,10 @@
 
     <section class="overlay panel-overlay" id="upgradeOverlay" aria-labelledby="upgradeTitle">
       <div class="panel upgrade-panel">
+        <div class="tutorial-upgrade-tip" id="tutorialUpgradeTip" hidden>
+          <strong data-i18n="tutorial.xpTitle">XP FUELS UPGRADES</strong>
+          <span data-i18n="tutorial.xpCopy">Destroy enemies and mine ore to earn XP. Level up to improve your ship.</span>
+        </div>
         <p class="kicker" data-i18n="upgrade.kicker">POWER SIGNATURE INCREASED</p>
         <h2 id="upgradeTitle" data-i18n="upgrade.title">CHOOSE AN UPGRADE</h2>
         <p class="panel-copy" data-i18n="upgrade.copy">Your ship can safely integrate one recovered module.</p>
@@ -343,6 +347,10 @@
       <h2 id="tutorialTitle">TAKE THE CONTROLS</h2>
       <p id="tutorialText">Use W, A, S, and D to move through the sector.</p>
       <div class="tutorial-progress" id="tutorialProgress"></div>
+      <div class="tutorial-actions" id="tutorialActions" hidden>
+        <button class="tutorial-choice" id="repeatTutorial" type="button" data-i18n="tutorial.repeat">REPEAT TUTORIAL</button>
+        <button class="tutorial-choice primary" id="startCampaign" type="button" data-i18n="tutorial.startCampaign">START PLAYING</button>
+      </div>
       <button id="skipTutorial" type="button" data-i18n="tutorial.skip">SKIP TRAINING</button>
     </section>
 

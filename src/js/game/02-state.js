@@ -58,6 +58,11 @@
   let tutorialMode = false;
   let tutorialIndex = 0;
   let tutorialDelay = 0;
+  let tutorialMovementKeys = new Set();
+  let tutorialStationBuilt = false;
+  let tutorialCombatActive = false;
+  let tutorialCombatKills = 0;
+  let tutorialUpgradeTipShown = false;
   let runFinished = false;
   let seenEnemyTypes = new Set();
   let introQueue = [];
@@ -69,6 +74,7 @@
   let stageCheckpoint = null;
   const CAMPAIGN_KEY = 'voidline-campaign-v1';
   const HIGH_SCORE_KEY = 'voidline-highscore';
+  const GAME_STARTED_KEY = 'voidline-game-started';
   let activePilot = null;
   let activePilotId = null;
   let accountReturnMode = 'menu';

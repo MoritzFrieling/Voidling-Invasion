@@ -50,7 +50,7 @@
   function prepareFormation() {
     const level = LEVELS[currentLevel];
     spawnQueue = [];
-    const regularCount = tutorialMode ? 4 : 4 + Math.ceil(wave * 1.15) + currentLevel * 2 + formation;
+    const regularCount = 4 + Math.ceil(wave * 1.15) + currentLevel * 2 + formation;
     const available = ['scout', 'raider'];
     if (wave >= 2) available.push('striker');
     if (wave >= 3) available.push('major');
@@ -93,7 +93,7 @@
     if (isBossFormation) spawnQueue.push({ type: level.boss, pathId: Math.floor(level.paths.length / 2), entryProgress: 0 });
 
     const waveTypes = [...new Set(spawnQueue.map((entry) => entry.type).filter((type) => !ENEMY_TYPES[type].boss && type !== 'interceptor'))];
-    introQueue = tutorialMode ? [] : waveTypes.filter((type) => !seenEnemyTypes.has(type));
+    introQueue = waveTypes.filter((type) => !seenEnemyTypes.has(type));
     pendingWaveStart = true;
     if (isBossFormation) showBossIntro(level.boss);
     else if (introQueue.length) showNextIntel();
@@ -211,6 +211,7 @@
       boss: Boolean(blueprint.boss),
       carrier: Boolean(blueprint.carrier),
       interceptor: Boolean(blueprint.interceptor),
+      tutorialTarget: Boolean(spec.tutorialTarget),
       shielded: Boolean(blueprint.shielded),
       shieldCharges: blueprint.shieldCharges || 0,
       maxShieldCharges: blueprint.shieldCharges || 0,

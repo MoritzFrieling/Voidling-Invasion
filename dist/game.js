@@ -75,9 +75,14 @@
       'render.earthGate': 'EARTH GATE', 'render.station': 'DEFENSE STATION // MK {level}', 'render.upgradeAvailable': 'UPGRADE AVAILABLE', 'render.shield': 'SHIELD {amount}', 'render.finalStage': 'FINAL STAGE', 'render.hostileFormation': 'HOSTILE FORMATION DETECTED',
       'end.secured': 'CORRIDOR SECURED', 'end.pilotLost': 'PILOT SIGNAL LOST', 'end.defenseOffline': 'EARTH DEFENSE OFFLINE', 'end.victoryTitle': 'INVASION REPELLED', 'end.shipLostTitle': 'YOUR SHIP WAS LOST', 'end.gateLostTitle': 'THE GATE HAS FALLEN',
       'end.victoryCopy': 'Earth is safe. The invasion command signal has gone dark.', 'end.shipLostCopy': 'Your ship was destroyed before the final corridor could be secured.', 'end.gateLostCopy': 'The invasion fleet breached the last defense corridor.',
-      'tutorial.step': 'TRAINING // {step}', 'tutorial.takeControls': 'TAKE THE CONTROLS', 'tutorial.takeControlsCopy': 'Use W, A, S, and D to move through the sector.', 'tutorial.testBlaster': 'TEST THE BLASTER', 'tutorial.testBlasterCopy': 'Press the Up Arrow to fire forward, or hold the left mouse button to aim and fire.',
-      'tutorial.salvage': 'SALVAGE VOID ORE', 'tutorial.salvageCopy': 'Shoot the nearby ore cluster. Destroyed resources give XP for upgrades.', 'tutorial.punchVoid': 'PUNCH THE VOID', 'tutorial.punchVoidCopy': 'Press T to place or replace a jump destination, then Q or Space to teleport there. Hold T to clear it and dash again.',
-      'tutorial.armWarhead': 'ARM THE WARHEAD', 'tutorial.armWarheadCopy': 'Press F. Heavy rockets charge briefly, then deal large blast damage.', 'tutorial.defendGate': 'DEFEND THE GATE', 'tutorial.defendGateCopy': 'Enemies follow the glowing corridor. Stop them before the Earth Gate loses every shield.',
+      'tutorial.step': 'TRAINING // {step}', 'tutorial.takeControls': 'TAKE THE CONTROLS', 'tutorial.takeControlsCopy': 'Press W, A, S, and D once each: {keys}. Keep moving—standing still too long damages your ship.', 'tutorial.testBlaster': 'TEST THE BLASTER', 'tutorial.testBlasterCopy': 'Press the Up Arrow to fire forward, or hold the left mouse button to aim and fire.',
+      'tutorial.salvage': 'SALVAGE VOID ORE', 'tutorial.salvageCopy': 'Shoot and destroy the nearby ore cluster.', 'tutorial.mineToGrow': 'MINE TO GROW', 'tutorial.mineToGrowCopy': 'Fight the threat, but mine meteors too—the ore makes your ship stronger.',
+      'tutorial.xpTitle': 'XP FUELS UPGRADES', 'tutorial.xpCopy': 'Destroy enemies and mine ore to earn XP. Level up to improve your ship.',
+      'tutorial.punchVoid': 'PUNCH THE VOID', 'tutorial.punchVoidCopy': 'Press T to place or replace a jump destination, then Q or Space to teleport there. Hold T to clear it and dash again.',
+      'tutorial.armWarhead': 'ARM THE WARHEAD', 'tutorial.armWarheadCopy': 'Press F. Heavy rockets charge briefly, then deal large blast damage.',
+      'tutorial.station': 'BUILD YOUR DEFENSE', 'tutorial.stationCopy': 'Press B to build an auto-firing station. Stay above it and press B again to upgrade it. You can deploy up to three.', 'tutorial.stationUpgradeCopy': 'Station online. Stay above it and press B again to upgrade it.',
+      'tutorial.liveFire': 'LIVE-FIRE TEST', 'tutorial.liveFireCopy': 'Destroy two Dart Fighters and one Marauder. Your station fires at nearby enemies too.',
+      'tutorial.complete': 'TRAINING COMPLETE', 'tutorial.completeCopy': 'Repeat the tutorial or begin the campaign in Sector 01.', 'tutorial.repeat': 'REPEAT TUTORIAL', 'tutorial.startCampaign': 'START PLAYING',
       'account.adminAccess': 'ADMIN ACCESS', 'account.adminConsole': 'ADMIN CONSOLE', 'account.adminCopy': 'Administrator tools are active. Every sector is unlocked and runs are excluded from highscores.', 'account.signInCopy': 'Sign in with the private administrator account to unlock testing access.',
       'account.adminPilot': 'ADMIN PILOT · HIGHSCORE DISABLED', 'account.guestPilot': 'GUEST PILOT · DEVICE SESSION', 'account.pending': 'CHANGES PENDING', 'account.syncing': 'SYNCHRONIZING…', 'account.saveCurrent': 'CLOUD SAVE CURRENT', 'account.offlineSaved': 'OFFLINE · SAVED ON DEVICE',
       'account.offlineDevice': 'OFFLINE · USING DEVICE SAVE', 'account.cloudLoaded': 'CLOUD SAVE LOADED', 'account.uploading': 'UPLOADING DEVICE SAVE…', 'account.deviceLoaded': 'DEVICE SAVE LOADED', 'account.importing': 'IMPORTING EXISTING PROGRESS…', 'account.cloudCreated': 'NEW CLOUD SAVE CREATED',
@@ -151,9 +156,14 @@
       'render.earthGate': '지구 관문', 'render.station': '방어 기지 // MK {level}', 'render.upgradeAvailable': '업그레이드 가능', 'render.shield': '방벽 {amount}', 'render.finalStage': '최종 스테이지', 'render.hostileFormation': '적 편대 감지',
       'end.secured': '통로 확보', 'end.pilotLost': '조종사 신호 소실', 'end.defenseOffline': '지구 방어 오프라인', 'end.victoryTitle': '침공 격퇴', 'end.shipLostTitle': '함선 손실', 'end.gateLostTitle': '관문 함락',
       'end.victoryCopy': '지구는 안전합니다. 침공 지휘 신호가 사라졌습니다.', 'end.shipLostCopy': '최종 통로를 확보하기 전에 함선이 파괴되었습니다.', 'end.gateLostCopy': '침공 함대가 마지막 방어 통로를 돌파했습니다.',
-      'tutorial.step': '훈련 // {step}', 'tutorial.takeControls': '조작 익히기', 'tutorial.takeControlsCopy': 'W, A, S, D로 구역 안을 이동하세요.', 'tutorial.testBlaster': '블래스터 시험', 'tutorial.testBlasterCopy': '위쪽 화살표로 전방 발사하거나 왼쪽 마우스 버튼을 누른 채 조준해 발사하세요.',
-      'tutorial.salvage': '보이드 광물 회수', 'tutorial.salvageCopy': '근처 광물 덩어리를 쏘세요. 파괴한 자원은 업그레이드 경험치를 제공합니다.', 'tutorial.punchVoid': '보이드 돌파', 'tutorial.punchVoidCopy': 'T를 눌러 점프 목적지를 설정하거나 교체한 뒤 Q 또는 스페이스로 이동하세요. T를 길게 누르면 해제하고 대시로 돌아갑니다.',
-      'tutorial.armWarhead': '탄두 장전', 'tutorial.armWarheadCopy': 'F를 누르세요. 중로켓은 잠시 충전한 뒤 큰 폭발 피해를 줍니다.', 'tutorial.defendGate': '관문 방어', 'tutorial.defendGateCopy': '적은 빛나는 통로를 따라옵니다. 지구 관문 방벽이 모두 사라지기 전에 막으세요.',
+      'tutorial.step': '훈련 // {step}', 'tutorial.takeControls': '조작 익히기', 'tutorial.takeControlsCopy': 'W, A, S, D를 각각 한 번씩 누르세요: {keys}. 너무 오래 멈춰 있으면 함선이 피해를 입으니 계속 움직이세요.', 'tutorial.testBlaster': '블래스터 시험', 'tutorial.testBlasterCopy': '위쪽 화살표로 전방 발사하거나 왼쪽 마우스 버튼을 누른 채 조준해 발사하세요.',
+      'tutorial.salvage': '보이드 광물 회수', 'tutorial.salvageCopy': '근처 광물 덩어리를 쏘아 파괴하세요.', 'tutorial.mineToGrow': '채굴로 강화', 'tutorial.mineToGrowCopy': '적을 막는 동시에 운석도 파괴하세요. 광석으로 함선을 강화할 수 있습니다.',
+      'tutorial.xpTitle': 'XP로 업그레이드', 'tutorial.xpCopy': '적을 처치하고 광석을 채굴하면 XP를 얻습니다. 레벨이 오르면 함선을 강화할 수 있습니다.',
+      'tutorial.punchVoid': '보이드 돌파', 'tutorial.punchVoidCopy': 'T를 눌러 점프 목적지를 설정하거나 교체한 뒤 Q 또는 스페이스로 이동하세요. T를 길게 누르면 해제하고 대시로 돌아갑니다.',
+      'tutorial.armWarhead': '탄두 장전', 'tutorial.armWarheadCopy': 'F를 누르세요. 중로켓은 잠시 충전한 뒤 큰 폭발 피해를 줍니다.',
+      'tutorial.station': '방어망 구축', 'tutorial.stationCopy': 'B로 자동 사격 기지를 건설하세요. 기지 위에서 B를 다시 누르면 업그레이드됩니다. 최대 3개까지 배치할 수 있습니다.', 'tutorial.stationUpgradeCopy': '기지가 가동되었습니다. 기지 위에서 B를 다시 눌러 업그레이드하세요.',
+      'tutorial.liveFire': '실전 사격 훈련', 'tutorial.liveFireCopy': '다트 전투기 2대와 약탈자 1대를 파괴하세요. 방어 기지도 근처 적을 자동으로 공격합니다.',
+      'tutorial.complete': '훈련 완료', 'tutorial.completeCopy': '훈련을 반복하거나 구역 01에서 캠페인을 시작하세요.', 'tutorial.repeat': '훈련 반복', 'tutorial.startCampaign': '게임 시작',
       'account.adminAccess': '관리자 접근', 'account.adminConsole': '관리자 콘솔', 'account.adminCopy': '관리자 도구가 활성화되었습니다. 모든 구역이 해금되며 기록은 최고 점수에 포함되지 않습니다.', 'account.signInCopy': '테스트 접근을 해금하려면 개인 관리자 계정으로 로그인하세요.',
       'account.adminPilot': '관리자 조종사 · 최고 점수 비활성화', 'account.guestPilot': '게스트 조종사 · 기기 세션', 'account.pending': '변경 사항 대기 중', 'account.syncing': '동기화 중…', 'account.saveCurrent': '클라우드 저장 최신', 'account.offlineSaved': '오프라인 · 기기에 저장됨',
       'account.offlineDevice': '오프라인 · 기기 저장 사용 중', 'account.cloudLoaded': '클라우드 저장 불러옴', 'account.uploading': '기기 저장 업로드 중…', 'account.deviceLoaded': '기기 저장 불러옴', 'account.importing': '기존 진행도 가져오는 중…', 'account.cloudCreated': '새 클라우드 저장 생성됨',
@@ -272,7 +282,8 @@
     'waveText', 'waveState', 'scoreText', 'bestText', 'healthBar', 'healthText', 'xpBar', 'xpText',
     'levelText', 'shieldPips', 'rocketState', 'rocketCooldown', 'boostState', 'boostCooldown',
     'startOverlay', 'pauseOverlay', 'settingsOverlay', 'upgradeOverlay', 'endOverlay', 'upgradeChoices',
-    'tutorialCard', 'tutorialStep', 'tutorialTitle', 'tutorialText', 'tutorialProgress', 'crosshair',
+    'tutorialCard', 'tutorialStep', 'tutorialTitle', 'tutorialText', 'tutorialProgress', 'tutorialActions',
+    'repeatTutorial', 'startCampaign', 'skipTutorial', 'tutorialUpgradeTip', 'crosshair',
     'toast', 'endKicker', 'endTitle', 'endCopy', 'finalScore', 'finalWave', 'finalKills', 'playAgainLabel', 'retryStageButton', 'retryStageLabel', 'sectorText',
     'creditText', 'portalWarning', 'lockReadout', 'stationState', 'stationButton', 'intelOverlay', 'intelKicker', 'intelTitle',
     'intelRole', 'intelText', 'intelShip', 'bossOverlay', 'bossKicker', 'bossTitle', 'bossText',
@@ -345,6 +356,11 @@
   let tutorialMode = false;
   let tutorialIndex = 0;
   let tutorialDelay = 0;
+  let tutorialMovementKeys = new Set();
+  let tutorialStationBuilt = false;
+  let tutorialCombatActive = false;
+  let tutorialCombatKills = 0;
+  let tutorialUpgradeTipShown = false;
   let runFinished = false;
   let seenEnemyTypes = new Set();
   let introQueue = [];
@@ -356,6 +372,7 @@
   let stageCheckpoint = null;
   const CAMPAIGN_KEY = 'voidline-campaign-v1';
   const HIGH_SCORE_KEY = 'voidline-highscore';
+  const GAME_STARTED_KEY = 'voidline-game-started';
   let activePilot = null;
   let activePilotId = null;
   let accountReturnMode = 'menu';
@@ -790,19 +807,30 @@
 
   function startGame(withTutorial = false, levelIndex = 0) {
     audio.init();
+    localStorage.setItem(GAME_STARTED_KEY, 'true');
+    document.getElementById('tutorialButton').classList.remove('tutorial-recommended');
     clearRun(withTutorial ? 0 : levelIndex);
     lastRunLevel = currentLevel;
     tutorialMode = withTutorial;
     tutorialIndex = 0;
     tutorialDelay = 0;
+    resetTutorialFlow();
     mode = 'playing';
     hideOverlays();
     ui.crosshair.style.opacity = '1';
     if (tutorialMode) {
+      resources = resources.slice(0, 1);
       ui.tutorialCard.classList.add('active');
       updateTutorialCard();
       const rock = resources[0];
-      if (rock) { rock.x = player.x + 300; rock.y = player.y - 50; }
+      if (rock) {
+        rock.tutorialTarget = true;
+        rock.x = player.x + 300;
+        rock.y = player.y - 50;
+        rock.hp = Math.min(rock.hp, 54);
+        rock.maxHp = rock.hp;
+        rock.xpValue = Math.ceil((player.xpNext - player.xp) / player.salvage);
+      }
       showToast(t('toast.trainingLink'));
     } else {
       ui.tutorialCard.classList.remove('active');
@@ -1224,7 +1252,7 @@
   function prepareFormation() {
     const level = LEVELS[currentLevel];
     spawnQueue = [];
-    const regularCount = tutorialMode ? 4 : 4 + Math.ceil(wave * 1.15) + currentLevel * 2 + formation;
+    const regularCount = 4 + Math.ceil(wave * 1.15) + currentLevel * 2 + formation;
     const available = ['scout', 'raider'];
     if (wave >= 2) available.push('striker');
     if (wave >= 3) available.push('major');
@@ -1267,7 +1295,7 @@
     if (isBossFormation) spawnQueue.push({ type: level.boss, pathId: Math.floor(level.paths.length / 2), entryProgress: 0 });
 
     const waveTypes = [...new Set(spawnQueue.map((entry) => entry.type).filter((type) => !ENEMY_TYPES[type].boss && type !== 'interceptor'))];
-    introQueue = tutorialMode ? [] : waveTypes.filter((type) => !seenEnemyTypes.has(type));
+    introQueue = waveTypes.filter((type) => !seenEnemyTypes.has(type));
     pendingWaveStart = true;
     if (isBossFormation) showBossIntro(level.boss);
     else if (introQueue.length) showNextIntel();
@@ -1385,6 +1413,7 @@
       boss: Boolean(blueprint.boss),
       carrier: Boolean(blueprint.carrier),
       interceptor: Boolean(blueprint.interceptor),
+      tutorialTarget: Boolean(spec.tutorialTarget),
       shielded: Boolean(blueprint.shielded),
       shieldCharges: blueprint.shieldCharges || 0,
       maxShieldCharges: blueprint.shieldCharges || 0,
@@ -1516,7 +1545,6 @@
       player.lastMoveX = dx;
       player.lastMoveY = dy;
       if (!isPointerAiming()) player.angle = Math.atan2(dy, dx);
-      if (tutorialMode && tutorialIndex === 0) advanceTutorial();
     }
 
     const precision = input.keys.has('ShiftLeft') || input.keys.has('ShiftRight');
@@ -1593,8 +1621,10 @@
   }
 
   function updateWave(dt) {
-    if (tutorialMode && wave === 0 && tutorialIndex < 2) return;
-    if (tutorialMode && wave === 0) beginWave();
+    if (tutorialMode) {
+      updateTutorialCombatWave(dt);
+      return;
+    }
 
     if (spawnQueue.length) {
       spawnTimer -= dt;
@@ -1626,6 +1656,21 @@
       repairTimer = rand(17, 25);
     }
     updatePortalThreat(dt);
+  }
+
+  function updateTutorialCombatWave(dt) {
+    if (!tutorialCombatActive) return;
+    player.invulnerable = Math.max(player.invulnerable, .2);
+    if (spawnQueue.length) {
+      spawnTimer -= dt;
+      if (spawnTimer <= 0) {
+        spawnEnemy(spawnQueue.shift());
+        spawnTimer = .72;
+      }
+      return;
+    }
+    const targetsRemain = enemies.some((enemy) => enemy.tutorialTarget && !enemy.dead);
+    if (!targetsRemain && tutorialCombatKills >= 3) completeTutorial();
   }
 
   function advanceAfterClear() {
@@ -1739,7 +1784,7 @@
         dead: false,
       });
     });
-    if (tutorialMode && tutorialIndex === 1) advanceTutorial();
+    if (tutorialMode && tutorialIndex === TUTORIAL_STEP.blaster) advanceTutorial();
     audio.tone(340, .045, 'square', .035, 180);
   }
 
@@ -1770,7 +1815,7 @@
     });
     player.rocketTarget = null;
     player.rocketCooldown = player.rocketMax;
-    if (tutorialMode && tutorialIndex === 4) advanceTutorial();
+    if (tutorialMode && tutorialIndex === TUTORIAL_STEP.rocket) advanceTutorial();
     camera.shake = Math.max(camera.shake, 6);
   }
 
@@ -1857,7 +1902,7 @@
     }
     camera.shake = Math.max(camera.shake, 7);
     audio.tone(70, .42, 'sawtooth', .08, 520);
-    if (tutorialMode && tutorialIndex === 3) advanceTutorial();
+    if (tutorialMode && tutorialIndex === TUTORIAL_STEP.jump) advanceTutorial();
   }
 
   function updateProjectiles(dt) {
@@ -1955,6 +2000,11 @@
 
       if (enemy.progress >= enemy.pathLength - 18) {
         enemy.dead = true;
+        if (tutorialMode && enemy.tutorialTarget) {
+          spawnQueue.push({ type: enemy.type, pathId: enemy.pathId, entryProgress: 0, tutorialTarget: true });
+          spawnTimer = Math.min(spawnTimer, .35);
+          return;
+        }
         gateShields -= enemy.boss ? Math.max(1, gateShields) : 1;
         camera.shake = Math.max(camera.shake, 16);
         burst(PORTAL.x, PORTAL.y, COLORS.coral, 30, 320);
@@ -2016,6 +2066,7 @@
       burst(docked.x, docked.y, COLORS.amber, 24, 180);
       showToast(t('toast.stationUpgraded', { level: docked.level }));
       audio.tone(420, .36, 'sine', .07, 280);
+      if (tutorialMode && tutorialIndex === TUTORIAL_STEP.station) advanceTutorial();
       return;
     }
     if (stations.length >= 3) { showToast(t('toast.stationLimit')); return; }
@@ -2026,6 +2077,10 @@
     burst(player.x, player.y, COLORS.amber, 28, 210);
     showToast(t('toast.stationDeployed'));
     audio.tone(230, .5, 'triangle', .075, 310);
+    if (tutorialMode && tutorialIndex === TUTORIAL_STEP.station) {
+      tutorialStationBuilt = true;
+      updateTutorialCard();
+    }
   }
 
   function updateStations(dt) {
@@ -2224,6 +2279,7 @@
     if (enemy.hp <= 0 && !enemy.dead) {
       enemy.dead = true;
       kills += 1;
+      if (tutorialMode && tutorialCombatActive && enemy.tutorialTarget) tutorialCombatKills += 1;
       score += Math.round(enemy.score * (1 + wave * .05 + currentLevel * .18));
       grantXp(enemy.xp);
       burst(enemy.x, enemy.y, enemy.color, enemy.boss ? 60 : enemy.major ? 30 : 14, enemy.boss ? 520 : 240);
@@ -2268,13 +2324,16 @@
       rock.dead = true;
       const xp = Math.round(rock.xpValue * player.salvage);
       const credits = rock.creditValue;
-      grantXp(xp);
+      const completesTutorialMining = tutorialMode
+        && tutorialIndex === TUTORIAL_STEP.salvage
+        && rock.tutorialTarget;
+      grantXp(xp, completesTutorialMining);
       player.credits += credits;
       score += Math.round(rock.radius * (rock.crystal ? 6 : 3));
       burst(rock.x, rock.y, rock.crystal ? COLORS.purple : COLORS.cyan, 16, 170);
       addFloater(rock.x, rock.y - 20, `+${xp} XP  +${credits} ◈`, rock.crystal ? COLORS.purple : COLORS.cyan);
       audio.tone(520, .12, 'triangle', .04, 220);
-      if (tutorialMode && tutorialIndex === 2) advanceTutorial();
+      if (completesTutorialMining) advanceTutorial();
     }
   }
 
@@ -2377,6 +2436,9 @@
     mode = 'upgrade';
     ui.crosshair.style.opacity = '0';
     ui.lockReadout.classList.remove('active');
+    const showTutorialTip = tutorialMode && !tutorialUpgradeTipShown;
+    ui.tutorialUpgradeTip.hidden = !showTutorialTip;
+    if (showTutorialTip) tutorialUpgradeTipShown = true;
     const eligible = eligibleUpgrades();
     const pool = eligible.filter((upgrade) => upgrade.id !== lastSelectedUpgradeId);
     if (!pool.length) pool.push(...eligible);
@@ -2397,16 +2459,19 @@
   }
 
   function selectUpgrade(upgrade) {
+    const continueTutorial = tutorialMode && tutorialIndex === TUTORIAL_STEP.mining;
     upgrade.apply();
     lastSelectedUpgradeId = upgrade.id;
     pendingLevelUps -= 1;
     ui.upgradeOverlay.classList.remove('active');
+    ui.tutorialUpgradeTip.hidden = true;
     showToast(t('toast.upgradeInstalled', { upgrade: t(upgrade.nameKey) }));
     if (pendingLevelUps > 0) {
       setTimeout(showUpgradeChoices, 80);
     } else {
       mode = 'playing';
       ui.crosshair.style.opacity = '1';
+      if (continueTutorial) advanceTutorial();
     }
   }
 
@@ -2509,47 +2574,106 @@
     audio.tone(victory ? 220 : 55, .8, victory ? 'sine' : 'sawtooth', .1, victory ? 440 : -25);
   }
 
+  const TUTORIAL_STEP = Object.freeze({
+    controls: 0,
+    blaster: 1,
+    salvage: 2,
+    mining: 3,
+    jump: 4,
+    rocket: 5,
+    station: 6,
+    combat: 7,
+    complete: 8,
+  });
+
   const tutorialSteps = [
     { titleKey: 'tutorial.takeControls', textKey: 'tutorial.takeControlsCopy' },
     { titleKey: 'tutorial.testBlaster', textKey: 'tutorial.testBlasterCopy' },
     { titleKey: 'tutorial.salvage', textKey: 'tutorial.salvageCopy' },
+    { titleKey: 'tutorial.mineToGrow', textKey: 'tutorial.mineToGrowCopy' },
     { titleKey: 'tutorial.punchVoid', textKey: 'tutorial.punchVoidCopy' },
     { titleKey: 'tutorial.armWarhead', textKey: 'tutorial.armWarheadCopy' },
-    { titleKey: 'tutorial.defendGate', textKey: 'tutorial.defendGateCopy' },
+    { titleKey: 'tutorial.station', textKey: 'tutorial.stationCopy' },
+    { titleKey: 'tutorial.liveFire', textKey: 'tutorial.liveFireCopy' },
+    { titleKey: 'tutorial.complete', textKey: 'tutorial.completeCopy' },
   ];
+
+  function resetTutorialFlow() {
+    tutorialMovementKeys = new Set();
+    tutorialStationBuilt = false;
+    tutorialCombatActive = false;
+    tutorialCombatKills = 0;
+    tutorialUpgradeTipShown = false;
+    ui.tutorialActions.hidden = true;
+    ui.skipTutorial.hidden = false;
+    ui.tutorialUpgradeTip.hidden = true;
+  }
 
   function updateTutorialCard() {
     const step = tutorialSteps[tutorialIndex];
     if (!step) return;
     ui.tutorialStep.textContent = t('tutorial.step', { step: String(tutorialIndex + 1).padStart(2, '0') });
     ui.tutorialTitle.textContent = t(step.titleKey);
-    ui.tutorialText.textContent = t(step.textKey);
+    const movementStatus = ['W', 'A', 'S', 'D']
+      .map((key) => `${key}${tutorialMovementKeys.has(`Key${key}`) ? ' ✓' : ''}`)
+      .join(' · ');
+    const textKey = tutorialIndex === TUTORIAL_STEP.station && tutorialStationBuilt
+      ? 'tutorial.stationUpgradeCopy'
+      : step.textKey;
+    ui.tutorialText.textContent = t(textKey, { keys: movementStatus });
     ui.tutorialProgress.innerHTML = tutorialSteps.map((_, index) => `<i class="${index <= tutorialIndex ? 'done' : ''}"></i>`).join('');
   }
 
   function advanceTutorial() {
-    if (!tutorialMode || tutorialIndex >= tutorialSteps.length - 1) return;
+    if (!tutorialMode || tutorialIndex >= TUTORIAL_STEP.complete) return;
     tutorialIndex += 1;
-    if (tutorialIndex === 2) {
+    tutorialDelay = 0;
+    if (tutorialIndex === TUTORIAL_STEP.salvage) {
       const trainingOre = resources[0];
       if (trainingOre) {
         trainingOre.x = clamp(player.x + Math.cos(player.angle) * 245, 90, WORLD.width - 90);
         trainingOre.y = clamp(player.y + Math.sin(player.angle) * 245, 90, WORLD.height - 90);
       }
     }
-    tutorialDelay = tutorialIndex === tutorialSteps.length - 1 ? 5 : 0;
+    if (tutorialIndex === TUTORIAL_STEP.mining) tutorialDelay = 3.8;
+    if (tutorialIndex === TUTORIAL_STEP.station) {
+      const firstUpgradeCost = 90 + 80;
+      player.credits = Math.max(player.credits, stationBuildCost() + firstUpgradeCost);
+    }
+    if (tutorialIndex === TUTORIAL_STEP.combat) beginTutorialCombat();
     updateTutorialCard();
     audio.tone(540, .18, 'sine', .045, 210);
   }
 
   function updateTutorial(dt) {
-    if (!tutorialMode || tutorialIndex !== tutorialSteps.length - 1) return;
+    if (!tutorialMode || tutorialIndex !== TUTORIAL_STEP.mining || mode !== 'playing') return;
     tutorialDelay -= dt;
-    if (tutorialDelay <= 0) {
-      tutorialMode = false;
-      ui.tutorialCard.classList.remove('active');
-      showToast(t('toast.trainingComplete'));
-    }
+    if (tutorialDelay > 0) return;
+    if (pendingLevelUps > 0) showUpgradeChoices();
+    else advanceTutorial();
+  }
+
+  function beginTutorialCombat() {
+    tutorialCombatActive = true;
+    tutorialCombatKills = 0;
+    spawnQueue = [
+      { type: 'scout', pathId: 0, entryProgress: 0, tutorialTarget: true },
+      { type: 'scout', pathId: 0, entryProgress: 0, tutorialTarget: true },
+      { type: 'raider', pathId: 0, entryProgress: 0, tutorialTarget: true },
+    ];
+    spawnTimer = .25;
+  }
+
+  function completeTutorial() {
+    tutorialCombatActive = false;
+    tutorialIndex = TUTORIAL_STEP.complete;
+    mode = 'tutorialComplete';
+    ui.crosshair.style.opacity = '0';
+    ui.lockReadout.classList.remove('active');
+    ui.skipTutorial.hidden = true;
+    ui.tutorialActions.hidden = false;
+    updateTutorialCard();
+    showToast(t('toast.trainingComplete'));
   }
   // Canvas rendering, minimap, HUD synchronization, and visual effects.
   function addParticle(x, y, options = {}) {
@@ -3318,7 +3442,11 @@
     if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Space'].includes(event.code)) event.preventDefault();
     if (event.repeat && ['KeyQ', 'Space', 'KeyF', 'KeyB', 'KeyR', 'KeyT', 'Escape', 'Enter'].includes(event.code)) return;
     input.keys.add(event.code);
-    if (tutorialMode && tutorialIndex === 0 && ['KeyW', 'KeyA', 'KeyS', 'KeyD'].includes(event.code)) advanceTutorial();
+    if (tutorialMode && tutorialIndex === TUTORIAL_STEP.controls && ['KeyW', 'KeyA', 'KeyS', 'KeyD'].includes(event.code)) {
+      tutorialMovementKeys.add(event.code);
+      if (tutorialMovementKeys.size === 4) advanceTutorial();
+      else updateTutorialCard();
+    }
     if (event.code === 'ArrowUp' && mode === 'playing') fireBlaster(player.angle);
     if (['KeyQ', 'Space'].includes(event.code)) triggerBoost();
     if (event.code === 'KeyF') beginRocketCharge();
@@ -3414,12 +3542,12 @@
     document.getElementById('closeLeaderboard').addEventListener('click', closeLeaderboard);
     document.getElementById('authForm').addEventListener('submit', submitAdminForm);
     document.getElementById('signOutButton').addEventListener('click', signOutAdmin);
-    document.getElementById('skipTutorial').addEventListener('click', () => {
-      tutorialMode = false;
-      ui.tutorialCard.classList.remove('active');
-      if (wave === 0) beginWave();
+    ui.skipTutorial.addEventListener('click', () => {
+      startGame(false, 0);
       showToast(t('toast.trainingSkipped'));
     });
+    ui.repeatTutorial.addEventListener('click', () => startGame(true));
+    ui.startCampaign.addEventListener('click', () => startGame(false, 0));
 
     const musicToggle = document.getElementById('musicToggle');
     const sfxToggle = document.getElementById('sfxToggle');
@@ -3463,6 +3591,25 @@
 
   applyStaticTranslations();
   bindUi();
+  const storedKeys = Array.from({ length: localStorage.length }, (_, index) => localStorage.key(index));
+  const hasLegacyProgress = storedKeys.some((key) => {
+    if (key === HIGH_SCORE_KEY || key?.startsWith(`${HIGH_SCORE_KEY}:`)) return Number(localStorage.getItem(key)) > 0;
+    if (key !== CAMPAIGN_KEY && !key?.startsWith(`${CAMPAIGN_KEY}:`)) return false;
+    try {
+      const saved = JSON.parse(localStorage.getItem(key) || '{}');
+      const checkpointProgress = Object.values(saved.checkpoints || {}).some((checkpoint) => (
+        Number(checkpoint?.player?.level) > 1 || Number(checkpoint?.score) > 0 || Number(checkpoint?.wave) > 0
+      ));
+      return Number(saved.highestUnlocked) > 0
+        || Number(saved.completedCampaigns) > 0
+        || saved.seenEnemyTypes?.length > 0
+        || checkpointProgress;
+    } catch {
+      return false;
+    }
+  });
+  const hasStartedGame = localStorage.getItem(GAME_STARTED_KEY) === 'true' || hasLegacyProgress;
+  document.getElementById('tutorialButton').classList.toggle('tutorial-recommended', !hasStartedGame);
   prepareDefaultCallsign();
   renderAdminPanel();
   resize();

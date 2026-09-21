@@ -216,6 +216,8 @@ button { border: 0; }
 .secondary-button { min-width: 200px; background: rgba(12, 32, 42, .8); border: 1px solid var(--line-bright); color: var(--text); }
 .secondary-button b { margin-left: 18px; color: var(--muted); font: 700 .55rem var(--mono); }
 .secondary-button:hover, .ghost-button:hover { border-color: var(--cyan); background: rgba(109,247,232,.09); }
+.secondary-button.tutorial-recommended { border-color: var(--amber); animation: tutorialRecommended 1.25s ease-in-out infinite alternate; }
+@keyframes tutorialRecommended { to { background: rgba(255,179,92,.12); box-shadow: 0 0 24px rgba(255,179,92,.24); } }
 .primary-actions { margin-bottom: 12px; }
 .primary-actions .main-button { width: min(390px, 100%); }
 .secondary-actions { margin-top: 17px; }
@@ -276,6 +278,10 @@ button { border: 0; }
 .control-table span { min-height: 55px; display: flex; align-items: center; gap: 8px; padding: 8px; border: 1px solid rgba(142,214,214,.12); }.control-table b { font-size: .7rem; color: #acc2c1; font-weight: 500; }.control-table kbd { min-width: 55px; }
 
 .upgrade-panel { width: min(1040px, calc(100vw - 34px)); }
+.tutorial-upgrade-tip { display: grid; gap: 4px; margin: 0 0 22px; padding: 13px 15px; border: 1px solid rgba(255,179,92,.5); border-left: 3px solid var(--amber); background: rgba(255,179,92,.08); }
+.tutorial-upgrade-tip[hidden] { display: none; }
+.tutorial-upgrade-tip strong { color: var(--amber); font: 700 .65rem var(--mono); letter-spacing: .13em; }
+.tutorial-upgrade-tip span { color: #c8d7d5; font-size: .78rem; line-height: 1.45; }
 .upgrade-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 28px; }
 .upgrade-choice { position: relative; min-height: 218px; padding: 23px; text-align: left; border: 1px solid var(--line); background: linear-gradient(150deg, rgba(21,51,61,.42), rgba(4,13,20,.78)); cursor: pointer; overflow: hidden; }
 .upgrade-choice::after { content: ''; position: absolute; width: 100px; height: 100px; right: -48px; bottom: -48px; border: 1px solid var(--cyan); rotate: 45deg; opacity: .2; }
@@ -355,6 +361,10 @@ button { border: 0; }
 
 .tutorial-card { position: absolute; z-index: 18; left: 24px; bottom: 96px; width: min(390px, calc(100vw - 48px)); display: none; padding: 20px; border: 1px solid var(--line-bright); border-left: 3px solid var(--amber); background: rgba(4,15,22,.94); box-shadow: 0 14px 48px rgba(0,0,0,.4); }
 .tutorial-card.active { display: block; }.tutorial-card h2 { margin-top: 7px; font-size: 1.5rem; }.tutorial-card p { margin: 8px 0 16px; color: #afc3c2; font-size: .84rem; line-height: 1.45; }.tutorial-progress { display: flex; gap: 5px; }.tutorial-progress i { flex: 1; height: 3px; background: rgba(142,214,214,.18); }.tutorial-progress i.done { background: var(--amber); }.tutorial-card button { margin-top: 14px; padding: 0; color: var(--muted); background: transparent; font: 700 .56rem var(--mono); letter-spacing: .1em; cursor: pointer; }.tutorial-card button:hover { color: var(--text); }
+.tutorial-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 14px; }
+.tutorial-actions[hidden] { display: none; }
+.tutorial-card .tutorial-choice { min-height: 38px; margin: 0; padding: 0 10px; border: 1px solid var(--line-bright); color: var(--text); }
+.tutorial-card .tutorial-choice.primary { border-color: var(--cyan); background: rgba(109,247,232,.12); color: var(--cyan-soft); }
 
 .rotate-notice { display: none; position: absolute; inset: 0; z-index: 99; place-items: center; padding: 32px; text-align: center; background: var(--void); color: var(--cyan); font: 700 1rem var(--mono); }
 

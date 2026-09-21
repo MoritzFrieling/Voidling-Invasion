@@ -50,7 +50,6 @@
       player.lastMoveX = dx;
       player.lastMoveY = dy;
       if (!isPointerAiming()) player.angle = Math.atan2(dy, dx);
-      if (tutorialMode && tutorialIndex === 0) advanceTutorial();
     }
 
     const precision = input.keys.has('ShiftLeft') || input.keys.has('ShiftRight');
@@ -127,8 +126,10 @@
   }
 
   function updateWave(dt) {
-    if (tutorialMode && wave === 0 && tutorialIndex < 2) return;
-    if (tutorialMode && wave === 0) beginWave();
+    if (tutorialMode) {
+      updateTutorialCombatWave(dt);
+      return;
+    }
 
     if (spawnQueue.length) {
       spawnTimer -= dt;
@@ -160,6 +161,21 @@
       repairTimer = rand(17, 25);
     }
     updatePortalThreat(dt);
+  }
+
+  function updateTutorialCombatWave(dt) {
+    if (!tutorialCombatActive) return;
+    player.invulnerable = Math.max(player.invulnerable, .2);
+    if (spawnQueue.length) {
+      spawnTimer -= dt;
+      if (spawnTimer <= 0) {
+        spawnEnemy(spawnQueue.shift());
+        spawnTimer = .72;
+      }
+      return;
+    }
+    const targetsRemain = enemies.some((enemy) => enemy.tutorialTarget && !enemy.dead);
+    if (!targetsRemain && tutorialCombatKills >= 3) completeTutorial();
   }
 
   function advanceAfterClear() {
@@ -273,7 +289,7 @@
         dead: false,
       });
     });
-    if (tutorialMode && tutorialIndex === 1) advanceTutorial();
+    if (tutorialMode && tutorialIndex === TUTORIAL_STEP.blaster) advanceTutorial();
     audio.tone(340, .045, 'square', .035, 180);
   }
 
@@ -304,7 +320,7 @@
     });
     player.rocketTarget = null;
     player.rocketCooldown = player.rocketMax;
-    if (tutorialMode && tutorialIndex === 4) advanceTutorial();
+    if (tutorialMode && tutorialIndex === TUTORIAL_STEP.rocket) advanceTutorial();
     camera.shake = Math.max(camera.shake, 6);
   }
 
@@ -391,7 +407,7 @@
     }
     camera.shake = Math.max(camera.shake, 7);
     audio.tone(70, .42, 'sawtooth', .08, 520);
-    if (tutorialMode && tutorialIndex === 3) advanceTutorial();
+    if (tutorialMode && tutorialIndex === TUTORIAL_STEP.jump) advanceTutorial();
   }
 
   function updateProjectiles(dt) {
@@ -489,6 +505,11 @@
 
       if (enemy.progress >= enemy.pathLength - 18) {
         enemy.dead = true;
+        if (tutorialMode && enemy.tutorialTarget) {
+          spawnQueue.push({ type: enemy.type, pathId: enemy.pathId, entryProgress: 0, tutorialTarget: true });
+          spawnTimer = Math.min(spawnTimer, .35);
+          return;
+        }
         gateShields -= enemy.boss ? Math.max(1, gateShields) : 1;
         camera.shake = Math.max(camera.shake, 16);
         burst(PORTAL.x, PORTAL.y, COLORS.coral, 30, 320);
@@ -550,6 +571,7 @@
       burst(docked.x, docked.y, COLORS.amber, 24, 180);
       showToast(t('toast.stationUpgraded', { level: docked.level }));
       audio.tone(420, .36, 'sine', .07, 280);
+      if (tutorialMode && tutorialIndex === TUTORIAL_STEP.station) advanceTutorial();
       return;
     }
     if (stations.length >= 3) { showToast(t('toast.stationLimit')); return; }
@@ -560,6 +582,10 @@
     burst(player.x, player.y, COLORS.amber, 28, 210);
     showToast(t('toast.stationDeployed'));
     audio.tone(230, .5, 'triangle', .075, 310);
+    if (tutorialMode && tutorialIndex === TUTORIAL_STEP.station) {
+      tutorialStationBuilt = true;
+      updateTutorialCard();
+    }
   }
 
   function updateStations(dt) {
@@ -758,6 +784,7 @@
     if (enemy.hp <= 0 && !enemy.dead) {
       enemy.dead = true;
       kills += 1;
+      if (tutorialMode && tutorialCombatActive && enemy.tutorialTarget) tutorialCombatKills += 1;
       score += Math.round(enemy.score * (1 + wave * .05 + currentLevel * .18));
       grantXp(enemy.xp);
       burst(enemy.x, enemy.y, enemy.color, enemy.boss ? 60 : enemy.major ? 30 : 14, enemy.boss ? 520 : 240);
@@ -802,13 +829,16 @@
       rock.dead = true;
       const xp = Math.round(rock.xpValue * player.salvage);
       const credits = rock.creditValue;
-      grantXp(xp);
+      const completesTutorialMining = tutorialMode
+        && tutorialIndex === TUTORIAL_STEP.salvage
+        && rock.tutorialTarget;
+      grantXp(xp, completesTutorialMining);
       player.credits += credits;
       score += Math.round(rock.radius * (rock.crystal ? 6 : 3));
       burst(rock.x, rock.y, rock.crystal ? COLORS.purple : COLORS.cyan, 16, 170);
       addFloater(rock.x, rock.y - 20, `+${xp} XP  +${credits} ◈`, rock.crystal ? COLORS.purple : COLORS.cyan);
       audio.tone(520, .12, 'triangle', .04, 220);
-      if (tutorialMode && tutorialIndex === 2) advanceTutorial();
+      if (completesTutorialMining) advanceTutorial();
     }
   }
 
