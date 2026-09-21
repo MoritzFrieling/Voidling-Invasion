@@ -175,7 +175,7 @@
       return;
     }
     const targetsRemain = enemies.some((enemy) => enemy.tutorialTarget && !enemy.dead);
-    if (!targetsRemain && tutorialCombatKills >= 3) completeTutorial();
+    if (!targetsRemain && tutorialCombatKills >= 3) queueTutorialAdvance();
   }
 
   function advanceAfterClear() {
@@ -289,7 +289,7 @@
         dead: false,
       });
     });
-    if (tutorialMode && tutorialIndex === TUTORIAL_STEP.blaster) advanceTutorial();
+    if (tutorialMode && tutorialIndex === TUTORIAL_STEP.blaster) queueTutorialAdvance();
     audio.tone(340, .045, 'square', .035, 180);
   }
 
@@ -320,7 +320,7 @@
     });
     player.rocketTarget = null;
     player.rocketCooldown = player.rocketMax;
-    if (tutorialMode && tutorialIndex === TUTORIAL_STEP.rocket) advanceTutorial();
+    if (tutorialMode && tutorialIndex === TUTORIAL_STEP.rocket) queueTutorialAdvance();
     camera.shake = Math.max(camera.shake, 6);
   }
 
@@ -407,7 +407,7 @@
     }
     camera.shake = Math.max(camera.shake, 7);
     audio.tone(70, .42, 'sawtooth', .08, 520);
-    if (tutorialMode && tutorialIndex === TUTORIAL_STEP.jump) advanceTutorial();
+    if (tutorialMode && tutorialIndex === TUTORIAL_STEP.jump) queueTutorialAdvance();
   }
 
   function updateProjectiles(dt) {
@@ -571,7 +571,7 @@
       burst(docked.x, docked.y, COLORS.amber, 24, 180);
       showToast(t('toast.stationUpgraded', { level: docked.level }));
       audio.tone(420, .36, 'sine', .07, 280);
-      if (tutorialMode && tutorialIndex === TUTORIAL_STEP.station) advanceTutorial();
+      if (tutorialMode && tutorialIndex === TUTORIAL_STEP.station) queueTutorialAdvance();
       return;
     }
     if (stations.length >= 3) { showToast(t('toast.stationLimit')); return; }
@@ -837,7 +837,7 @@
       burst(rock.x, rock.y, rock.crystal ? COLORS.purple : COLORS.cyan, 16, 170);
       addFloater(rock.x, rock.y - 20, `+${xp} XP  +${credits} ◈`, rock.crystal ? COLORS.purple : COLORS.cyan);
       audio.tone(520, .12, 'triangle', .04, 220);
-      if (completesTutorialMining) advanceTutorial();
+      if (completesTutorialMining) queueTutorialAdvance();
     }
   }
 

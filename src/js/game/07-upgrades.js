@@ -71,7 +71,7 @@
     } else {
       mode = 'playing';
       ui.crosshair.style.opacity = '1';
-      if (continueTutorial) advanceTutorial();
+      if (continueTutorial) queueTutorialAdvance();
     }
   }
 
@@ -185,6 +185,7 @@
     combat: 7,
     complete: 8,
   });
+  const TUTORIAL_TRANSITION_DELAY = 2.6;
 
   const tutorialSteps = [
     { titleKey: 'tutorial.takeControls', textKey: 'tutorial.takeControlsCopy' },
@@ -204,6 +205,8 @@
     tutorialCombatActive = false;
     tutorialCombatKills = 0;
     tutorialUpgradeTipShown = false;
+    tutorialTransitionTimer = 0;
+    tutorialTransitioning = false;
     ui.tutorialActions.hidden = true;
     ui.skipTutorial.hidden = false;
     ui.tutorialUpgradeTip.hidden = true;
@@ -225,6 +228,10 @@
     if (!tutorialMode || tutorialIndex >= TUTORIAL_STEP.complete) return;
     tutorialIndex += 1;
     tutorialDelay = 0;
+    if (tutorialIndex === TUTORIAL_STEP.complete) {
+      completeTutorial();
+      return;
+    }
     if (tutorialIndex === TUTORIAL_STEP.salvage) {
       resources = [];
       const oreCount = 3;
@@ -267,12 +274,28 @@
     audio.tone(540, .18, 'sine', .045, 210);
   }
 
+  function queueTutorialAdvance() {
+    if (!tutorialMode || tutorialTransitioning || tutorialIndex >= TUTORIAL_STEP.complete) return;
+    tutorialTransitioning = true;
+    tutorialTransitionTimer = TUTORIAL_TRANSITION_DELAY;
+  }
+
   function updateTutorial(dt) {
-    if (!tutorialMode || tutorialIndex !== TUTORIAL_STEP.mining || mode !== 'playing') return;
+    if (!tutorialMode || mode !== 'playing') return;
+    if (tutorialTransitioning) {
+      tutorialTransitionTimer -= dt;
+      if (tutorialTransitionTimer <= 0) {
+        tutorialTransitioning = false;
+        tutorialTransitionTimer = 0;
+        advanceTutorial();
+      }
+      return;
+    }
+    if (tutorialIndex !== TUTORIAL_STEP.mining) return;
     tutorialDelay -= dt;
     if (tutorialDelay > 0) return;
     if (pendingLevelUps > 0) showUpgradeChoices();
-    else advanceTutorial();
+    else queueTutorialAdvance();
   }
 
   function beginTutorialCombat() {

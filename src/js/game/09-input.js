@@ -15,7 +15,7 @@
     input.keys.add(event.code);
     if (tutorialMode && tutorialIndex === TUTORIAL_STEP.controls && ['KeyW', 'KeyA', 'KeyS', 'KeyD'].includes(event.code)) {
       tutorialMovementKeys.add(event.code);
-      if (tutorialMovementKeys.size === 4) advanceTutorial();
+      if (tutorialMovementKeys.size === 4) queueTutorialAdvance();
       else updateTutorialCard();
     }
     if (event.code === 'ArrowUp' && mode === 'playing') fireBlaster(player.angle);

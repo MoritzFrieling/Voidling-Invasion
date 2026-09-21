@@ -58,6 +58,8 @@
   let tutorialMode = false;
   let tutorialIndex = 0;
   let tutorialDelay = 0;
+  let tutorialTransitionTimer = 0;
+  let tutorialTransitioning = false;
   let tutorialMovementKeys = new Set();
   let tutorialStationBuilt = false;
   let tutorialCombatActive = false;

@@ -75,7 +75,7 @@
       'render.earthGate': 'EARTH GATE', 'render.station': 'DEFENSE STATION // MK {level}', 'render.upgradeAvailable': 'UPGRADE AVAILABLE', 'render.shield': 'SHIELD {amount}', 'render.finalStage': 'FINAL STAGE', 'render.hostileFormation': 'HOSTILE FORMATION DETECTED',
       'end.secured': 'CORRIDOR SECURED', 'end.pilotLost': 'PILOT SIGNAL LOST', 'end.defenseOffline': 'EARTH DEFENSE OFFLINE', 'end.victoryTitle': 'INVASION REPELLED', 'end.shipLostTitle': 'YOUR SHIP WAS LOST', 'end.gateLostTitle': 'THE GATE HAS FALLEN',
       'end.victoryCopy': 'Earth is safe. The invasion command signal has gone dark.', 'end.shipLostCopy': 'Your ship was destroyed before the final corridor could be secured.', 'end.gateLostCopy': 'The invasion fleet breached the last defense corridor.',
-      'tutorial.step': 'TRAINING // {step}', 'tutorial.takeControls': 'TAKE THE CONTROLS', 'tutorial.takeControlsCopy': 'Use WASD for steering. Keep moving - standing still too long causes your ship to take damage.', 'tutorial.testBlaster': 'TEST THE BLASTER', 'tutorial.testBlasterCopy': 'Press the Up Arrow to fire forward, or hold the left mouse button to aim and fire.',
+      'tutorial.step': 'TRAINING // {step}', 'tutorial.takeControls': 'TAKE THE CONTROLS', 'tutorial.takeControlsCopy': 'Use WASD for steering. Keep moving - standing still too long causes your ship to take damage.', 'tutorial.testBlaster': 'TEST THE BLASTER', 'tutorial.testBlasterCopy': 'You can aim and shoot with the left mouse button. Without a mouse, press the Up Arrow to shoot in the direction your ship is facing.',
       'tutorial.salvage': 'SALVAGE VOID ORE', 'tutorial.salvageCopy': 'Shoot and destroy the nearby ore cluster.', 'tutorial.mineToGrow': 'MINE TO GROW', 'tutorial.mineToGrowCopy': 'Fight the threat, but mine meteors too—the ore makes your ship stronger.',
       'tutorial.xpTitle': 'XP FUELS UPGRADES', 'tutorial.xpCopy': 'Destroy enemies and mine ore to earn XP. Level up to improve your ship.',
       'tutorial.punchVoid': 'PUNCH THE VOID', 'tutorial.punchVoidCopy': 'Press T to place or replace a jump destination, then Q or Space to teleport there. Hold T to clear it and dash again.',
@@ -156,7 +156,7 @@
       'render.earthGate': '지구 관문', 'render.station': '방어 기지 // MK {level}', 'render.upgradeAvailable': '업그레이드 가능', 'render.shield': '방벽 {amount}', 'render.finalStage': '최종 스테이지', 'render.hostileFormation': '적 편대 감지',
       'end.secured': '통로 확보', 'end.pilotLost': '조종사 신호 소실', 'end.defenseOffline': '지구 방어 오프라인', 'end.victoryTitle': '침공 격퇴', 'end.shipLostTitle': '함선 손실', 'end.gateLostTitle': '관문 함락',
       'end.victoryCopy': '지구는 안전합니다. 침공 지휘 신호가 사라졌습니다.', 'end.shipLostCopy': '최종 통로를 확보하기 전에 함선이 파괴되었습니다.', 'end.gateLostCopy': '침공 함대가 마지막 방어 통로를 돌파했습니다.',
-      'tutorial.step': '훈련 // {step}', 'tutorial.takeControls': '조작 익히기', 'tutorial.takeControlsCopy': 'WASD로 조종하세요. 계속 움직이세요. 너무 오래 멈춰 있으면 함선이 피해를 입습니다.', 'tutorial.testBlaster': '블래스터 시험', 'tutorial.testBlasterCopy': '위쪽 화살표로 전방 발사하거나 왼쪽 마우스 버튼을 누른 채 조준해 발사하세요.',
+      'tutorial.step': '훈련 // {step}', 'tutorial.takeControls': '조작 익히기', 'tutorial.takeControlsCopy': 'WASD로 조종하세요. 계속 움직이세요. 너무 오래 멈춰 있으면 함선이 피해를 입습니다.', 'tutorial.testBlaster': '블래스터 시험', 'tutorial.testBlasterCopy': '왼쪽 마우스 버튼으로 조준하고 발사할 수 있습니다. 마우스가 없으면 위쪽 화살표로 함선이 바라보는 방향에 발사하세요.',
       'tutorial.salvage': '보이드 광물 회수', 'tutorial.salvageCopy': '근처 광물 덩어리를 쏘아 파괴하세요.', 'tutorial.mineToGrow': '채굴로 강화', 'tutorial.mineToGrowCopy': '적을 막는 동시에 운석도 파괴하세요. 광석으로 함선을 강화할 수 있습니다.',
       'tutorial.xpTitle': 'XP로 업그레이드', 'tutorial.xpCopy': '적을 처치하고 광석을 채굴하면 XP를 얻습니다. 레벨이 오르면 함선을 강화할 수 있습니다.',
       'tutorial.punchVoid': '보이드 돌파', 'tutorial.punchVoidCopy': 'T를 눌러 점프 목적지를 설정하거나 교체한 뒤 Q 또는 스페이스로 이동하세요. T를 길게 누르면 해제하고 대시로 돌아갑니다.',
@@ -356,6 +356,8 @@
   let tutorialMode = false;
   let tutorialIndex = 0;
   let tutorialDelay = 0;
+  let tutorialTransitionTimer = 0;
+  let tutorialTransitioning = false;
   let tutorialMovementKeys = new Set();
   let tutorialStationBuilt = false;
   let tutorialCombatActive = false;
@@ -1661,7 +1663,7 @@
       return;
     }
     const targetsRemain = enemies.some((enemy) => enemy.tutorialTarget && !enemy.dead);
-    if (!targetsRemain && tutorialCombatKills >= 3) completeTutorial();
+    if (!targetsRemain && tutorialCombatKills >= 3) queueTutorialAdvance();
   }
 
   function advanceAfterClear() {
@@ -1775,7 +1777,7 @@
         dead: false,
       });
     });
-    if (tutorialMode && tutorialIndex === TUTORIAL_STEP.blaster) advanceTutorial();
+    if (tutorialMode && tutorialIndex === TUTORIAL_STEP.blaster) queueTutorialAdvance();
     audio.tone(340, .045, 'square', .035, 180);
   }
 
@@ -1806,7 +1808,7 @@
     });
     player.rocketTarget = null;
     player.rocketCooldown = player.rocketMax;
-    if (tutorialMode && tutorialIndex === TUTORIAL_STEP.rocket) advanceTutorial();
+    if (tutorialMode && tutorialIndex === TUTORIAL_STEP.rocket) queueTutorialAdvance();
     camera.shake = Math.max(camera.shake, 6);
   }
 
@@ -1893,7 +1895,7 @@
     }
     camera.shake = Math.max(camera.shake, 7);
     audio.tone(70, .42, 'sawtooth', .08, 520);
-    if (tutorialMode && tutorialIndex === TUTORIAL_STEP.jump) advanceTutorial();
+    if (tutorialMode && tutorialIndex === TUTORIAL_STEP.jump) queueTutorialAdvance();
   }
 
   function updateProjectiles(dt) {
@@ -2057,7 +2059,7 @@
       burst(docked.x, docked.y, COLORS.amber, 24, 180);
       showToast(t('toast.stationUpgraded', { level: docked.level }));
       audio.tone(420, .36, 'sine', .07, 280);
-      if (tutorialMode && tutorialIndex === TUTORIAL_STEP.station) advanceTutorial();
+      if (tutorialMode && tutorialIndex === TUTORIAL_STEP.station) queueTutorialAdvance();
       return;
     }
     if (stations.length >= 3) { showToast(t('toast.stationLimit')); return; }
@@ -2323,7 +2325,7 @@
       burst(rock.x, rock.y, rock.crystal ? COLORS.purple : COLORS.cyan, 16, 170);
       addFloater(rock.x, rock.y - 20, `+${xp} XP  +${credits} ◈`, rock.crystal ? COLORS.purple : COLORS.cyan);
       audio.tone(520, .12, 'triangle', .04, 220);
-      if (completesTutorialMining) advanceTutorial();
+      if (completesTutorialMining) queueTutorialAdvance();
     }
   }
 
@@ -2464,7 +2466,7 @@
     } else {
       mode = 'playing';
       ui.crosshair.style.opacity = '1';
-      if (continueTutorial) advanceTutorial();
+      if (continueTutorial) queueTutorialAdvance();
     }
   }
 
@@ -2578,6 +2580,7 @@
     combat: 7,
     complete: 8,
   });
+  const TUTORIAL_TRANSITION_DELAY = 2.6;
 
   const tutorialSteps = [
     { titleKey: 'tutorial.takeControls', textKey: 'tutorial.takeControlsCopy' },
@@ -2597,6 +2600,8 @@
     tutorialCombatActive = false;
     tutorialCombatKills = 0;
     tutorialUpgradeTipShown = false;
+    tutorialTransitionTimer = 0;
+    tutorialTransitioning = false;
     ui.tutorialActions.hidden = true;
     ui.skipTutorial.hidden = false;
     ui.tutorialUpgradeTip.hidden = true;
@@ -2618,6 +2623,10 @@
     if (!tutorialMode || tutorialIndex >= TUTORIAL_STEP.complete) return;
     tutorialIndex += 1;
     tutorialDelay = 0;
+    if (tutorialIndex === TUTORIAL_STEP.complete) {
+      completeTutorial();
+      return;
+    }
     if (tutorialIndex === TUTORIAL_STEP.salvage) {
       resources = [];
       const oreCount = 3;
@@ -2660,12 +2669,28 @@
     audio.tone(540, .18, 'sine', .045, 210);
   }
 
+  function queueTutorialAdvance() {
+    if (!tutorialMode || tutorialTransitioning || tutorialIndex >= TUTORIAL_STEP.complete) return;
+    tutorialTransitioning = true;
+    tutorialTransitionTimer = TUTORIAL_TRANSITION_DELAY;
+  }
+
   function updateTutorial(dt) {
-    if (!tutorialMode || tutorialIndex !== TUTORIAL_STEP.mining || mode !== 'playing') return;
+    if (!tutorialMode || mode !== 'playing') return;
+    if (tutorialTransitioning) {
+      tutorialTransitionTimer -= dt;
+      if (tutorialTransitionTimer <= 0) {
+        tutorialTransitioning = false;
+        tutorialTransitionTimer = 0;
+        advanceTutorial();
+      }
+      return;
+    }
+    if (tutorialIndex !== TUTORIAL_STEP.mining) return;
     tutorialDelay -= dt;
     if (tutorialDelay > 0) return;
     if (pendingLevelUps > 0) showUpgradeChoices();
-    else advanceTutorial();
+    else queueTutorialAdvance();
   }
 
   function beginTutorialCombat() {
@@ -3459,7 +3484,7 @@
     input.keys.add(event.code);
     if (tutorialMode && tutorialIndex === TUTORIAL_STEP.controls && ['KeyW', 'KeyA', 'KeyS', 'KeyD'].includes(event.code)) {
       tutorialMovementKeys.add(event.code);
-      if (tutorialMovementKeys.size === 4) advanceTutorial();
+      if (tutorialMovementKeys.size === 4) queueTutorialAdvance();
       else updateTutorialCard();
     }
     if (event.code === 'ArrowUp' && mode === 'playing') fireBlaster(player.angle);
