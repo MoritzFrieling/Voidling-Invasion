@@ -187,15 +187,23 @@
       * (LEVELS[currentLevel].enemyDurability || 1)
       * (LEVELS[currentLevel].enemyTankinessMultiplier || 1);
     const maxHp = blueprint.hp * difficultyScale * hpVariance;
+    const lane = type === 'striker' ? rand(-210, 210) : rand(-58, 58);
+    const wobble = rand(0, Math.PI * 2);
+    const laneTaper = type === 'striker' ? clamp((path.length - progress) / 420, 0, 1) : 1;
+    const sway = lane * laneTaper + Math.sin(wobble) * (blueprint.boss ? 22 : 13);
+    const laneOffsetX = type === 'striker' ? at.nx * sway : 0;
+    const laneOffsetY = type === 'striker' ? at.ny * sway : 0;
     const enemy = {
       type,
-      x: at.x,
-      y: at.y,
+      x: at.x + laneOffsetX,
+      y: at.y + laneOffsetY,
       pathId,
       pathLength: path.length,
       progress,
-      lane: type === 'striker' ? rand(-210, 210) : rand(-58, 58),
-      wobble: rand(0, Math.PI * 2),
+      lane,
+      wobble,
+      laneOffsetX,
+      laneOffsetY,
       radius: blueprint.radius,
       hp: maxHp,
       maxHp,

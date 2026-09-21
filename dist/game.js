@@ -221,7 +221,7 @@
 
   const LEVELS = [
     {
-      nameKey: 'sector.one.name', shortKey: 'sector.one.short', nextKey: 'sector.one.next', stages: 6, boss: 'bossOmega', enemyDurability: 1.38, enemyTankinessMultiplier: 1.15,
+      nameKey: 'sector.one.name', shortKey: 'sector.one.short', nextKey: 'sector.one.next', stages: 6, boss: 'bossOmega', enemyDurability: 1.38, enemyTankinessMultiplier: 1.15 * 1.15,
       paths: [createPath([
         { x: -120, y: 380 }, { x: 360, y: 430 }, { x: 690, y: 770 }, { x: 1110, y: 690 },
         { x: 1470, y: 1010 }, { x: 1860, y: 1260 }, { x: 2250, y: 1160 }, { x: 2570, y: 850 },
@@ -1361,15 +1361,23 @@
       * (LEVELS[currentLevel].enemyDurability || 1)
       * (LEVELS[currentLevel].enemyTankinessMultiplier || 1);
     const maxHp = blueprint.hp * difficultyScale * hpVariance;
+    const lane = type === 'striker' ? rand(-210, 210) : rand(-58, 58);
+    const wobble = rand(0, Math.PI * 2);
+    const laneTaper = type === 'striker' ? clamp((path.length - progress) / 420, 0, 1) : 1;
+    const sway = lane * laneTaper + Math.sin(wobble) * (blueprint.boss ? 22 : 13);
+    const laneOffsetX = type === 'striker' ? at.nx * sway : 0;
+    const laneOffsetY = type === 'striker' ? at.ny * sway : 0;
     const enemy = {
       type,
-      x: at.x,
-      y: at.y,
+      x: at.x + laneOffsetX,
+      y: at.y + laneOffsetY,
       pathId,
       pathLength: path.length,
       progress,
-      lane: type === 'striker' ? rand(-210, 210) : rand(-58, 58),
-      wobble: rand(0, Math.PI * 2),
+      lane,
+      wobble,
+      laneOffsetX,
+      laneOffsetY,
       radius: blueprint.radius,
       hp: maxHp,
       maxHp,
@@ -1910,10 +1918,19 @@
       enemy.hitFlash = Math.max(0, enemy.hitFlash - dt);
       enemy.shieldHitTimer = Math.max(0, enemy.shieldHitTimer - dt);
       const point = getPathPoint(enemy.progress, enemy.pathId);
-      const laneTaper = enemy.type === 'striker' ? clamp((enemy.pathLength - enemy.progress) / 420, 0, 1) : 1;
+      const isStriker = enemy.type === 'striker';
+      const laneTaper = isStriker ? clamp((enemy.pathLength - enemy.progress) / 420, 0, 1) : 1;
       const sway = enemy.lane * laneTaper + Math.sin(enemy.wobble) * (enemy.boss ? 22 : 13);
-      enemy.x = point.x + point.nx * sway;
-      enemy.y = point.y + point.ny * sway;
+      if (isStriker) {
+        const laneSmoothing = 1 - Math.exp(-9 * dt);
+        enemy.laneOffsetX += (point.nx * sway - enemy.laneOffsetX) * laneSmoothing;
+        enemy.laneOffsetY += (point.ny * sway - enemy.laneOffsetY) * laneSmoothing;
+        enemy.x = point.x + enemy.laneOffsetX;
+        enemy.y = point.y + enemy.laneOffsetY;
+      } else {
+        enemy.x = point.x + point.nx * sway;
+        enemy.y = point.y + point.ny * sway;
+      }
       enemy.angle = point.angle + Math.cos(enemy.wobble * .8) * .08;
 
       if (enemy.major) {
