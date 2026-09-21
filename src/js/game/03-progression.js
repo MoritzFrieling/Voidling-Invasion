@@ -253,18 +253,9 @@
     hideOverlays();
     ui.crosshair.style.opacity = '1';
     if (tutorialMode) {
-      resources = resources.slice(0, 1);
+      resources = [];
       ui.tutorialCard.classList.add('active');
       updateTutorialCard();
-      const rock = resources[0];
-      if (rock) {
-        rock.tutorialTarget = true;
-        rock.x = player.x + 300;
-        rock.y = player.y - 50;
-        rock.hp = Math.min(rock.hp, 54);
-        rock.maxHp = rock.hp;
-        rock.xpValue = Math.ceil((player.xpNext - player.xp) / player.salvage);
-      }
       showToast(t('toast.trainingLink'));
     } else {
       ui.tutorialCard.classList.remove('active');

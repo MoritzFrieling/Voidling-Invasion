@@ -226,10 +226,36 @@
     tutorialIndex += 1;
     tutorialDelay = 0;
     if (tutorialIndex === TUTORIAL_STEP.salvage) {
-      const trainingOre = resources[0];
-      if (trainingOre) {
-        trainingOre.x = clamp(player.x + Math.cos(player.angle) * 245, 90, WORLD.width - 90);
-        trainingOre.y = clamp(player.y + Math.sin(player.angle) * 245, 90, WORLD.height - 90);
+      resources = [];
+      const oreCount = 3;
+      const requiredXp = Math.max(1, player.xpNext - player.xp);
+      const forwardX = Math.cos(player.angle);
+      const forwardY = Math.sin(player.angle);
+      const normalX = -forwardY;
+      const normalY = forwardX;
+      const orePlacements = [
+        { distance: 240, lateral: -90 },
+        { distance: 290, lateral: 0 },
+        { distance: 240, lateral: 90 },
+      ];
+      for (const placement of orePlacements) {
+        spawnResource(true);
+        const trainingOre = resources[resources.length - 1];
+        if (!trainingOre) continue;
+        trainingOre.tutorialTarget = true;
+        trainingOre.x = clamp(
+          player.x + forwardX * placement.distance + normalX * placement.lateral,
+          90,
+          WORLD.width - 90,
+        );
+        trainingOre.y = clamp(
+          player.y + forwardY * placement.distance + normalY * placement.lateral,
+          90,
+          WORLD.height - 90,
+        );
+        trainingOre.hp = Math.min(trainingOre.hp, 54);
+        trainingOre.maxHp = trainingOre.hp;
+        trainingOre.xpValue = Math.ceil(Math.ceil(requiredXp / oreCount) / player.salvage);
       }
     }
     if (tutorialIndex === TUTORIAL_STEP.mining) tutorialDelay = 3.8;
