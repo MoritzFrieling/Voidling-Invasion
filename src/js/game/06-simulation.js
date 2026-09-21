@@ -455,19 +455,10 @@
       enemy.hitFlash = Math.max(0, enemy.hitFlash - dt);
       enemy.shieldHitTimer = Math.max(0, enemy.shieldHitTimer - dt);
       const point = getPathPoint(enemy.progress, enemy.pathId);
-      const isStriker = enemy.type === 'striker';
-      const laneTaper = isStriker ? clamp((enemy.pathLength - enemy.progress) / 420, 0, 1) : 1;
+      const laneTaper = enemy.type === 'striker' ? clamp((enemy.pathLength - enemy.progress) / 420, 0, 1) : 1;
       const sway = enemy.lane * laneTaper + Math.sin(enemy.wobble) * (enemy.boss ? 22 : 13);
-      if (isStriker) {
-        const laneSmoothing = 1 - Math.exp(-9 * dt);
-        enemy.laneOffsetX += (point.nx * sway - enemy.laneOffsetX) * laneSmoothing;
-        enemy.laneOffsetY += (point.ny * sway - enemy.laneOffsetY) * laneSmoothing;
-        enemy.x = point.x + enemy.laneOffsetX;
-        enemy.y = point.y + enemy.laneOffsetY;
-      } else {
-        enemy.x = point.x + point.nx * sway;
-        enemy.y = point.y + point.ny * sway;
-      }
+      enemy.x = point.x + point.nx * sway;
+      enemy.y = point.y + point.ny * sway;
       enemy.angle = point.angle + Math.cos(enemy.wobble * .8) * .08;
 
       if (enemy.major) {
@@ -707,7 +698,6 @@
         const angle = Math.atan2(player.y - enemy.y, player.x - enemy.x);
         player.vx += Math.cos(angle) * 330;
         player.vy += Math.sin(angle) * 330;
-        enemy.progress = Math.max(0, enemy.progress - 30);
       }
     }
 

@@ -1365,19 +1365,15 @@
     const wobble = rand(0, Math.PI * 2);
     const laneTaper = type === 'striker' ? clamp((path.length - progress) / 420, 0, 1) : 1;
     const sway = lane * laneTaper + Math.sin(wobble) * (blueprint.boss ? 22 : 13);
-    const laneOffsetX = type === 'striker' ? at.nx * sway : 0;
-    const laneOffsetY = type === 'striker' ? at.ny * sway : 0;
     const enemy = {
       type,
-      x: at.x + laneOffsetX,
-      y: at.y + laneOffsetY,
+      x: at.x + at.nx * sway,
+      y: at.y + at.ny * sway,
       pathId,
       pathLength: path.length,
       progress,
       lane,
       wobble,
-      laneOffsetX,
-      laneOffsetY,
       radius: blueprint.radius,
       hp: maxHp,
       maxHp,
@@ -1409,8 +1405,7 @@
     return enemy;
   }
 
-  function getPathPoint(distance, pathId = 0) {
-    const path = activePaths[pathId] || activePaths[0];
+  function getPathPosition(path, distance) {
     const d = clamp(distance, 0, path.length);
     let segment = path.segments[path.segments.length - 1];
     for (let i = 0; i < path.segments.length; i += 1) {
@@ -1420,10 +1415,18 @@
       }
     }
     const t = clamp((d - segment.start) / segment.length, 0, 1);
-    const x = lerp(segment.a.x, segment.b.x, t);
-    const y = lerp(segment.a.y, segment.b.y, t);
-    const angle = Math.atan2(segment.b.y - segment.a.y, segment.b.x - segment.a.x);
-    return { x, y, angle, nx: -Math.sin(angle), ny: Math.cos(angle) };
+    return { x: lerp(segment.a.x, segment.b.x, t), y: lerp(segment.a.y, segment.b.y, t) };
+  }
+
+  function getPathPoint(distance, pathId = 0) {
+    const path = activePaths[pathId] || activePaths[0];
+    const d = clamp(distance, 0, path.length);
+    const position = getPathPosition(path, d);
+    const turnSmoothingDistance = 180;
+    const before = getPathPosition(path, d - turnSmoothingDistance);
+    const after = getPathPosition(path, d + turnSmoothingDistance);
+    const angle = Math.atan2(after.y - before.y, after.x - before.x);
+    return { ...position, angle, nx: -Math.sin(angle), ny: Math.cos(angle) };
   }
 
   function spawnResource(initial = false) {
@@ -1918,19 +1921,10 @@
       enemy.hitFlash = Math.max(0, enemy.hitFlash - dt);
       enemy.shieldHitTimer = Math.max(0, enemy.shieldHitTimer - dt);
       const point = getPathPoint(enemy.progress, enemy.pathId);
-      const isStriker = enemy.type === 'striker';
-      const laneTaper = isStriker ? clamp((enemy.pathLength - enemy.progress) / 420, 0, 1) : 1;
+      const laneTaper = enemy.type === 'striker' ? clamp((enemy.pathLength - enemy.progress) / 420, 0, 1) : 1;
       const sway = enemy.lane * laneTaper + Math.sin(enemy.wobble) * (enemy.boss ? 22 : 13);
-      if (isStriker) {
-        const laneSmoothing = 1 - Math.exp(-9 * dt);
-        enemy.laneOffsetX += (point.nx * sway - enemy.laneOffsetX) * laneSmoothing;
-        enemy.laneOffsetY += (point.ny * sway - enemy.laneOffsetY) * laneSmoothing;
-        enemy.x = point.x + enemy.laneOffsetX;
-        enemy.y = point.y + enemy.laneOffsetY;
-      } else {
-        enemy.x = point.x + point.nx * sway;
-        enemy.y = point.y + point.ny * sway;
-      }
+      enemy.x = point.x + point.nx * sway;
+      enemy.y = point.y + point.ny * sway;
       enemy.angle = point.angle + Math.cos(enemy.wobble * .8) * .08;
 
       if (enemy.major) {
@@ -2170,7 +2164,6 @@
         const angle = Math.atan2(player.y - enemy.y, player.x - enemy.x);
         player.vx += Math.cos(angle) * 330;
         player.vy += Math.sin(angle) * 330;
-        enemy.progress = Math.max(0, enemy.progress - 30);
       }
     }
 
