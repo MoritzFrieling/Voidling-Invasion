@@ -221,8 +221,8 @@ button { border: 0; }
 .secondary-button.tutorial-recommended { border-color: var(--amber); animation: tutorialRecommended 1.25s ease-in-out infinite alternate; }
 @keyframes tutorialRecommended { to { background: rgba(255,179,92,.12); box-shadow: 0 0 24px rgba(255,179,92,.24); } }
 .primary-actions { flex-wrap: nowrap; align-items: stretch; margin-bottom: 12px; }
-.primary-actions .main-button { width: auto; min-width: 0; flex: 1 1 0; }
-.primary-actions .secondary-button { min-width: 0; flex: 1 1 0; padding-inline: 14px; white-space: nowrap; font-size: .78rem; }
+.primary-actions .main-button { width: 220px; min-width: 220px; flex: 0 0 220px; }
+.primary-actions .secondary-button { width: auto; min-width: 0; flex: 1 1 auto; padding-inline: 12px; white-space: nowrap; font-size: .68rem; }
 .secondary-actions { margin-top: 17px; }
 .start-header-actions { position: absolute; z-index: 3; top: 24px; right: 24px; display: flex; align-items: center; gap: 16px; }
 .start-header-actions .language-select { position: static; }
@@ -383,11 +383,6 @@ button { border: 0; }
   .acknowledgements { font-size: .5rem; }.acknowledgements span { display: none; }
 }
 
-@media (max-width: 720px) {
-  .primary-actions { display: grid; }
-  .primary-actions .main-button, .primary-actions .secondary-button { width: 100%; }
-}
-
 @media (max-width: 650px) {
   .topbar { grid-template-columns: 1fr auto; grid-template-rows: auto auto; min-height: 114px; gap: 6px 10px; padding: 8px 12px; }.round-readout { display: none; }.score-readout div:first-child { display: none; }
   .vitals { grid-column: 1 / -1; grid-row: 2; width: 100%; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px; }.vital-row, .gate-row, .credit-row { min-height: 24px; padding: 3px 5px; }.minimap-wrap { top: 126px; right: 12px; width: 142px; }.minimap-wrap canvas { width: 140px !important; height: 84px !important; }
@@ -396,7 +391,7 @@ button { border: 0; }
   .upgrade-readout { display: none; }
   .static-warning { right: 12px; bottom: 72px; }.wave-call { bottom: 76px; }
   .upgrade-grid { grid-template-columns: 1fr; max-height: 58vh; overflow-y: auto; }.upgrade-choice { min-height: 130px; }.upgrade-choice .upgrade-icon { margin-bottom: 14px; }
-  .start-overlay { padding-inline: 24px; }.intro { margin: 28px 0 24px; }.menu-actions { display: grid; }.main-button, .secondary-button, .primary-actions .main-button, .primary-actions .secondary-button { width: 100%; }
+  .start-overlay { padding-inline: 24px; }.intro { margin: 28px 0 24px; }.menu-actions { display: grid; }.menu-actions.primary-actions { display: flex; }.main-button, .secondary-button { width: 100%; }.primary-actions .main-button { width: 220px; }.primary-actions .secondary-button { width: auto; }
 }
 
 @media (orientation: portrait) and (max-width: 600px) { .rotate-notice { display: grid; } }
