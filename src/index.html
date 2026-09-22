@@ -114,6 +114,7 @@
     </aside>
 
     <div class="status-toast" id="toast" role="status" aria-live="polite"></div>
+    <div class="checkpoint-notice" id="checkpointNotice" role="status" aria-live="polite"></div>
 
     <section class="overlay start-overlay active" id="startOverlay" aria-labelledby="gameTitle">
       <div class="start-header-actions">
@@ -131,6 +132,7 @@
             void ore, and protect Earth's last stronghold.</p>
           <div class="menu-actions primary-actions">
             <button class="main-button" id="startButton" type="button"><span data-i18n="menu.beginDefense">BEGIN DEFENSE</span><b>ENTER</b></button>
+            <button class="secondary-button" id="checkpointButton" type="button" hidden><span data-i18n="menu.playCheckpoint">PLAY FROM LAST SAVE-POINT</span></button>
           </div>
           <div class="callsign-entry">
             <input id="publicUsername" type="text" minlength="2" maxlength="20" pattern="[A-Za-z0-9_äöüÄÖÜßẞ가-힣]+"

@@ -14,7 +14,7 @@
       'hud.gateProximity': 'GATE PROXIMITY ALERT', 'hud.targetLocked': 'TARGET LOCKED', 'hud.staticDrain': 'STATIC SIGNATURE // HULL DRAIN',
       'hud.callNextWave': 'CALL NEXT WAVE', 'hud.shipModules': 'SHIP MODULES',
       'ability.blaster': 'BLASTER', 'ability.ready': 'READY', 'ability.heavyRocket': 'HEAVY ROCKET', 'ability.voidJump': 'VOID JUMP', 'ability.station': 'DEFENSE STATION',
-      'menu.beginDefense': 'BEGIN DEFENSE', 'menu.trainingRun': 'TRAINING RUN', 'menu.levelSelect': 'LEVEL SELECT', 'menu.topPilots': 'TOP PILOTS', 'menu.ranksShortcut': 'RANKS',
+      'menu.beginDefense': 'BEGIN DEFENSE', 'menu.playCheckpoint': 'PLAY FROM LAST SAVE-POINT', 'menu.trainingRun': 'TRAINING RUN', 'menu.levelSelect': 'LEVEL SELECT', 'menu.topPilots': 'TOP PILOTS', 'menu.ranksShortcut': 'RANKS',
       'menu.intro': "Three sectors stand between the invasion fleet and Earth. Intercept every formation, salvage void ore, and protect Earth's last stronghold.",
       'menu.callsignAria': 'Callsign', 'menu.callsignTitle': '3–20 characters, or 2–20 when using Korean or German letters. Used for saves and the highscore board.',
       'menu.flightBriefing': 'FLIGHT BRIEFING', 'menu.flyFreely': 'Fly freely', 'menu.fireBlaster': 'Fire blaster', 'menu.chargeRocket': 'Charge heavy rocket',
@@ -69,7 +69,7 @@
       'toast.shieldRemaining': '{enemy} // {count} SHIELD CHARGES REMAIN', 'toast.shieldCollapsed': '{enemy} // SHIELD COLLAPSED', 'toast.carrierInterceptorDestroyed': 'CARRIER INTERCEPTOR DESTROYED',
       'toast.emergencyHeal': '{enemy} // EMERGENCY REPAIRS +{amount} HULL', 'toast.aegisRecovered': 'AEGIS CORE RECOVERED // GATE +1', 'toast.upgradeInstalled': '{upgrade} INSTALLED',
       'toast.multipleApproaches': '{sector} // MULTIPLE APPROACH VECTORS', 'toast.trainingComplete': 'TRAINING COMPLETE // GOOD HUNTING', 'toast.trainingSkipped': 'TRAINING SKIPPED',
-      'toast.commandEntering': 'COMMAND SHIP ENTERING THE VOIDLINE', 'toast.stageWave': 'STAGE {stage} // WAVE {wave} OF {total}',
+      'toast.commandEntering': 'COMMAND SHIP ENTERING THE VOIDLINE', 'toast.stageWave': 'STAGE {stage} // WAVE {wave} OF {total}', 'toast.checkpointSaved': 'CHECKPOINT SAVED // {sector} · STAGE {stage}',
       'floater.shielded': 'SHIELDED', 'floater.shieldCollapsed': 'SHIELD COLLAPSED', 'floater.shieldBroken': 'SHIELD BROKEN', 'floater.emergencyHeal': '+{amount} HULL', 'floater.missileIntercepted': 'MISSILE INTERCEPTED',
       'floater.collision': 'COLLISION', 'floater.hull': '{amount} HULL', 'floater.shield': 'SHIELD {current}/{total}', 'floater.gateShield': '+1 GATE SHIELD',
       'render.earthGate': 'EARTH GATE', 'render.station': 'DEFENSE STATION // MK {level}', 'render.upgradeAvailable': 'UPGRADE AVAILABLE', 'render.shield': 'SHIELD {amount}', 'render.finalStage': 'FINAL STAGE', 'render.hostileFormation': 'HOSTILE FORMATION DETECTED',
@@ -101,7 +101,7 @@
       'hud.tacticalMap': '전술 지도', 'hud.live': '실시간', 'hud.you': '플레이어', 'hud.hostile': '적', 'hud.gate': '관문',
       'hud.gateProximity': '관문 근접 경보', 'hud.targetLocked': '표적 고정', 'hud.staticDrain': '정지 신호 // 선체 손상', 'hud.callNextWave': '다음 웨이브 호출', 'hud.shipModules': '함선 모듈',
       'ability.blaster': '블래스터', 'ability.ready': '준비', 'ability.heavyRocket': '중로켓', 'ability.voidJump': '보이드 점프', 'ability.station': '방어 기지',
-      'menu.beginDefense': '방어 시작', 'menu.trainingRun': '훈련 시작', 'menu.levelSelect': '구역 선택', 'menu.topPilots': '최고 조종사', 'menu.ranksShortcut': '순위',
+      'menu.beginDefense': '방어 시작', 'menu.playCheckpoint': '마지막 저장 지점부터 시작', 'menu.trainingRun': '훈련 시작', 'menu.levelSelect': '구역 선택', 'menu.topPilots': '최고 조종사', 'menu.ranksShortcut': '순위',
       'menu.intro': '침공 함대와 지구 사이에는 세 개의 구역이 있습니다. 모든 편대를 요격하고, 보이드 광물을 회수하여 지구 최후의 거점을 지키세요.',
       'menu.callsignAria': '호출부호', 'menu.callsignTitle': '3~20자이며, 한글 또는 독일어 문자를 사용하면 2~20자까지 가능합니다. 저장과 최고 점수판에 사용됩니다.',
       'menu.flightBriefing': '비행 브리핑', 'menu.flyFreely': '자유 비행', 'menu.fireBlaster': '블래스터 발사', 'menu.chargeRocket': '중로켓 충전',
@@ -151,7 +151,7 @@
       'toast.slowDock': '도킹하려면 감속하세요', 'toast.stationMax': '기지 최대 출력', 'toast.upgradeRequires': '업그레이드에 회수 크레딧 {cost} 필요', 'toast.stationUpgraded': '기지 업그레이드 // MK {level}',
       'toast.stationLimit': '기지 한도 도달', 'toast.needCredits': '회수 크레딧 {cost} 필요', 'toast.stationDeployed': '아군 방어 기지 배치', 'toast.repairField': '수리장 // 선체 +{amount}', 'toast.hullStable': '선체가 이미 안정적입니다',
       'toast.shieldRemaining': '{enemy} // 방벽 충전 {count}개 남음', 'toast.shieldCollapsed': '{enemy} // 방벽 붕괴', 'toast.carrierInterceptorDestroyed': '캐리어 요격기 파괴', 'toast.emergencyHeal': '{enemy} // 비상 수리 +{amount} 선체', 'toast.aegisRecovered': '이지스 코어 회수 // 관문 +1', 'toast.upgradeInstalled': '{upgrade} 설치 완료',
-      'toast.multipleApproaches': '{sector} // 다중 접근 경로', 'toast.trainingComplete': '훈련 완료 // 행운을 빕니다', 'toast.trainingSkipped': '훈련 건너뜀', 'toast.commandEntering': '지휘함이 보이드라인에 진입', 'toast.stageWave': '스테이지 {stage} // 웨이브 {wave}/{total}',
+      'toast.multipleApproaches': '{sector} // 다중 접근 경로', 'toast.trainingComplete': '훈련 완료 // 행운을 빕니다', 'toast.trainingSkipped': '훈련 건너뜀', 'toast.commandEntering': '지휘함이 보이드라인에 진입', 'toast.stageWave': '스테이지 {stage} // 웨이브 {wave}/{total}', 'toast.checkpointSaved': '체크포인트 저장 // {sector} · 스테이지 {stage}',
       'floater.shielded': '방벽', 'floater.shieldCollapsed': '방벽 붕괴', 'floater.shieldBroken': '방벽 파괴', 'floater.emergencyHeal': '선체 +{amount}', 'floater.missileIntercepted': '미사일 요격', 'floater.collision': '충돌', 'floater.hull': '선체 {amount}', 'floater.shield': '방벽 {current}/{total}', 'floater.gateShield': '관문 방벽 +1',
       'render.earthGate': '지구 관문', 'render.station': '방어 기지 // MK {level}', 'render.upgradeAvailable': '업그레이드 가능', 'render.shield': '방벽 {amount}', 'render.finalStage': '최종 스테이지', 'render.hostileFormation': '적 편대 감지',
       'end.secured': '통로 확보', 'end.pilotLost': '조종사 신호 소실', 'end.defenseOffline': '지구 방어 오프라인', 'end.victoryTitle': '침공 격퇴', 'end.shipLostTitle': '함선 손실', 'end.gateLostTitle': '관문 함락',
@@ -284,7 +284,7 @@
     'startOverlay', 'pauseOverlay', 'settingsOverlay', 'upgradeOverlay', 'endOverlay', 'upgradeChoices',
     'tutorialCard', 'tutorialStep', 'tutorialTitle', 'tutorialText', 'tutorialProgress', 'tutorialActions',
     'repeatTutorial', 'startCampaign', 'skipTutorial', 'tutorialUpgradeTip', 'crosshair',
-    'toast', 'endKicker', 'endTitle', 'endCopy', 'finalScore', 'finalWave', 'finalKills', 'playAgainLabel', 'retryStageButton', 'retryStageLabel', 'sectorText',
+    'toast', 'checkpointNotice', 'checkpointButton', 'endKicker', 'endTitle', 'endCopy', 'finalScore', 'finalWave', 'finalKills', 'playAgainLabel', 'retryStageButton', 'retryStageLabel', 'sectorText',
     'creditText', 'portalWarning', 'lockReadout', 'stationState', 'stationButton', 'intelOverlay', 'intelKicker', 'intelTitle',
     'intelRole', 'intelText', 'intelShip', 'bossOverlay', 'bossKicker', 'bossTitle', 'bossText',
     'sectorOverlay', 'sectorTitle', 'sectorCopy',
@@ -347,6 +347,7 @@
   let jumpDestinationCancelArmed = false;
   let announcementTimer = 0;
   let toastTimer = 0;
+  let checkpointNoticeTimer = 0;
   let resourceTimer = 1;
   let repairTimer = 12;
   let spawnTimer = 0;
@@ -388,7 +389,7 @@
   }
 
   function emptyCampaignState() {
-    return { highestUnlocked: 0, checkpoints: {}, completedCampaigns: 0, seenEnemyTypes: [] };
+    return { highestUnlocked: 0, checkpoints: {}, lastStageCheckpoint: null, completedCampaigns: 0, seenEnemyTypes: [] };
   }
 
   function campaignKey(userId = activePilotId) {
@@ -407,6 +408,7 @@
     return {
       highestUnlocked: Math.max(0, Math.min(LEVELS.length - 1, Number(saved?.highestUnlocked) || 0)),
       checkpoints: saved?.checkpoints && typeof saved.checkpoints === 'object' ? saved.checkpoints : {},
+      lastStageCheckpoint: saved?.lastStageCheckpoint && typeof saved.lastStageCheckpoint === 'object' ? saved.lastStageCheckpoint : null,
       completedCampaigns: Number(saved?.completedCampaigns) || 0,
       seenEnemyTypes: Array.isArray(saved?.seenEnemyTypes) ? saved.seenEnemyTypes.filter((type) => typeof type === 'string') : [],
     };
@@ -675,7 +677,55 @@
         changed = true;
       }
     }
+    if (campaignState.lastStageCheckpoint && !isStageCheckpointValid(campaignState.lastStageCheckpoint)) {
+      campaignState.lastStageCheckpoint = null;
+      changed = true;
+    }
     if (changed) saveCampaignState();
+  }
+
+  function isStageCheckpointValid(checkpoint) {
+    const level = Number(checkpoint?.level);
+    const stage = Number(checkpoint?.stage);
+    return Number(checkpoint?.progressionVersion) === PROGRESSION_VERSION
+      && Number.isInteger(level) && level >= 0 && level < LEVELS.length
+      && Number.isInteger(stage) && stage >= 1 && stage <= LEVELS[level].stages
+      && checkpoint.player && typeof checkpoint.player === 'object'
+      && Array.isArray(checkpoint.resources) && Array.isArray(checkpoint.pickups) && Array.isArray(checkpoint.stations);
+  }
+
+  function stageCheckpointRank(checkpoint) {
+    if (!isStageCheckpointValid(checkpoint)) return -1;
+    return LEVELS.slice(0, checkpoint.level).reduce((total, level) => total + level.stages, 0) + checkpoint.stage;
+  }
+
+  function cloneStageCheckpoint(checkpoint) {
+    return {
+      ...checkpoint,
+      player: { ...checkpoint.player },
+      resources: checkpoint.resources.map((resource) => ({ ...resource })),
+      pickups: checkpoint.pickups.map((pickup) => ({ ...pickup })),
+      stations: checkpoint.stations.map((station) => ({ ...station })),
+    };
+  }
+
+  function updateCheckpointButton() {
+    ui.checkpointButton.hidden = !isStageCheckpointValid(campaignState.lastStageCheckpoint);
+  }
+
+  function showCheckpointNotice(checkpoint) {
+    const level = translateLevel(LEVELS[checkpoint.level]);
+    ui.checkpointNotice.textContent = t('toast.checkpointSaved', { sector: level.short, stage: String(checkpoint.stage).padStart(2, '0') });
+    ui.checkpointNotice.classList.add('visible');
+    checkpointNoticeTimer = 2.8;
+  }
+
+  function saveStageCheckpoint(checkpoint) {
+    if (stageCheckpointRank(checkpoint) >= stageCheckpointRank(campaignState.lastStageCheckpoint)) {
+      campaignState.lastStageCheckpoint = cloneStageCheckpoint(checkpoint);
+      saveCampaignState();
+      updateCheckpointButton();
+    }
   }
 
   function captureStageCheckpoint() {
@@ -684,6 +734,7 @@
     stageCheckpoint = {
       level: currentLevel,
       stage: wave,
+      progressionVersion: PROGRESSION_VERSION,
       player: checkpointPlayer,
       gateShields,
       score,
@@ -695,10 +746,12 @@
       repairTimer,
       lastSelectedUpgradeId,
     };
+    saveStageCheckpoint(stageCheckpoint);
+    showCheckpointNotice(stageCheckpoint);
   }
 
   function retryStageCheckpoint() {
-    if (!stageCheckpoint || stageCheckpoint.level !== currentLevel) return false;
+    if (!isStageCheckpointValid(stageCheckpoint)) return false;
     const checkpoint = stageCheckpoint;
     currentLevel = checkpoint.level;
     activePaths = LEVELS[currentLevel].paths;
@@ -750,6 +803,16 @@
     beginWave();
     syncUi();
     return true;
+  }
+
+  function resumeLastStageCheckpoint() {
+    if (!isStageCheckpointValid(campaignState.lastStageCheckpoint)) return false;
+    audio.init();
+    localStorage.setItem(GAME_STARTED_KEY, 'true');
+    tutorialMode = false;
+    resetTutorialFlow();
+    stageCheckpoint = cloneStageCheckpoint(campaignState.lastStageCheckpoint);
+    return retryStageCheckpoint();
   }
 
   function clearRun(levelIndex = 0) {
@@ -844,6 +907,7 @@
     ui.crosshair.style.opacity = '0';
     ui.portalWarning.classList.remove('active');
     ui.lockReadout.classList.remove('active');
+    updateCheckpointButton();
   }
 
   function updatePilotUi() {
@@ -868,6 +932,7 @@
       campaignState = emptyCampaignState();
       highScore = 0;
       ui.bestText.textContent = formatScore(0);
+      updateCheckpointButton();
       return;
     }
 
@@ -915,6 +980,7 @@
       saveCampaignState();
     }
     ui.bestText.textContent = formatScore(highScore);
+    updateCheckpointButton();
     if (mode === 'levelSelect') renderLevelSelect();
   }
   // Guest launch, admin access, leaderboard, settings, and level-select actions.
@@ -1493,6 +1559,10 @@
     if (toastTimer > 0) {
       toastTimer -= dt;
       if (toastTimer <= 0) ui.toast.classList.remove('visible');
+    }
+    if (checkpointNoticeTimer > 0) {
+      checkpointNoticeTimer -= dt;
+      if (checkpointNoticeTimer <= 0) ui.checkpointNotice.classList.remove('visible');
     }
     if (mode === 'cutscene') {
       bossIntroTimer -= dt;
@@ -3556,6 +3626,7 @@
       select.addEventListener('change', (event) => setLanguage(event.target.value));
     });
     document.getElementById('startButton').addEventListener('click', () => requirePilot(() => startGame(false)));
+    ui.checkpointButton.addEventListener('click', () => requirePilot(resumeLastStageCheckpoint));
     document.getElementById('tutorialButton').addEventListener('click', () => requirePilot(() => startGame(true)));
     document.getElementById('levelSelectButton').addEventListener('click', () => requirePilot(openLevelSelect));
     document.getElementById('closeLevelSelect').addEventListener('click', closeLevelSelect);
@@ -3658,6 +3729,7 @@
   camera.y = player.y - screenHeight / 2;
   ui.bestText.textContent = formatScore(highScore);
   syncUi();
+  updateCheckpointButton();
   if (window.VoidlineCloud) {
     window.VoidlineCloud.onChange((pilot) => {
       if (!pilot && activePilot) activatePilot(null);
@@ -3668,6 +3740,7 @@
 
   function refreshLocalizedUi() {
     updatePilotUi();
+    updateCheckpointButton();
     if (player) syncUi();
     if (mode === 'levelSelect') renderLevelSelect();
     if (mode === 'sector') {

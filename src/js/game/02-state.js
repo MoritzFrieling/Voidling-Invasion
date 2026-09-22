@@ -49,6 +49,7 @@
   let jumpDestinationCancelArmed = false;
   let announcementTimer = 0;
   let toastTimer = 0;
+  let checkpointNoticeTimer = 0;
   let resourceTimer = 1;
   let repairTimer = 12;
   let spawnTimer = 0;
@@ -90,7 +91,7 @@
   }
 
   function emptyCampaignState() {
-    return { highestUnlocked: 0, checkpoints: {}, completedCampaigns: 0, seenEnemyTypes: [] };
+    return { highestUnlocked: 0, checkpoints: {}, lastStageCheckpoint: null, completedCampaigns: 0, seenEnemyTypes: [] };
   }
 
   function campaignKey(userId = activePilotId) {
@@ -109,6 +110,7 @@
     return {
       highestUnlocked: Math.max(0, Math.min(LEVELS.length - 1, Number(saved?.highestUnlocked) || 0)),
       checkpoints: saved?.checkpoints && typeof saved.checkpoints === 'object' ? saved.checkpoints : {},
+      lastStageCheckpoint: saved?.lastStageCheckpoint && typeof saved.lastStageCheckpoint === 'object' ? saved.lastStageCheckpoint : null,
       completedCampaigns: Number(saved?.completedCampaigns) || 0,
       seenEnemyTypes: Array.isArray(saved?.seenEnemyTypes) ? saved.seenEnemyTypes.filter((type) => typeof type === 'string') : [],
     };

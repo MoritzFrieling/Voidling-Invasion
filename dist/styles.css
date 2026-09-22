@@ -177,6 +177,8 @@ kbd { min-width: 32px; padding: 6px 7px; color: var(--cyan-soft); border: 1px so
 
 .status-toast { position: absolute; z-index: 9; left: 50%; top: 25%; translate: -50% -50%; opacity: 0; padding: 9px 16px; border: 1px solid var(--line-bright); background: rgba(4, 16, 23, .86); color: var(--cyan-soft); font: 700 .72rem var(--mono); letter-spacing: .12em; transition: opacity .22s, transform .22s; transform: translateY(8px); pointer-events: none; }
 .status-toast.visible { opacity: 1; transform: translateY(0); }
+.checkpoint-notice { position: absolute; z-index: 9; top: 98px; left: 24px; max-width: min(360px, calc(100vw - 48px)); padding: 8px 11px; border-left: 2px solid var(--cyan); background: rgba(4, 16, 23, .88); color: var(--cyan-soft); font: 700 .58rem var(--mono); letter-spacing: .1em; line-height: 1.4; opacity: 0; transform: translateX(-8px); transition: opacity .22s, transform .22s; pointer-events: none; }
+.checkpoint-notice.visible { opacity: 1; transform: translateX(0); }
 
 .crosshair { position: absolute; z-index: 5; width: 34px; height: 34px; border: 1px solid rgba(109,247,232,.55); border-radius: 50%; translate: -50% -50%; pointer-events: none; opacity: 0; transition: opacity .15s; }
 .crosshair::before, .crosshair::after { content: ''; position: absolute; background: var(--cyan); }
@@ -384,6 +386,7 @@ button { border: 0; }
   .topbar { grid-template-columns: 1fr auto; grid-template-rows: auto auto; min-height: 114px; gap: 6px 10px; padding: 8px 12px; }.round-readout { display: none; }.score-readout div:first-child { display: none; }
   .vitals { grid-column: 1 / -1; grid-row: 2; width: 100%; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px; }.vital-row, .gate-row, .credit-row { min-height: 24px; padding: 3px 5px; }.minimap-wrap { top: 126px; right: 12px; width: 142px; }.minimap-wrap canvas { width: 140px !important; height: 84px !important; }
   .ability-dock { width: calc(100% - 20px); bottom: 10px; }.ability-card { flex: 1; min-width: 0; padding: 7px; height: 50px; }.ability-card div span { display: none; }.ability-card kbd { min-width: 28px; }
+  .checkpoint-notice { top: 138px; left: 12px; max-width: calc(100vw - 24px); }
   .upgrade-readout { display: none; }
   .static-warning { right: 12px; bottom: 72px; }.wave-call { bottom: 76px; }
   .upgrade-grid { grid-template-columns: 1fr; max-height: 58vh; overflow-y: auto; }.upgrade-choice { min-height: 130px; }.upgrade-choice .upgrade-icon { margin-bottom: 14px; }

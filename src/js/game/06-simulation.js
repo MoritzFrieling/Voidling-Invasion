@@ -5,6 +5,10 @@
       toastTimer -= dt;
       if (toastTimer <= 0) ui.toast.classList.remove('visible');
     }
+    if (checkpointNoticeTimer > 0) {
+      checkpointNoticeTimer -= dt;
+      if (checkpointNoticeTimer <= 0) ui.checkpointNotice.classList.remove('visible');
+    }
     if (mode === 'cutscene') {
       bossIntroTimer -= dt;
       if (bossIntroTimer <= 0) activateWave();

@@ -107,7 +107,55 @@
         changed = true;
       }
     }
+    if (campaignState.lastStageCheckpoint && !isStageCheckpointValid(campaignState.lastStageCheckpoint)) {
+      campaignState.lastStageCheckpoint = null;
+      changed = true;
+    }
     if (changed) saveCampaignState();
+  }
+
+  function isStageCheckpointValid(checkpoint) {
+    const level = Number(checkpoint?.level);
+    const stage = Number(checkpoint?.stage);
+    return Number(checkpoint?.progressionVersion) === PROGRESSION_VERSION
+      && Number.isInteger(level) && level >= 0 && level < LEVELS.length
+      && Number.isInteger(stage) && stage >= 1 && stage <= LEVELS[level].stages
+      && checkpoint.player && typeof checkpoint.player === 'object'
+      && Array.isArray(checkpoint.resources) && Array.isArray(checkpoint.pickups) && Array.isArray(checkpoint.stations);
+  }
+
+  function stageCheckpointRank(checkpoint) {
+    if (!isStageCheckpointValid(checkpoint)) return -1;
+    return LEVELS.slice(0, checkpoint.level).reduce((total, level) => total + level.stages, 0) + checkpoint.stage;
+  }
+
+  function cloneStageCheckpoint(checkpoint) {
+    return {
+      ...checkpoint,
+      player: { ...checkpoint.player },
+      resources: checkpoint.resources.map((resource) => ({ ...resource })),
+      pickups: checkpoint.pickups.map((pickup) => ({ ...pickup })),
+      stations: checkpoint.stations.map((station) => ({ ...station })),
+    };
+  }
+
+  function updateCheckpointButton() {
+    ui.checkpointButton.hidden = !isStageCheckpointValid(campaignState.lastStageCheckpoint);
+  }
+
+  function showCheckpointNotice(checkpoint) {
+    const level = translateLevel(LEVELS[checkpoint.level]);
+    ui.checkpointNotice.textContent = t('toast.checkpointSaved', { sector: level.short, stage: String(checkpoint.stage).padStart(2, '0') });
+    ui.checkpointNotice.classList.add('visible');
+    checkpointNoticeTimer = 2.8;
+  }
+
+  function saveStageCheckpoint(checkpoint) {
+    if (stageCheckpointRank(checkpoint) >= stageCheckpointRank(campaignState.lastStageCheckpoint)) {
+      campaignState.lastStageCheckpoint = cloneStageCheckpoint(checkpoint);
+      saveCampaignState();
+      updateCheckpointButton();
+    }
   }
 
   function captureStageCheckpoint() {
@@ -116,6 +164,7 @@
     stageCheckpoint = {
       level: currentLevel,
       stage: wave,
+      progressionVersion: PROGRESSION_VERSION,
       player: checkpointPlayer,
       gateShields,
       score,
@@ -127,10 +176,12 @@
       repairTimer,
       lastSelectedUpgradeId,
     };
+    saveStageCheckpoint(stageCheckpoint);
+    showCheckpointNotice(stageCheckpoint);
   }
 
   function retryStageCheckpoint() {
-    if (!stageCheckpoint || stageCheckpoint.level !== currentLevel) return false;
+    if (!isStageCheckpointValid(stageCheckpoint)) return false;
     const checkpoint = stageCheckpoint;
     currentLevel = checkpoint.level;
     activePaths = LEVELS[currentLevel].paths;
@@ -182,6 +233,16 @@
     beginWave();
     syncUi();
     return true;
+  }
+
+  function resumeLastStageCheckpoint() {
+    if (!isStageCheckpointValid(campaignState.lastStageCheckpoint)) return false;
+    audio.init();
+    localStorage.setItem(GAME_STARTED_KEY, 'true');
+    tutorialMode = false;
+    resetTutorialFlow();
+    stageCheckpoint = cloneStageCheckpoint(campaignState.lastStageCheckpoint);
+    return retryStageCheckpoint();
   }
 
   function clearRun(levelIndex = 0) {
@@ -276,6 +337,7 @@
     ui.crosshair.style.opacity = '0';
     ui.portalWarning.classList.remove('active');
     ui.lockReadout.classList.remove('active');
+    updateCheckpointButton();
   }
 
   function updatePilotUi() {
@@ -300,6 +362,7 @@
       campaignState = emptyCampaignState();
       highScore = 0;
       ui.bestText.textContent = formatScore(0);
+      updateCheckpointButton();
       return;
     }
 
@@ -347,5 +410,6 @@
       saveCampaignState();
     }
     ui.bestText.textContent = formatScore(highScore);
+    updateCheckpointButton();
     if (mode === 'levelSelect') renderLevelSelect();
   }

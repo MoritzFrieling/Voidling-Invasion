@@ -87,6 +87,7 @@
       select.addEventListener('change', (event) => setLanguage(event.target.value));
     });
     document.getElementById('startButton').addEventListener('click', () => requirePilot(() => startGame(false)));
+    ui.checkpointButton.addEventListener('click', () => requirePilot(resumeLastStageCheckpoint));
     document.getElementById('tutorialButton').addEventListener('click', () => requirePilot(() => startGame(true)));
     document.getElementById('levelSelectButton').addEventListener('click', () => requirePilot(openLevelSelect));
     document.getElementById('closeLevelSelect').addEventListener('click', closeLevelSelect);

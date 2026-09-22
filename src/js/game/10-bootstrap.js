@@ -38,6 +38,7 @@
   camera.y = player.y - screenHeight / 2;
   ui.bestText.textContent = formatScore(highScore);
   syncUi();
+  updateCheckpointButton();
   if (window.VoidlineCloud) {
     window.VoidlineCloud.onChange((pilot) => {
       if (!pilot && activePilot) activatePilot(null);
@@ -48,6 +49,7 @@
 
   function refreshLocalizedUi() {
     updatePilotUi();
+    updateCheckpointButton();
     if (player) syncUi();
     if (mode === 'levelSelect') renderLevelSelect();
     if (mode === 'sector') {
