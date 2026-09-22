@@ -140,7 +140,13 @@
   }
 
   function updateCheckpointButton() {
-    ui.checkpointButton.hidden = !isStageCheckpointValid(campaignState.lastStageCheckpoint);
+    const checkpoint = campaignState.lastStageCheckpoint;
+    const hasCheckpoint = isStageCheckpointValid(checkpoint);
+    ui.checkpointButton.hidden = !hasCheckpoint;
+    ui.startButton.querySelector('[data-i18n]').textContent = t(hasCheckpoint ? 'menu.beginNewDefense' : 'menu.beginDefense');
+    ui.checkpointDetails.textContent = hasCheckpoint
+      ? `${t('menu.checkpointSector', { level: checkpoint.level + 1 })}\n${t('menu.checkpointStage', { stage: checkpoint.stage })}`
+      : '';
   }
 
   function showCheckpointNotice(checkpoint) {
