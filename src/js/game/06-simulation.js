@@ -793,15 +793,14 @@
       camera.shake = Math.max(camera.shake, enemy.boss ? 22 : enemy.major ? 9 : 3.5);
       audio.tone(enemy.boss ? 48 : enemy.major ? 72 : 130, enemy.boss ? .75 : .16, 'sawtooth', enemy.boss ? .14 : .05, -35);
       if (enemy.major && Math.random() < .28) spawnPickupAt('repair', enemy.x, enemy.y);
-    } else if (enemy.emergencyShield && !enemy.emergencyShieldUsed
+    } else if (enemy.emergencyHeal && !enemy.emergencyHealUsed
       && enemy.hp / enemy.maxHp <= .4 && enemy.progress < enemy.pathLength * .7) {
-      enemy.emergencyShieldUsed = true;
-      enemy.maxShield = enemy.maxHp * .2;
-      enemy.shieldHp = enemy.maxShield;
-      enemy.shieldHitTimer = .45;
-      showToast(t('toast.emergencyShield', { enemy: translateEnemy(enemy.type).name }));
-      addFloater(enemy.x, enemy.y - enemy.radius, t('floater.emergencyShield'), '#9acbff');
-      burst(enemy.x, enemy.y, '#79a8ff', 34, 280);
+      enemy.emergencyHealUsed = true;
+      const healAmount = Math.round(enemy.maxHp * enemy.emergencyHeal);
+      enemy.hp = Math.min(enemy.maxHp, enemy.hp + healAmount);
+      showToast(t('toast.emergencyHeal', { enemy: translateEnemy(enemy.type).name, amount: healAmount }));
+      addFloater(enemy.x, enemy.y - enemy.radius, t('floater.emergencyHeal', { amount: healAmount }), COLORS.cyan);
+      burst(enemy.x, enemy.y, COLORS.cyan, 34, 280);
     }
   }
 

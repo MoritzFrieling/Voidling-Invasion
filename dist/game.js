@@ -67,10 +67,10 @@
       'toast.slowDock': 'SLOW DOWN TO DOCK', 'toast.stationMax': 'STATION AT MAXIMUM POWER', 'toast.upgradeRequires': 'UPGRADE REQUIRES {cost} SALVAGE CREDITS', 'toast.stationUpgraded': 'STATION UPGRADED // MK {level}',
       'toast.stationLimit': 'STATION LIMIT REACHED', 'toast.needCredits': 'NEED {cost} SALVAGE CREDITS', 'toast.stationDeployed': 'FRIENDLY DEFENSE STATION DEPLOYED', 'toast.repairField': 'REPAIR FIELD // +{amount} HULL', 'toast.hullStable': 'HULL ALREADY STABLE',
       'toast.shieldRemaining': '{enemy} // {count} SHIELD CHARGES REMAIN', 'toast.shieldCollapsed': '{enemy} // SHIELD COLLAPSED', 'toast.carrierInterceptorDestroyed': 'CARRIER INTERCEPTOR DESTROYED',
-      'toast.emergencyShield': '{enemy} // EMERGENCY SHIELD ONLINE', 'toast.aegisRecovered': 'AEGIS CORE RECOVERED // GATE +1', 'toast.upgradeInstalled': '{upgrade} INSTALLED',
+      'toast.emergencyHeal': '{enemy} // EMERGENCY REPAIRS +{amount} HULL', 'toast.aegisRecovered': 'AEGIS CORE RECOVERED // GATE +1', 'toast.upgradeInstalled': '{upgrade} INSTALLED',
       'toast.multipleApproaches': '{sector} // MULTIPLE APPROACH VECTORS', 'toast.trainingComplete': 'TRAINING COMPLETE // GOOD HUNTING', 'toast.trainingSkipped': 'TRAINING SKIPPED',
       'toast.commandEntering': 'COMMAND SHIP ENTERING THE VOIDLINE', 'toast.stageWave': 'STAGE {stage} // WAVE {wave} OF {total}',
-      'floater.shielded': 'SHIELDED', 'floater.shieldCollapsed': 'SHIELD COLLAPSED', 'floater.shieldBroken': 'SHIELD BROKEN', 'floater.emergencyShield': 'EMERGENCY SHIELD', 'floater.missileIntercepted': 'MISSILE INTERCEPTED',
+      'floater.shielded': 'SHIELDED', 'floater.shieldCollapsed': 'SHIELD COLLAPSED', 'floater.shieldBroken': 'SHIELD BROKEN', 'floater.emergencyHeal': '+{amount} HULL', 'floater.missileIntercepted': 'MISSILE INTERCEPTED',
       'floater.collision': 'COLLISION', 'floater.hull': '{amount} HULL', 'floater.shield': 'SHIELD {current}/{total}', 'floater.gateShield': '+1 GATE SHIELD',
       'render.earthGate': 'EARTH GATE', 'render.station': 'DEFENSE STATION // MK {level}', 'render.upgradeAvailable': 'UPGRADE AVAILABLE', 'render.shield': 'SHIELD {amount}', 'render.finalStage': 'FINAL STAGE', 'render.hostileFormation': 'HOSTILE FORMATION DETECTED',
       'end.secured': 'CORRIDOR SECURED', 'end.pilotLost': 'PILOT SIGNAL LOST', 'end.defenseOffline': 'EARTH DEFENSE OFFLINE', 'end.victoryTitle': 'INVASION REPELLED', 'end.shipLostTitle': 'YOUR SHIP WAS LOST', 'end.gateLostTitle': 'THE GATE HAS FALLEN',
@@ -150,9 +150,9 @@
       'toast.carrierWing': '캐리어 편대 전개', 'toast.carrierLaunch': '브루드 캐리어가 요격기를 발진', 'toast.gateHit': ({ count }) => `관문 피격 // 방벽 ${count}개 남음`, 'toast.gateBreached': '지구 관문 돌파',
       'toast.slowDock': '도킹하려면 감속하세요', 'toast.stationMax': '기지 최대 출력', 'toast.upgradeRequires': '업그레이드에 회수 크레딧 {cost} 필요', 'toast.stationUpgraded': '기지 업그레이드 // MK {level}',
       'toast.stationLimit': '기지 한도 도달', 'toast.needCredits': '회수 크레딧 {cost} 필요', 'toast.stationDeployed': '아군 방어 기지 배치', 'toast.repairField': '수리장 // 선체 +{amount}', 'toast.hullStable': '선체가 이미 안정적입니다',
-      'toast.shieldRemaining': '{enemy} // 방벽 충전 {count}개 남음', 'toast.shieldCollapsed': '{enemy} // 방벽 붕괴', 'toast.carrierInterceptorDestroyed': '캐리어 요격기 파괴', 'toast.emergencyShield': '{enemy} // 비상 방벽 가동', 'toast.aegisRecovered': '이지스 코어 회수 // 관문 +1', 'toast.upgradeInstalled': '{upgrade} 설치 완료',
+      'toast.shieldRemaining': '{enemy} // 방벽 충전 {count}개 남음', 'toast.shieldCollapsed': '{enemy} // 방벽 붕괴', 'toast.carrierInterceptorDestroyed': '캐리어 요격기 파괴', 'toast.emergencyHeal': '{enemy} // 비상 수리 +{amount} 선체', 'toast.aegisRecovered': '이지스 코어 회수 // 관문 +1', 'toast.upgradeInstalled': '{upgrade} 설치 완료',
       'toast.multipleApproaches': '{sector} // 다중 접근 경로', 'toast.trainingComplete': '훈련 완료 // 행운을 빕니다', 'toast.trainingSkipped': '훈련 건너뜀', 'toast.commandEntering': '지휘함이 보이드라인에 진입', 'toast.stageWave': '스테이지 {stage} // 웨이브 {wave}/{total}',
-      'floater.shielded': '방벽', 'floater.shieldCollapsed': '방벽 붕괴', 'floater.shieldBroken': '방벽 파괴', 'floater.emergencyShield': '비상 방벽', 'floater.missileIntercepted': '미사일 요격', 'floater.collision': '충돌', 'floater.hull': '선체 {amount}', 'floater.shield': '방벽 {current}/{total}', 'floater.gateShield': '관문 방벽 +1',
+      'floater.shielded': '방벽', 'floater.shieldCollapsed': '방벽 붕괴', 'floater.shieldBroken': '방벽 파괴', 'floater.emergencyHeal': '선체 +{amount}', 'floater.missileIntercepted': '미사일 요격', 'floater.collision': '충돌', 'floater.hull': '선체 {amount}', 'floater.shield': '방벽 {current}/{total}', 'floater.gateShield': '관문 방벽 +1',
       'render.earthGate': '지구 관문', 'render.station': '방어 기지 // MK {level}', 'render.upgradeAvailable': '업그레이드 가능', 'render.shield': '방벽 {amount}', 'render.finalStage': '최종 스테이지', 'render.hostileFormation': '적 편대 감지',
       'end.secured': '통로 확보', 'end.pilotLost': '조종사 신호 소실', 'end.defenseOffline': '지구 방어 오프라인', 'end.victoryTitle': '침공 격퇴', 'end.shipLostTitle': '함선 손실', 'end.gateLostTitle': '관문 함락',
       'end.victoryCopy': '지구는 안전합니다. 침공 지휘 신호가 사라졌습니다.', 'end.shipLostCopy': '최종 통로를 확보하기 전에 함선이 파괴되었습니다.', 'end.gateLostCopy': '침공 함대가 마지막 방어 통로를 돌파했습니다.',
@@ -240,7 +240,7 @@
       wormholes: [],
     },
     {
-      nameKey: 'sector.two.name', shortKey: 'sector.two.short', nextKey: 'sector.two.next', stages: 7, boss: 'bossCarrier',
+      nameKey: 'sector.two.name', shortKey: 'sector.two.short', nextKey: 'sector.two.next', stages: 7, boss: 'bossCarrier', enemyDurability: 1.2,
       paths: [
         createPath([{ x: -120, y: 310 }, { x: 440, y: 330 }, { x: 900, y: 600 }, { x: 1380, y: 520 }, { x: 1820, y: 820 }, { x: 2280, y: 760 }, { x: 2670, y: 900 }, { x: PORTAL.x, y: PORTAL.y }]),
         createPath([{ x: -120, y: 1780 }, { x: 420, y: 1670 }, { x: 820, y: 1390 }, { x: 1290, y: 1510 }, { x: 1710, y: 1220 }, { x: 2220, y: 1320 }, { x: 2660, y: 1100 }, { x: PORTAL.x, y: PORTAL.y }]),
@@ -1310,7 +1310,8 @@
     carrier: { nameKey: 'enemy.carrier.name', roleKey: 'enemy.carrier.role', descriptionKey: 'enemy.carrier.description', radius: 37, hp: 520, speed: 49, score: 920, xp: 60, color: '#f071c8', major: true, carrier: true },
     sentinel: { nameKey: 'enemy.sentinel.name', roleKey: 'enemy.sentinel.role', descriptionKey: 'enemy.sentinel.description', radius: 29, hp: 310, shield: 0, shieldCharges: 2, speed: 62, score: 840, xp: 58, color: '#aeb8c0', major: true, shielded: true },
     bossOmega: { nameKey: 'enemy.bossOmega.name', roleKey: 'enemy.bossOmega.role', descriptionKey: 'enemy.bossOmega.description', radius: 66, hp: 2280, speed: 34, score: 5400, xp: 260, color: '#ff506b', major: true, boss: true, bossSkill: 'rockets' },
-    bossCarrier: { nameKey: 'enemy.bossCarrier.name', roleKey: 'enemy.bossCarrier.role', descriptionKey: 'enemy.bossCarrier.description', radius: 74, hp: 4600, speed: 29, score: 7600, xp: 340, color: '#ef67d1', major: true, boss: true, carrier: true, bossSkill: 'swarm', emergencyShield: true },
+    // Offset Sector Two's 20% enemy durability bonus so this boss keeps its existing effective HP.
+    bossCarrier: { nameKey: 'enemy.bossCarrier.name', roleKey: 'enemy.bossCarrier.role', descriptionKey: 'enemy.bossCarrier.description', radius: 74, hp: 4600 / 1.2, speed: 29, score: 7600, xp: 340, color: '#ef67d1', major: true, boss: true, carrier: true, bossSkill: 'swarm', emergencyHeal: .15 },
     bossTitan: { nameKey: 'enemy.bossTitan.name', roleKey: 'enemy.bossTitan.role', descriptionKey: 'enemy.bossTitan.description', radius: 82, hp: 2520, shield: 330, speed: 26, score: 12000, xp: 500, color: '#aeb8c0', major: true, boss: true, shielded: true, bossSkill: 'titan' },
   };
 
@@ -1412,8 +1413,8 @@
       maxShieldCharges: blueprint.shieldCharges || 0,
       shieldHp: (blueprint.shield || 0) * difficultyScale,
       maxShield: (blueprint.shield || 0) * difficultyScale,
-      emergencyShield: Boolean(blueprint.emergencyShield),
-      emergencyShieldUsed: false,
+      emergencyHeal: blueprint.emergencyHeal || 0,
+      emergencyHealUsed: false,
       bossSkill: blueprint.bossSkill || '',
       rocketTimer: rand(1.3, 3),
       spawnTimer: blueprint.carrier ? rand(3.55, 5.95) : rand(3.2, 5.4),
@@ -2281,15 +2282,14 @@
       camera.shake = Math.max(camera.shake, enemy.boss ? 22 : enemy.major ? 9 : 3.5);
       audio.tone(enemy.boss ? 48 : enemy.major ? 72 : 130, enemy.boss ? .75 : .16, 'sawtooth', enemy.boss ? .14 : .05, -35);
       if (enemy.major && Math.random() < .28) spawnPickupAt('repair', enemy.x, enemy.y);
-    } else if (enemy.emergencyShield && !enemy.emergencyShieldUsed
+    } else if (enemy.emergencyHeal && !enemy.emergencyHealUsed
       && enemy.hp / enemy.maxHp <= .4 && enemy.progress < enemy.pathLength * .7) {
-      enemy.emergencyShieldUsed = true;
-      enemy.maxShield = enemy.maxHp * .2;
-      enemy.shieldHp = enemy.maxShield;
-      enemy.shieldHitTimer = .45;
-      showToast(t('toast.emergencyShield', { enemy: translateEnemy(enemy.type).name }));
-      addFloater(enemy.x, enemy.y - enemy.radius, t('floater.emergencyShield'), '#9acbff');
-      burst(enemy.x, enemy.y, '#79a8ff', 34, 280);
+      enemy.emergencyHealUsed = true;
+      const healAmount = Math.round(enemy.maxHp * enemy.emergencyHeal);
+      enemy.hp = Math.min(enemy.maxHp, enemy.hp + healAmount);
+      showToast(t('toast.emergencyHeal', { enemy: translateEnemy(enemy.type).name, amount: healAmount }));
+      addFloater(enemy.x, enemy.y - enemy.radius, t('floater.emergencyHeal', { amount: healAmount }), COLORS.cyan);
+      burst(enemy.x, enemy.y, COLORS.cyan, 34, 280);
     }
   }
 
