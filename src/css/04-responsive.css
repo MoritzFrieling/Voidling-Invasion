@@ -19,7 +19,7 @@
   .upgrade-readout { display: none; }
   .static-warning { right: 12px; bottom: 72px; }.wave-call { bottom: 76px; }
   .upgrade-grid { grid-template-columns: 1fr; max-height: 58vh; overflow-y: auto; }.upgrade-choice { min-height: 130px; }.upgrade-choice .upgrade-icon { margin-bottom: 14px; }
-  .start-overlay { padding-inline: 24px; }.intro { margin: 28px 0 24px; }.menu-actions { display: grid; }.menu-actions.primary-actions { display: flex; }.main-button, .secondary-button { width: 100%; }.primary-actions .main-button { width: 220px; }.primary-actions .checkpoint-button { width: 250px; }
+  .start-overlay { padding-inline: 24px; }.intro { margin: 28px 0 24px; }.menu-actions { display: grid; }.menu-actions.primary-actions { display: flex; }.main-button, .secondary-button { width: 100%; }.primary-actions .main-button { width: 220px; }.primary-actions .checkpoint-button { width: 385px; }
 }
 
 @media (orientation: portrait) and (max-width: 600px) { .rotate-notice { display: grid; } }

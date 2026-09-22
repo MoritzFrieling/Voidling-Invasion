@@ -20,7 +20,7 @@ button { border: 0; }
 @keyframes tutorialRecommended { to { background: rgba(255,179,92,.12); box-shadow: 0 0 24px rgba(255,179,92,.24); } }
 .primary-actions { flex-wrap: nowrap; align-items: stretch; margin-bottom: 12px; }
 .primary-actions .main-button { width: 220px; min-width: 220px; flex: 0 0 220px; }
-.primary-actions .checkpoint-button { width: 250px; min-width: 250px; flex-basis: 250px; }
+.primary-actions .checkpoint-button { width: 385px; min-width: 385px; flex-basis: 385px; }
 .checkpoint-button { justify-content: center; text-align: center; }
 .checkpoint-button > span { display: grid; gap: 2px; line-height: 1.05; }
 .checkpoint-button > b { display: grid; gap: 2px; min-width: 62px; white-space: pre-line; text-align: center; line-height: 1.25; }
