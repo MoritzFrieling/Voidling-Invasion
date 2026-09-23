@@ -259,6 +259,14 @@
       if (unlocked) card.addEventListener('click', () => startGame(false, index));
       ui.levelChoices.append(card);
     });
+    updateLevelSlider();
+  }
+
+  function updateLevelSlider() {
+    const maxScroll = Math.max(0, ui.levelChoices.scrollWidth - ui.levelChoices.clientWidth);
+    ui.levelSlider.max = String(Math.max(1, Math.ceil(maxScroll)));
+    ui.levelSlider.value = String(Math.round(Math.min(maxScroll, ui.levelChoices.scrollLeft)));
+    ui.levelSlider.parentElement.hidden = maxScroll < 1;
   }
 
   function openLevelSelect() {
@@ -266,6 +274,7 @@
     mode = 'levelSelect';
     hideOverlays();
     ui.levelSelectOverlay.classList.add('active');
+    updateLevelSlider();
     ui.crosshair.style.opacity = '0';
   }
 

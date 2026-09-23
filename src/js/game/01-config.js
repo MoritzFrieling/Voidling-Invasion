@@ -107,7 +107,7 @@
     'creditText', 'portalWarning', 'lockReadout', 'stationState', 'stationButton', 'intelOverlay', 'intelKicker', 'intelTitle',
     'intelRole', 'intelText', 'intelShip', 'bossOverlay', 'bossKicker', 'bossTitle', 'bossText',
     'sectorOverlay', 'sectorTitle', 'sectorCopy', 'sectorRewardLabel', 'sectorRewardValue',
-    'levelSelectOverlay', 'levelChoices',
+    'levelSelectOverlay', 'levelChoices', 'levelSlider',
     'speedTierText', 'damageTierText', 'rateTierText', 'hullTierText', 'rocketTierText', 'coolingTierText',
     'staticWarning', 'waveCallButton', 'objectiveLabel', 'mapObjectiveLabel', 'stationChoiceOverlay', 'stationChoices', 'stationChoiceClose', 'constructionOverlay',
     'authOverlay', 'authTitle', 'authCopy', 'authForm', 'authUsername', 'authPassword',

@@ -3,7 +3,7 @@
   const TRANSLATIONS = {
     en: {
       'language.label': 'Language', 'brand.network': 'EARTH DEFENSE NETWORK - FRONTIER LUNA', 'aria.gameWorld': 'Voidline Invasion game world', 'aria.gameStatus': 'Game status', 'aria.shipStatus': 'Ship status', 'aria.sectorMinimap': 'Sector minimap', 'aria.abilities': 'Weapons and abilities', 'aria.upgradeTiers': 'Installed ship upgrade tiers',
-      'aria.adminAccess': 'Open admin access', 'aria.pause': 'Pause game', 'aria.closeLevelSelect': 'Close level selection', 'aria.closeSettings': 'Close settings', 'aria.closeAdmin': 'Close admin access', 'aria.closeLeaderboard': 'Close leaderboard',
+      'aria.adminAccess': 'Open admin access', 'aria.pause': 'Pause game', 'aria.closeLevelSelect': 'Close level selection', 'aria.scrollSectors': 'Slide through sectors', 'aria.closeSettings': 'Close settings', 'aria.closeAdmin': 'Close admin access', 'aria.closeLeaderboard': 'Close leaderboard',
       'tooltip.adminAccess': 'Admin access', 'tooltip.flightSpeed': 'Flight speed', 'tooltip.blasterDamage': 'Blaster damage', 'tooltip.fireRate': 'Fire rate', 'tooltip.hullStrength': 'Hull strength', 'tooltip.rocketPower': 'Rocket power', 'tooltip.systemCooling': 'System cooling',
       'hud.hull': 'HULL', 'hud.level': 'LVL', 'hud.earthGate': 'EARTH GATE', 'hud.salvageCredits': 'SALVAGE CREDITS',
       'hud.sectorDefense': 'SECTOR DEFENSE', 'hud.wave': 'WAVE', 'hud.standby': 'STANDBY', 'hud.score': 'SCORE', 'hud.best': 'BEST',
@@ -110,7 +110,7 @@
     },
     ko: {
       'language.label': '언어', 'brand.network': '지구 방어 네트워크 - 프론티어 루나', 'aria.gameWorld': '보이드라인 인베이전 게임 화면', 'aria.gameStatus': '게임 상태', 'aria.shipStatus': '함선 상태', 'aria.sectorMinimap': '구역 미니맵', 'aria.abilities': '무기 및 능력', 'aria.upgradeTiers': '설치된 함선 업그레이드 단계',
-      'aria.adminAccess': '관리자 접근 열기', 'aria.pause': '게임 일시 정지', 'aria.closeLevelSelect': '구역 선택 닫기', 'aria.closeSettings': '설정 닫기', 'aria.closeAdmin': '관리자 접근 닫기', 'aria.closeLeaderboard': '순위표 닫기',
+      'aria.adminAccess': '관리자 접근 열기', 'aria.pause': '게임 일시 정지', 'aria.closeLevelSelect': '구역 선택 닫기', 'aria.scrollSectors': '구역 목록 좌우로 이동', 'aria.closeSettings': '설정 닫기', 'aria.closeAdmin': '관리자 접근 닫기', 'aria.closeLeaderboard': '순위표 닫기',
       'tooltip.adminAccess': '관리자 접근', 'tooltip.flightSpeed': '비행 속도', 'tooltip.blasterDamage': '블래스터 피해', 'tooltip.fireRate': '연사력', 'tooltip.hullStrength': '선체 내구도', 'tooltip.rocketPower': '로켓 위력', 'tooltip.systemCooling': '시스템 냉각',
       'hud.hull': '선체', 'hud.level': '레벨', 'hud.earthGate': '지구 관문', 'hud.salvageCredits': '회수 크레딧',
       'hud.sectorDefense': '구역 방어', 'hud.wave': '웨이브', 'hud.standby': '대기', 'hud.score': '점수', 'hud.best': '최고',

@@ -6,7 +6,7 @@
   const TRANSLATIONS = {
     en: {
       'language.label': 'Language', 'brand.network': 'EARTH DEFENSE NETWORK - FRONTIER LUNA', 'aria.gameWorld': 'Voidline Invasion game world', 'aria.gameStatus': 'Game status', 'aria.shipStatus': 'Ship status', 'aria.sectorMinimap': 'Sector minimap', 'aria.abilities': 'Weapons and abilities', 'aria.upgradeTiers': 'Installed ship upgrade tiers',
-      'aria.adminAccess': 'Open admin access', 'aria.pause': 'Pause game', 'aria.closeLevelSelect': 'Close level selection', 'aria.closeSettings': 'Close settings', 'aria.closeAdmin': 'Close admin access', 'aria.closeLeaderboard': 'Close leaderboard',
+      'aria.adminAccess': 'Open admin access', 'aria.pause': 'Pause game', 'aria.closeLevelSelect': 'Close level selection', 'aria.scrollSectors': 'Slide through sectors', 'aria.closeSettings': 'Close settings', 'aria.closeAdmin': 'Close admin access', 'aria.closeLeaderboard': 'Close leaderboard',
       'tooltip.adminAccess': 'Admin access', 'tooltip.flightSpeed': 'Flight speed', 'tooltip.blasterDamage': 'Blaster damage', 'tooltip.fireRate': 'Fire rate', 'tooltip.hullStrength': 'Hull strength', 'tooltip.rocketPower': 'Rocket power', 'tooltip.systemCooling': 'System cooling',
       'hud.hull': 'HULL', 'hud.level': 'LVL', 'hud.earthGate': 'EARTH GATE', 'hud.salvageCredits': 'SALVAGE CREDITS',
       'hud.sectorDefense': 'SECTOR DEFENSE', 'hud.wave': 'WAVE', 'hud.standby': 'STANDBY', 'hud.score': 'SCORE', 'hud.best': 'BEST',
@@ -113,7 +113,7 @@
     },
     ko: {
       'language.label': '언어', 'brand.network': '지구 방어 네트워크 - 프론티어 루나', 'aria.gameWorld': '보이드라인 인베이전 게임 화면', 'aria.gameStatus': '게임 상태', 'aria.shipStatus': '함선 상태', 'aria.sectorMinimap': '구역 미니맵', 'aria.abilities': '무기 및 능력', 'aria.upgradeTiers': '설치된 함선 업그레이드 단계',
-      'aria.adminAccess': '관리자 접근 열기', 'aria.pause': '게임 일시 정지', 'aria.closeLevelSelect': '구역 선택 닫기', 'aria.closeSettings': '설정 닫기', 'aria.closeAdmin': '관리자 접근 닫기', 'aria.closeLeaderboard': '순위표 닫기',
+      'aria.adminAccess': '관리자 접근 열기', 'aria.pause': '게임 일시 정지', 'aria.closeLevelSelect': '구역 선택 닫기', 'aria.scrollSectors': '구역 목록 좌우로 이동', 'aria.closeSettings': '설정 닫기', 'aria.closeAdmin': '관리자 접근 닫기', 'aria.closeLeaderboard': '순위표 닫기',
       'tooltip.adminAccess': '관리자 접근', 'tooltip.flightSpeed': '비행 속도', 'tooltip.blasterDamage': '블래스터 피해', 'tooltip.fireRate': '연사력', 'tooltip.hullStrength': '선체 내구도', 'tooltip.rocketPower': '로켓 위력', 'tooltip.systemCooling': '시스템 냉각',
       'hud.hull': '선체', 'hud.level': '레벨', 'hud.earthGate': '지구 관문', 'hud.salvageCredits': '회수 크레딧',
       'hud.sectorDefense': '구역 방어', 'hud.wave': '웨이브', 'hud.standby': '대기', 'hud.score': '점수', 'hud.best': '최고',
@@ -354,7 +354,7 @@
     'creditText', 'portalWarning', 'lockReadout', 'stationState', 'stationButton', 'intelOverlay', 'intelKicker', 'intelTitle',
     'intelRole', 'intelText', 'intelShip', 'bossOverlay', 'bossKicker', 'bossTitle', 'bossText',
     'sectorOverlay', 'sectorTitle', 'sectorCopy', 'sectorRewardLabel', 'sectorRewardValue',
-    'levelSelectOverlay', 'levelChoices',
+    'levelSelectOverlay', 'levelChoices', 'levelSlider',
     'speedTierText', 'damageTierText', 'rateTierText', 'hullTierText', 'rocketTierText', 'coolingTierText',
     'staticWarning', 'waveCallButton', 'objectiveLabel', 'mapObjectiveLabel', 'stationChoiceOverlay', 'stationChoices', 'stationChoiceClose', 'constructionOverlay',
     'authOverlay', 'authTitle', 'authCopy', 'authForm', 'authUsername', 'authPassword',
@@ -1327,6 +1327,14 @@
       if (unlocked) card.addEventListener('click', () => startGame(false, index));
       ui.levelChoices.append(card);
     });
+    updateLevelSlider();
+  }
+
+  function updateLevelSlider() {
+    const maxScroll = Math.max(0, ui.levelChoices.scrollWidth - ui.levelChoices.clientWidth);
+    ui.levelSlider.max = String(Math.max(1, Math.ceil(maxScroll)));
+    ui.levelSlider.value = String(Math.round(Math.min(maxScroll, ui.levelChoices.scrollLeft)));
+    ui.levelSlider.parentElement.hidden = maxScroll < 1;
   }
 
   function openLevelSelect() {
@@ -1334,6 +1342,7 @@
     mode = 'levelSelect';
     hideOverlays();
     ui.levelSelectOverlay.classList.add('active');
+    updateLevelSlider();
     ui.crosshair.style.opacity = '0';
   }
 
@@ -3881,6 +3890,7 @@
   }
 
   function keyDown(event) {
+    if ((event.target === ui.levelSlider || event.target === ui.levelChoices) && event.code !== 'Escape') return;
     const textEntry = event.target instanceof HTMLInputElement
       || event.target instanceof HTMLTextAreaElement
       || event.target.isContentEditable;
@@ -3971,6 +3981,8 @@
     document.getElementById('tutorialButton').addEventListener('click', () => requirePilot(() => startGame(true)));
     document.getElementById('levelSelectButton').addEventListener('click', () => requirePilot(openLevelSelect));
     document.getElementById('closeLevelSelect').addEventListener('click', closeLevelSelect);
+    ui.levelSlider.addEventListener('input', () => { ui.levelChoices.scrollLeft = Number(ui.levelSlider.value); });
+    ui.levelChoices.addEventListener('scroll', updateLevelSlider, { passive: true });
     document.getElementById('controlsButton').addEventListener('click', () => openSettings('menu'));
     document.getElementById('settingsButton').addEventListener('click', () => openSettings('menu'));
     document.getElementById('pauseButton').addEventListener('click', () => togglePause(true));
@@ -4038,6 +4050,7 @@
   }
   // Browser event listeners and initial application boot.
   window.addEventListener('resize', resize);
+  window.addEventListener('resize', updateLevelSlider);
   window.addEventListener('keydown', keyDown, { passive: false });
   window.addEventListener('keyup', keyUp);
   window.addEventListener('blur', () => { input.keys.clear(); input.pointerDown = false; if (mode === 'playing') togglePause(true); });

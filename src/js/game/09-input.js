@@ -6,6 +6,7 @@
   }
 
   function keyDown(event) {
+    if ((event.target === ui.levelSlider || event.target === ui.levelChoices) && event.code !== 'Escape') return;
     const textEntry = event.target instanceof HTMLInputElement
       || event.target instanceof HTMLTextAreaElement
       || event.target.isContentEditable;
@@ -96,6 +97,8 @@
     document.getElementById('tutorialButton').addEventListener('click', () => requirePilot(() => startGame(true)));
     document.getElementById('levelSelectButton').addEventListener('click', () => requirePilot(openLevelSelect));
     document.getElementById('closeLevelSelect').addEventListener('click', closeLevelSelect);
+    ui.levelSlider.addEventListener('input', () => { ui.levelChoices.scrollLeft = Number(ui.levelSlider.value); });
+    ui.levelChoices.addEventListener('scroll', updateLevelSlider, { passive: true });
     document.getElementById('controlsButton').addEventListener('click', () => openSettings('menu'));
     document.getElementById('settingsButton').addEventListener('click', () => openSettings('menu'));
     document.getElementById('pauseButton').addEventListener('click', () => togglePause(true));

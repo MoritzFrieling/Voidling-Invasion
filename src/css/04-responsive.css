@@ -7,7 +7,7 @@
   .start-grid { grid-template-columns: 1fr; }.start-side { display: none; }.intro { max-width: 560px; }
   .settings-grid { grid-template-columns: 1fr; gap: 28px; max-height: 70vh; overflow-y: auto; }
   .intel-panel { grid-template-columns: 1fr; }.intel-ship { width: 190px; }.intel-copy { text-align: center; }.intel-copy .main-button { margin-inline: auto; }
-  .level-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }.level-card { min-height: 200px; }
+  .level-grid { grid-auto-columns: clamp(210px, 44%, 330px); }.level-card { min-height: 200px; }
   .acknowledgements { font-size: .5rem; }.acknowledgements span { display: none; }
 }
 
@@ -19,7 +19,7 @@
   .upgrade-readout { display: none; }
   .static-warning { right: 12px; bottom: 72px; }.wave-call { bottom: 76px; }
   .upgrade-grid { grid-template-columns: 1fr; max-height: 58vh; overflow-y: auto; }.upgrade-choice { min-height: 130px; }.upgrade-choice .upgrade-icon { margin-bottom: 14px; }
-  .level-grid { grid-template-columns: 1fr; }.level-card { min-height: 165px; }
+  .level-grid { grid-auto-columns: minmax(210px, 86%); }.level-card { min-height: 165px; }
   .start-overlay { padding-inline: 24px; }.intro { margin: 28px 0 24px; }.menu-actions { display: grid; }.menu-actions.primary-actions { display: flex; }.main-button, .secondary-button { width: 100%; }.primary-actions .main-button { width: 220px; }.primary-actions .checkpoint-button { width: calc(100vw - 278px); flex-basis: calc(100vw - 278px); }
 }
 

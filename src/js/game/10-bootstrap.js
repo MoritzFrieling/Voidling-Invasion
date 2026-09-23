@@ -1,5 +1,6 @@
   // Browser event listeners and initial application boot.
   window.addEventListener('resize', resize);
+  window.addEventListener('resize', updateLevelSlider);
   window.addEventListener('keydown', keyDown, { passive: false });
   window.addEventListener('keyup', keyUp);
   window.addEventListener('blur', () => { input.keys.clear(); input.pointerDown = false; if (mode === 'playing') togglePause(true); });
