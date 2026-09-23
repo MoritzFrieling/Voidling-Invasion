@@ -53,7 +53,7 @@
       const range = enemy.boss ? 390 : 310;
       if (distance >= range || distance < 1) continue;
       player.gravityLocked = true;
-      const force = enemy.boss ? 140 : 105;
+      const force = enemy.boss ? 430 : 320;
       pullX += deltaX / distance * force;
       pullY += deltaY / distance * force;
     }
@@ -75,15 +75,15 @@
     }
 
     const precision = input.keys.has('ShiftLeft') || input.keys.has('ShiftRight');
-    const acceleration = player.acceleration * (precision ? .52 : player.jumpBrake > 0 ? .62 : 1);
+    const acceleration = player.acceleration * (precision ? .52 : player.jumpBrake > 0 ? .62 : 1) * (player.gravityLocked ? .4 : 1);
     player.vx += dx * acceleration * dt;
     player.vy += dy * acceleration * dt;
-    player.vx += clamp(pullX, -190, 190) * dt;
-    player.vy += clamp(pullY, -190, 190) * dt;
+    player.vx += clamp(pullX, -550, 550) * dt;
+    player.vy += clamp(pullY, -550, 550) * dt;
     const drag = Math.pow(magnitude ? player.jumpBrake > 0 ? .08 : .12 : player.jumpBrake > 0 ? .02 : .035, dt);
     player.vx *= drag;
     player.vy *= drag;
-    const maxSpeed = player.speed * (player.jumpBrake > 0 ? .58 : precision ? .48 : 1);
+    const maxSpeed = player.speed * (player.jumpBrake > 0 ? .58 : precision ? .48 : 1) * (player.gravityLocked ? .42 : 1);
     const speed = Math.hypot(player.vx, player.vy);
     if (speed > maxSpeed) {
       player.vx = (player.vx / speed) * maxSpeed;

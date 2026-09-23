@@ -253,12 +253,12 @@
 
   const WORLD = { width: 3400, height: 2100 };
   const PORTAL = { x: 3080, y: 1010, radius: 112 };
-  const STATION_SITE = { x: 3000, y: 2000, radius: 112 };
+  const STATION_SITE = { x: 2500, y: 1750, radius: 112 };
 
   function setLevelGeometry(index) {
     const construction = index >= 3;
-    WORLD.width = construction ? 6000 : 3400;
-    WORLD.height = construction ? 4800 : 2100;
+    WORLD.width = construction ? 5000 : 3400;
+    WORLD.height = construction ? 3700 : 2100;
     PORTAL.x = construction ? STATION_SITE.x : 3080;
     PORTAL.y = construction ? STATION_SITE.y : 1010;
     stars.forEach((star, index) => {
@@ -282,16 +282,36 @@
     return { points, segments, length };
   }
 
-  function wormholeOnPath(paths, pathId, pointIndex, minWave = 3) {
+  function createCurvedPath(start, end, bendX, bendY) {
+    const points = [];
+    const steps = 80;
+    for (let step = 0; step <= steps; step += 1) {
+      const t = step / steps;
+      const bend = step === steps ? 0 : Math.sin(Math.PI * 2 * t);
+      points.push({
+        x: start.x + (end.x - start.x) * t + bendX * bend,
+        y: start.y + (end.y - start.y) * t + bendY * bend,
+      });
+    }
+    return createPath(points);
+  }
+
+  function wormholeOnPath(paths, pathId, progress, minWave = 3) {
     const path = paths[pathId];
-    const segment = path.segments[pointIndex - 1];
-    return { ...path.points[pointIndex], pathId, progress: (segment.start + segment.length) / path.length, minWave };
+    const distance = path.length * progress;
+    const segment = path.segments.find((part) => distance <= part.start + part.length) || path.segments[path.segments.length - 1];
+    const t = (distance - segment.start) / segment.length;
+    return {
+      x: segment.a.x + (segment.b.x - segment.a.x) * t,
+      y: segment.a.y + (segment.b.y - segment.a.y) * t,
+      pathId, progress, minWave,
+    };
   }
 
   const SECTOR_FOUR_PATHS = [
-    createPath([{ x: -120, y: -120 }, { x: 360, y: 240 }, { x: 900, y: 510 }, { x: 1420, y: 720 }, { x: 1880, y: 1040 }, { x: 2280, y: 1410 }, { x: 2640, y: 1730 }, { x: STATION_SITE.x, y: STATION_SITE.y }]),
-    createPath([{ x: 800, y: 4920 }, { x: 900, y: 4420 }, { x: 1200, y: 3900 }, { x: 1500, y: 3400 }, { x: 1800, y: 2950 }, { x: 2200, y: 2550 }, { x: 2600, y: 2220 }, { x: STATION_SITE.x, y: STATION_SITE.y }]),
-    createPath([{ x: 6120, y: 2000 }, { x: 5550, y: 1750 }, { x: 5050, y: 1400 }, { x: 4550, y: 1050 }, { x: 4050, y: 1150 }, { x: 3650, y: 1520 }, { x: 3300, y: 1850 }, { x: STATION_SITE.x, y: STATION_SITE.y }]),
+    createCurvedPath({ x: -120, y: 100 }, STATION_SITE, 0, 550),
+    createCurvedPath({ x: 700, y: 3820 }, STATION_SITE, 670, 0),
+    createCurvedPath({ x: 5120, y: 1600 }, STATION_SITE, 0, 615),
   ];
 
   const LEVELS = [
@@ -324,7 +344,7 @@
     {
       nameKey: 'sector.four.name', shortKey: 'sector.four.short', stages: 8, boss: 'bossWarden',
       paths: SECTOR_FOUR_PATHS,
-      wormholes: [wormholeOnPath(SECTOR_FOUR_PATHS, 0, 4), wormholeOnPath(SECTOR_FOUR_PATHS, 1, 4), wormholeOnPath(SECTOR_FOUR_PATHS, 2, 4, 6)],
+      wormholes: [wormholeOnPath(SECTOR_FOUR_PATHS, 0, .55), wormholeOnPath(SECTOR_FOUR_PATHS, 1, .55), wormholeOnPath(SECTOR_FOUR_PATHS, 2, .55, 6)],
     },
   ];
   let currentLevel = 0;
@@ -815,7 +835,7 @@
       level: currentLevel,
       stage: wave,
       progressionVersion: PROGRESSION_VERSION,
-      sectorFourMapVersion: currentLevel === 3 ? 2 : undefined,
+      sectorFourMapVersion: currentLevel === 3 ? 3 : undefined,
       player: checkpointPlayer,
       gateShields,
       score,
@@ -837,20 +857,24 @@
     currentLevel = checkpoint.level;
     setLevelGeometry(currentLevel);
     activePaths = LEVELS[currentLevel].paths;
-    const mapOffset = currentLevel === 3 && Number(checkpoint.sectorFourMapVersion) !== 2
-      ? { x: STATION_SITE.x - 2250, y: STATION_SITE.y - 1600 }
+    const mapVersion = Number(checkpoint.sectorFourMapVersion);
+    const previousStationSite = mapVersion >= 3
+      ? STATION_SITE
+      : mapVersion === 2 ? { x: 3000, y: 2000 } : { x: 2250, y: 1600 };
+    const mapOffset = currentLevel === 3
+      ? { x: STATION_SITE.x - previousStationSite.x, y: STATION_SITE.y - previousStationSite.y }
       : { x: 0, y: 0 };
     player = { ...checkpoint.player, rocketTarget: null, invulnerable: 0, collisionTimer: 0, jumpFlash: 0 };
-    player.x += mapOffset.x;
-    player.y += mapOffset.y;
-    if (Number.isFinite(player.jumpDestinationX)) player.jumpDestinationX += mapOffset.x;
-    if (Number.isFinite(player.jumpDestinationY)) player.jumpDestinationY += mapOffset.y;
+    player.x = clamp(player.x + mapOffset.x, 45, WORLD.width - 45);
+    player.y = clamp(player.y + mapOffset.y, 45, WORLD.height - 45);
+    if (Number.isFinite(player.jumpDestinationX)) player.jumpDestinationX = clamp(player.jumpDestinationX + mapOffset.x, 70, WORLD.width - 70);
+    if (Number.isFinite(player.jumpDestinationY)) player.jumpDestinationY = clamp(player.jumpDestinationY + mapOffset.y, 70, WORLD.height - 70);
     gateShields = checkpoint.gateShields;
     score = checkpoint.score;
     kills = checkpoint.kills;
-    resources = checkpoint.resources.map((resource) => ({ ...resource, x: resource.x + mapOffset.x, y: resource.y + mapOffset.y }));
-    pickups = checkpoint.pickups.map((pickup) => ({ ...pickup, x: pickup.x + mapOffset.x, y: pickup.y + mapOffset.y }));
-    stations = checkpoint.stations.map((station) => ({ ...station, x: station.x + mapOffset.x, y: station.y + mapOffset.y, target: null }));
+    resources = checkpoint.resources.map((resource) => ({ ...resource, x: clamp(resource.x + mapOffset.x, 70, WORLD.width - 70), y: clamp(resource.y + mapOffset.y, 70, WORLD.height - 70) }));
+    pickups = checkpoint.pickups.map((pickup) => ({ ...pickup, x: clamp(pickup.x + mapOffset.x, 70, WORLD.width - 70), y: clamp(pickup.y + mapOffset.y, 70, WORLD.height - 70) }));
+    stations = checkpoint.stations.map((station) => ({ ...station, x: clamp(station.x + mapOffset.x, 70, WORLD.width - 70), y: clamp(station.y + mapOffset.y, 70, WORLD.height - 70), target: null }));
     bullets = [];
     rockets = [];
     enemies = [];
@@ -929,7 +953,7 @@
     ensureCampaignCheckpoints();
     applyCheckpoint(campaignState.checkpoints[currentLevel] || expectedCheckpoint(currentLevel));
     if (currentLevel === 3) player.credits = Math.max(player.credits, 340);
-    if (currentLevel === 3) { player.x = 2800; player.y = 2000; }
+    if (currentLevel === 3) { player.x = STATION_SITE.x - 200; player.y = STATION_SITE.y; }
     waveClearTimer = 0;
     formationStartedAt = 0;
     formationParTime = 0;
@@ -1568,7 +1592,8 @@
     const difficultyScale = (1.05 + rampStage * .125 + currentLevel * .16)
       * (LEVELS[currentLevel].enemyDurability || 1)
       * (LEVELS[currentLevel].enemyTankinessMultiplier || 1);
-    const maxHp = blueprint.hp * difficultyScale * hpVariance;
+    const heavyHullScale = currentLevel === 3 && blueprint.major ? (blueprint.boss ? .58 : .62) : 1;
+    const maxHp = blueprint.hp * difficultyScale * heavyHullScale * hpVariance;
     const lane = sectorFourLight
       ? type === 'striker' ? rand(-85, 85) : rand(-36, 36)
       : type === 'striker' ? rand(-210, 210) : rand(-58, 58);
@@ -1608,8 +1633,8 @@
       shielded: Boolean(blueprint.shielded),
       shieldCharges: blueprint.shieldCharges || 0,
       maxShieldCharges: blueprint.shieldCharges || 0,
-      shieldHp: (blueprint.shield || 0) * difficultyScale,
-      maxShield: (blueprint.shield || 0) * difficultyScale,
+      shieldHp: (blueprint.shield || 0) * difficultyScale * heavyHullScale,
+      maxShield: (blueprint.shield || 0) * difficultyScale * heavyHullScale,
       emergencyHeal: blueprint.emergencyHeal || 0,
       emergencyHealUsed: false,
       bossSkill: blueprint.bossSkill || '',
@@ -1740,7 +1765,7 @@
       const range = enemy.boss ? 390 : 310;
       if (distance >= range || distance < 1) continue;
       player.gravityLocked = true;
-      const force = enemy.boss ? 140 : 105;
+      const force = enemy.boss ? 430 : 320;
       pullX += deltaX / distance * force;
       pullY += deltaY / distance * force;
     }
@@ -1762,15 +1787,15 @@
     }
 
     const precision = input.keys.has('ShiftLeft') || input.keys.has('ShiftRight');
-    const acceleration = player.acceleration * (precision ? .52 : player.jumpBrake > 0 ? .62 : 1);
+    const acceleration = player.acceleration * (precision ? .52 : player.jumpBrake > 0 ? .62 : 1) * (player.gravityLocked ? .4 : 1);
     player.vx += dx * acceleration * dt;
     player.vy += dy * acceleration * dt;
-    player.vx += clamp(pullX, -190, 190) * dt;
-    player.vy += clamp(pullY, -190, 190) * dt;
+    player.vx += clamp(pullX, -550, 550) * dt;
+    player.vy += clamp(pullY, -550, 550) * dt;
     const drag = Math.pow(magnitude ? player.jumpBrake > 0 ? .08 : .12 : player.jumpBrake > 0 ? .02 : .035, dt);
     player.vx *= drag;
     player.vy *= drag;
-    const maxSpeed = player.speed * (player.jumpBrake > 0 ? .58 : precision ? .48 : 1);
+    const maxSpeed = player.speed * (player.jumpBrake > 0 ? .58 : precision ? .48 : 1) * (player.gravityLocked ? .42 : 1);
     const speed = Math.hypot(player.vx, player.vy);
     if (speed > maxSpeed) {
       player.vx = (player.vx / speed) * maxSpeed;
@@ -2856,8 +2881,8 @@
     stations = [];
     resources = [];
     pickups = [];
-    player.x = currentLevel === 3 ? 2800 : 760;
-    player.y = currentLevel === 3 ? 2000 : 1030;
+    player.x = currentLevel === 3 ? STATION_SITE.x - 200 : 760;
+    player.y = currentLevel === 3 ? STATION_SITE.y : 1030;
     if (currentLevel === 3) player.credits = Math.max(player.credits, 340);
     openingWaveTimer = 0;
     player.vx = 0;

@@ -173,7 +173,7 @@
       level: currentLevel,
       stage: wave,
       progressionVersion: PROGRESSION_VERSION,
-      sectorFourMapVersion: currentLevel === 3 ? 2 : undefined,
+      sectorFourMapVersion: currentLevel === 3 ? 3 : undefined,
       player: checkpointPlayer,
       gateShields,
       score,
@@ -195,20 +195,24 @@
     currentLevel = checkpoint.level;
     setLevelGeometry(currentLevel);
     activePaths = LEVELS[currentLevel].paths;
-    const mapOffset = currentLevel === 3 && Number(checkpoint.sectorFourMapVersion) !== 2
-      ? { x: STATION_SITE.x - 2250, y: STATION_SITE.y - 1600 }
+    const mapVersion = Number(checkpoint.sectorFourMapVersion);
+    const previousStationSite = mapVersion >= 3
+      ? STATION_SITE
+      : mapVersion === 2 ? { x: 3000, y: 2000 } : { x: 2250, y: 1600 };
+    const mapOffset = currentLevel === 3
+      ? { x: STATION_SITE.x - previousStationSite.x, y: STATION_SITE.y - previousStationSite.y }
       : { x: 0, y: 0 };
     player = { ...checkpoint.player, rocketTarget: null, invulnerable: 0, collisionTimer: 0, jumpFlash: 0 };
-    player.x += mapOffset.x;
-    player.y += mapOffset.y;
-    if (Number.isFinite(player.jumpDestinationX)) player.jumpDestinationX += mapOffset.x;
-    if (Number.isFinite(player.jumpDestinationY)) player.jumpDestinationY += mapOffset.y;
+    player.x = clamp(player.x + mapOffset.x, 45, WORLD.width - 45);
+    player.y = clamp(player.y + mapOffset.y, 45, WORLD.height - 45);
+    if (Number.isFinite(player.jumpDestinationX)) player.jumpDestinationX = clamp(player.jumpDestinationX + mapOffset.x, 70, WORLD.width - 70);
+    if (Number.isFinite(player.jumpDestinationY)) player.jumpDestinationY = clamp(player.jumpDestinationY + mapOffset.y, 70, WORLD.height - 70);
     gateShields = checkpoint.gateShields;
     score = checkpoint.score;
     kills = checkpoint.kills;
-    resources = checkpoint.resources.map((resource) => ({ ...resource, x: resource.x + mapOffset.x, y: resource.y + mapOffset.y }));
-    pickups = checkpoint.pickups.map((pickup) => ({ ...pickup, x: pickup.x + mapOffset.x, y: pickup.y + mapOffset.y }));
-    stations = checkpoint.stations.map((station) => ({ ...station, x: station.x + mapOffset.x, y: station.y + mapOffset.y, target: null }));
+    resources = checkpoint.resources.map((resource) => ({ ...resource, x: clamp(resource.x + mapOffset.x, 70, WORLD.width - 70), y: clamp(resource.y + mapOffset.y, 70, WORLD.height - 70) }));
+    pickups = checkpoint.pickups.map((pickup) => ({ ...pickup, x: clamp(pickup.x + mapOffset.x, 70, WORLD.width - 70), y: clamp(pickup.y + mapOffset.y, 70, WORLD.height - 70) }));
+    stations = checkpoint.stations.map((station) => ({ ...station, x: clamp(station.x + mapOffset.x, 70, WORLD.width - 70), y: clamp(station.y + mapOffset.y, 70, WORLD.height - 70), target: null }));
     bullets = [];
     rockets = [];
     enemies = [];
@@ -287,7 +291,7 @@
     ensureCampaignCheckpoints();
     applyCheckpoint(campaignState.checkpoints[currentLevel] || expectedCheckpoint(currentLevel));
     if (currentLevel === 3) player.credits = Math.max(player.credits, 340);
-    if (currentLevel === 3) { player.x = 2800; player.y = 2000; }
+    if (currentLevel === 3) { player.x = STATION_SITE.x - 200; player.y = STATION_SITE.y; }
     waveClearTimer = 0;
     formationStartedAt = 0;
     formationParTime = 0;

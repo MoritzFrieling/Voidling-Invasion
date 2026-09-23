@@ -203,7 +203,8 @@
     const difficultyScale = (1.05 + rampStage * .125 + currentLevel * .16)
       * (LEVELS[currentLevel].enemyDurability || 1)
       * (LEVELS[currentLevel].enemyTankinessMultiplier || 1);
-    const maxHp = blueprint.hp * difficultyScale * hpVariance;
+    const heavyHullScale = currentLevel === 3 && blueprint.major ? (blueprint.boss ? .58 : .62) : 1;
+    const maxHp = blueprint.hp * difficultyScale * heavyHullScale * hpVariance;
     const lane = sectorFourLight
       ? type === 'striker' ? rand(-85, 85) : rand(-36, 36)
       : type === 'striker' ? rand(-210, 210) : rand(-58, 58);
@@ -243,8 +244,8 @@
       shielded: Boolean(blueprint.shielded),
       shieldCharges: blueprint.shieldCharges || 0,
       maxShieldCharges: blueprint.shieldCharges || 0,
-      shieldHp: (blueprint.shield || 0) * difficultyScale,
-      maxShield: (blueprint.shield || 0) * difficultyScale,
+      shieldHp: (blueprint.shield || 0) * difficultyScale * heavyHullScale,
+      maxShield: (blueprint.shield || 0) * difficultyScale * heavyHullScale,
       emergencyHeal: blueprint.emergencyHeal || 0,
       emergencyHealUsed: false,
       bossSkill: blueprint.bossSkill || '',

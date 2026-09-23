@@ -6,12 +6,12 @@
 
   const WORLD = { width: 3400, height: 2100 };
   const PORTAL = { x: 3080, y: 1010, radius: 112 };
-  const STATION_SITE = { x: 3000, y: 2000, radius: 112 };
+  const STATION_SITE = { x: 2500, y: 1750, radius: 112 };
 
   function setLevelGeometry(index) {
     const construction = index >= 3;
-    WORLD.width = construction ? 6000 : 3400;
-    WORLD.height = construction ? 4800 : 2100;
+    WORLD.width = construction ? 5000 : 3400;
+    WORLD.height = construction ? 3700 : 2100;
     PORTAL.x = construction ? STATION_SITE.x : 3080;
     PORTAL.y = construction ? STATION_SITE.y : 1010;
     stars.forEach((star, index) => {
@@ -35,16 +35,36 @@
     return { points, segments, length };
   }
 
-  function wormholeOnPath(paths, pathId, pointIndex, minWave = 3) {
+  function createCurvedPath(start, end, bendX, bendY) {
+    const points = [];
+    const steps = 80;
+    for (let step = 0; step <= steps; step += 1) {
+      const t = step / steps;
+      const bend = step === steps ? 0 : Math.sin(Math.PI * 2 * t);
+      points.push({
+        x: start.x + (end.x - start.x) * t + bendX * bend,
+        y: start.y + (end.y - start.y) * t + bendY * bend,
+      });
+    }
+    return createPath(points);
+  }
+
+  function wormholeOnPath(paths, pathId, progress, minWave = 3) {
     const path = paths[pathId];
-    const segment = path.segments[pointIndex - 1];
-    return { ...path.points[pointIndex], pathId, progress: (segment.start + segment.length) / path.length, minWave };
+    const distance = path.length * progress;
+    const segment = path.segments.find((part) => distance <= part.start + part.length) || path.segments[path.segments.length - 1];
+    const t = (distance - segment.start) / segment.length;
+    return {
+      x: segment.a.x + (segment.b.x - segment.a.x) * t,
+      y: segment.a.y + (segment.b.y - segment.a.y) * t,
+      pathId, progress, minWave,
+    };
   }
 
   const SECTOR_FOUR_PATHS = [
-    createPath([{ x: -120, y: -120 }, { x: 360, y: 240 }, { x: 900, y: 510 }, { x: 1420, y: 720 }, { x: 1880, y: 1040 }, { x: 2280, y: 1410 }, { x: 2640, y: 1730 }, { x: STATION_SITE.x, y: STATION_SITE.y }]),
-    createPath([{ x: 800, y: 4920 }, { x: 900, y: 4420 }, { x: 1200, y: 3900 }, { x: 1500, y: 3400 }, { x: 1800, y: 2950 }, { x: 2200, y: 2550 }, { x: 2600, y: 2220 }, { x: STATION_SITE.x, y: STATION_SITE.y }]),
-    createPath([{ x: 6120, y: 2000 }, { x: 5550, y: 1750 }, { x: 5050, y: 1400 }, { x: 4550, y: 1050 }, { x: 4050, y: 1150 }, { x: 3650, y: 1520 }, { x: 3300, y: 1850 }, { x: STATION_SITE.x, y: STATION_SITE.y }]),
+    createCurvedPath({ x: -120, y: 100 }, STATION_SITE, 0, 550),
+    createCurvedPath({ x: 700, y: 3820 }, STATION_SITE, 670, 0),
+    createCurvedPath({ x: 5120, y: 1600 }, STATION_SITE, 0, 615),
   ];
 
   const LEVELS = [
@@ -77,7 +97,7 @@
     {
       nameKey: 'sector.four.name', shortKey: 'sector.four.short', stages: 8, boss: 'bossWarden',
       paths: SECTOR_FOUR_PATHS,
-      wormholes: [wormholeOnPath(SECTOR_FOUR_PATHS, 0, 4), wormholeOnPath(SECTOR_FOUR_PATHS, 1, 4), wormholeOnPath(SECTOR_FOUR_PATHS, 2, 4, 6)],
+      wormholes: [wormholeOnPath(SECTOR_FOUR_PATHS, 0, .55), wormholeOnPath(SECTOR_FOUR_PATHS, 1, .55), wormholeOnPath(SECTOR_FOUR_PATHS, 2, .55, 6)],
     },
   ];
   let currentLevel = 0;

@@ -133,8 +133,8 @@
     stations = [];
     resources = [];
     pickups = [];
-    player.x = currentLevel === 3 ? 2800 : 760;
-    player.y = currentLevel === 3 ? 2000 : 1030;
+    player.x = currentLevel === 3 ? STATION_SITE.x - 200 : 760;
+    player.y = currentLevel === 3 ? STATION_SITE.y : 1030;
     if (currentLevel === 3) player.credits = Math.max(player.credits, 340);
     openingWaveTimer = 0;
     player.vx = 0;
