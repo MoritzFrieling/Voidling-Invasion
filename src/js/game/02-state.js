@@ -15,7 +15,7 @@
     lastPointerAt: -Infinity,
   };
 
-  const stars = Array.from({ length: 340 }, (_, i) => ({
+  const stars = Array.from({ length: 900 }, (_, i) => ({
     x: (i * 977 + 113) % WORLD.width,
     y: (i * 631 + 71) % WORLD.height,
     size: i % 17 === 0 ? 1.8 : i % 5 === 0 ? 1.15 : .65,

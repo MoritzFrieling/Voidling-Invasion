@@ -71,7 +71,8 @@
     ctx.save();
     const parallaxX = camera.x * .2;
     const parallaxY = camera.y * .2;
-    for (const star of stars) {
+    for (let index = 0; index < (currentLevel === 3 ? stars.length : 340); index += 1) {
+      const star = stars[index];
       let sx = (star.x - parallaxX * star.depth) % (WORLD.width + screenWidth);
       let sy = (star.y - parallaxY * star.depth) % (WORLD.height + screenHeight);
       if (sx < 0) sx += WORLD.width + screenWidth;

@@ -510,12 +510,12 @@
     enemies.forEach((enemy) => {
       const slowingStation = stations.find((station) => station.type === 'network' && distanceSq(station, enemy) < station.range ** 2);
       enemy.progress += enemy.speed * (slowingStation ? (enemy.boss ? .84 : .62) : 1) * dt;
-      enemy.wobble += dt * (enemy.type === 'striker' ? 1.15 : 1.7);
+      enemy.wobble += dt * enemy.wobbleRate;
       enemy.hitFlash = Math.max(0, enemy.hitFlash - dt);
       enemy.shieldHitTimer = Math.max(0, enemy.shieldHitTimer - dt);
       const point = getPathPoint(enemy.progress, enemy.pathId);
-      const laneTaper = enemy.type === 'striker' ? clamp((enemy.pathLength - enemy.progress) / 420, 0, 1) : 1;
-      const sway = enemy.lane * laneTaper + Math.sin(enemy.wobble) * (enemy.boss ? 22 : 13);
+      const laneTaper = enemy.type === 'striker' ? clamp((enemy.pathLength - enemy.progress) / enemy.laneTaperDistance, 0, 1) : 1;
+      const sway = enemy.lane * laneTaper + Math.sin(enemy.wobble) * enemy.wobbleAmplitude;
       enemy.x = point.x + point.nx * sway;
       enemy.y = point.y + point.ny * sway;
       enemy.angle = point.angle + Math.cos(enemy.wobble * .8) * .08;

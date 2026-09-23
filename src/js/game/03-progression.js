@@ -173,6 +173,7 @@
       level: currentLevel,
       stage: wave,
       progressionVersion: PROGRESSION_VERSION,
+      sectorFourMapVersion: currentLevel === 3 ? 2 : undefined,
       player: checkpointPlayer,
       gateShields,
       score,
@@ -194,13 +195,20 @@
     currentLevel = checkpoint.level;
     setLevelGeometry(currentLevel);
     activePaths = LEVELS[currentLevel].paths;
+    const mapOffset = currentLevel === 3 && Number(checkpoint.sectorFourMapVersion) !== 2
+      ? { x: STATION_SITE.x - 2250, y: STATION_SITE.y - 1600 }
+      : { x: 0, y: 0 };
     player = { ...checkpoint.player, rocketTarget: null, invulnerable: 0, collisionTimer: 0, jumpFlash: 0 };
+    player.x += mapOffset.x;
+    player.y += mapOffset.y;
+    if (Number.isFinite(player.jumpDestinationX)) player.jumpDestinationX += mapOffset.x;
+    if (Number.isFinite(player.jumpDestinationY)) player.jumpDestinationY += mapOffset.y;
     gateShields = checkpoint.gateShields;
     score = checkpoint.score;
     kills = checkpoint.kills;
-    resources = checkpoint.resources.map((resource) => ({ ...resource }));
-    pickups = checkpoint.pickups.map((pickup) => ({ ...pickup }));
-    stations = checkpoint.stations.map((station) => ({ ...station, target: null }));
+    resources = checkpoint.resources.map((resource) => ({ ...resource, x: resource.x + mapOffset.x, y: resource.y + mapOffset.y }));
+    pickups = checkpoint.pickups.map((pickup) => ({ ...pickup, x: pickup.x + mapOffset.x, y: pickup.y + mapOffset.y }));
+    stations = checkpoint.stations.map((station) => ({ ...station, x: station.x + mapOffset.x, y: station.y + mapOffset.y, target: null }));
     bullets = [];
     rockets = [];
     enemies = [];
@@ -279,7 +287,7 @@
     ensureCampaignCheckpoints();
     applyCheckpoint(campaignState.checkpoints[currentLevel] || expectedCheckpoint(currentLevel));
     if (currentLevel === 3) player.credits = Math.max(player.credits, 340);
-    if (currentLevel === 3) { player.x = 2050; player.y = 1600; }
+    if (currentLevel === 3) { player.x = 2800; player.y = 2000; }
     waveClearTimer = 0;
     formationStartedAt = 0;
     formationParTime = 0;

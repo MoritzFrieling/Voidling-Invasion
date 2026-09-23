@@ -53,7 +53,7 @@
     const level = LEVELS[currentLevel];
     spawnQueue = [];
     const regularCount = currentLevel === 3
-      ? Math.min(20, (wave === 1 ? 3 : 5 + wave * 2) + formation)
+      ? (wave === 1 ? 3 + formation : Math.min(15, 4 + Math.ceil(wave * 1.1) + formation))
       : 4 + Math.ceil(wave * 1.15) + currentLevel * 2 + formation;
     const available = ['scout', 'raider'];
     if (wave >= 2) available.push('striker');
@@ -197,16 +197,25 @@
     const at = getPathPoint(progress, pathId);
     const campaignStage = LEVELS.slice(0, currentLevel).reduce((sum, level) => sum + level.stages, 0) + wave;
     const rampStage = Math.max(0, campaignStage - 1);
+    const sectorFourLight = currentLevel === 3 && ['scout', 'raider', 'striker', 'interceptor'].includes(type);
     const hpVariance = rand(.86, 1.28);
-    const speedVariance = rand(.86, 1.17);
+    const speedVariance = sectorFourLight ? rand(.94, 1.08) : rand(.86, 1.17);
     const difficultyScale = (1.05 + rampStage * .125 + currentLevel * .16)
       * (LEVELS[currentLevel].enemyDurability || 1)
       * (LEVELS[currentLevel].enemyTankinessMultiplier || 1);
     const maxHp = blueprint.hp * difficultyScale * hpVariance;
-    const lane = type === 'striker' ? rand(-210, 210) : rand(-58, 58);
+    const lane = sectorFourLight
+      ? type === 'striker' ? rand(-85, 85) : rand(-36, 36)
+      : type === 'striker' ? rand(-210, 210) : rand(-58, 58);
     const wobble = rand(0, Math.PI * 2);
-    const laneTaper = type === 'striker' ? clamp((path.length - progress) / 420, 0, 1) : 1;
-    const sway = lane * laneTaper + Math.sin(wobble) * (blueprint.boss ? 22 : 13);
+    const laneTaperDistance = sectorFourLight && type === 'striker' ? 700 : 420;
+    const wobbleAmplitude = blueprint.boss ? 22 : sectorFourLight ? 5 : 13;
+    const wobbleRate = sectorFourLight ? .8 : type === 'striker' ? 1.15 : 1.7;
+    const laneTaper = type === 'striker' ? clamp((path.length - progress) / laneTaperDistance, 0, 1) : 1;
+    const sway = lane * laneTaper + Math.sin(wobble) * wobbleAmplitude;
+    const speedScale = currentLevel === 3
+      ? (1.3 + Math.max(0, wave - 1) * .015) * (type === 'striker' ? .82 : sectorFourLight ? .9 : 1)
+      : 1 + rampStage * .022 + currentLevel * .015;
     const enemy = {
       type,
       x: at.x + at.nx * sway,
@@ -216,10 +225,13 @@
       progress,
       lane,
       wobble,
+      wobbleAmplitude,
+      wobbleRate,
+      laneTaperDistance,
       radius: blueprint.radius,
       hp: maxHp,
       maxHp,
-      speed: blueprint.speed * (1 + rampStage * .022 + currentLevel * .015) * speedVariance,
+      speed: blueprint.speed * speedScale * speedVariance,
       score: blueprint.score,
       xp: blueprint.xp,
       color: blueprint.color,
@@ -266,7 +278,7 @@
     const path = activePaths[pathId] || activePaths[0];
     const d = clamp(distance, 0, path.length);
     const position = getPathPosition(path, d);
-    const turnSmoothingDistance = 180;
+    const turnSmoothingDistance = currentLevel === 3 ? 280 : 180;
     const before = getPathPosition(path, d - turnSmoothingDistance);
     const after = getPathPosition(path, d + turnSmoothingDistance);
     const angle = Math.atan2(after.y - before.y, after.x - before.x);

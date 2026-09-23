@@ -6,14 +6,18 @@
 
   const WORLD = { width: 3400, height: 2100 };
   const PORTAL = { x: 3080, y: 1010, radius: 112 };
-  const STATION_SITE = { x: 2250, y: 1600, radius: 112 };
+  const STATION_SITE = { x: 3000, y: 2000, radius: 112 };
 
   function setLevelGeometry(index) {
     const construction = index >= 3;
-    WORLD.width = construction ? 4600 : 3400;
-    WORLD.height = construction ? 3200 : 2100;
+    WORLD.width = construction ? 6000 : 3400;
+    WORLD.height = construction ? 4800 : 2100;
     PORTAL.x = construction ? STATION_SITE.x : 3080;
     PORTAL.y = construction ? STATION_SITE.y : 1010;
+    stars.forEach((star, index) => {
+      star.x = (index * 977 + 113) % WORLD.width;
+      star.y = (index * 631 + 71) % WORLD.height;
+    });
   }
 
   function createPath(points) {
@@ -38,9 +42,9 @@
   }
 
   const SECTOR_FOUR_PATHS = [
-    createPath([{ x: 1650, y: -120 }, { x: 1300, y: 500 }, { x: 1950, y: 780 }, { x: 1480, y: 1000 }, { x: 1980, y: 1170 }, { x: 1620, y: 1390 }, { x: STATION_SITE.x, y: STATION_SITE.y }]),
-    createPath([{ x: 1200, y: 3320 }, { x: 1570, y: 2720 }, { x: 1050, y: 2450 }, { x: 1680, y: 2200 }, { x: 1230, y: 1980 }, { x: 1800, y: 1770 }, { x: STATION_SITE.x, y: STATION_SITE.y }]),
-    createPath([{ x: 4720, y: 1000 }, { x: 4100, y: 1200 }, { x: 3800, y: 780 }, { x: 3400, y: 1300 }, { x: 3000, y: 950 }, { x: 2600, y: 1500 }, { x: STATION_SITE.x, y: STATION_SITE.y }]),
+    createPath([{ x: -120, y: -120 }, { x: 360, y: 240 }, { x: 900, y: 510 }, { x: 1420, y: 720 }, { x: 1880, y: 1040 }, { x: 2280, y: 1410 }, { x: 2640, y: 1730 }, { x: STATION_SITE.x, y: STATION_SITE.y }]),
+    createPath([{ x: 800, y: 4920 }, { x: 900, y: 4420 }, { x: 1200, y: 3900 }, { x: 1500, y: 3400 }, { x: 1800, y: 2950 }, { x: 2200, y: 2550 }, { x: 2600, y: 2220 }, { x: STATION_SITE.x, y: STATION_SITE.y }]),
+    createPath([{ x: 6120, y: 2000 }, { x: 5550, y: 1750 }, { x: 5050, y: 1400 }, { x: 4550, y: 1050 }, { x: 4050, y: 1150 }, { x: 3650, y: 1520 }, { x: 3300, y: 1850 }, { x: STATION_SITE.x, y: STATION_SITE.y }]),
   ];
 
   const LEVELS = [
@@ -73,7 +77,7 @@
     {
       nameKey: 'sector.four.name', shortKey: 'sector.four.short', stages: 8, boss: 'bossWarden',
       paths: SECTOR_FOUR_PATHS,
-      wormholes: [wormholeOnPath(SECTOR_FOUR_PATHS, 0, 3), wormholeOnPath(SECTOR_FOUR_PATHS, 1, 3), wormholeOnPath(SECTOR_FOUR_PATHS, 2, 3, 6)],
+      wormholes: [wormholeOnPath(SECTOR_FOUR_PATHS, 0, 4), wormholeOnPath(SECTOR_FOUR_PATHS, 1, 4), wormholeOnPath(SECTOR_FOUR_PATHS, 2, 4, 6)],
     },
   ];
   let currentLevel = 0;
