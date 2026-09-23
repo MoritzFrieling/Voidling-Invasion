@@ -3,6 +3,8 @@
     ui.waveCallButton.classList.toggle('active', available);
     ui.waveCallButton.disabled = !available;
     ui.waveCallButton.setAttribute('aria-hidden', String(!available));
+    ui.waveCallButton.querySelector('span').textContent = t('hud.callNextWave');
+    ui.waveCallButton.querySelector('b').hidden = openingWaveTimer > 0;
   }
 
   function togglePause(forcePause = null) {
@@ -50,23 +52,33 @@
   function prepareFormation() {
     const level = LEVELS[currentLevel];
     spawnQueue = [];
-    const regularCount = 4 + Math.ceil(wave * 1.15) + currentLevel * 2 + formation;
+    const regularCount = currentLevel === 3
+      ? Math.min(20, (wave === 1 ? 3 : 5 + wave * 2) + formation)
+      : 4 + Math.ceil(wave * 1.15) + currentLevel * 2 + formation;
     const available = ['scout', 'raider'];
     if (wave >= 2) available.push('striker');
     if (wave >= 3) available.push('major');
     if (currentLevel >= 1 && wave >= 2) available.push('carrier');
     if (currentLevel >= 2 && wave >= 2) available.push('sentinel');
+    if (currentLevel >= 3 && wave >= 2) available.push('gravity');
+    if (currentLevel >= 3 && wave >= 3) available.push('repair');
     for (let i = 0; i < regularCount; i += 1) {
       let type = available[(i * 7 + wave * 3 + formation * 2) % available.length];
+      if (currentLevel === 3 && wave === 1) type = i % 3 === 0 ? 'raider' : 'scout';
       if (wave === 1 && formation === 1 && i === 0) type = 'scout';
       if (wave === 1 && formation === 1 && i === 1) type = 'raider';
+      if (currentLevel === 3 && wave === 2 && formation === 1 && i === 0) type = 'gravity';
+      if (currentLevel === 3 && wave === 3 && formation === 1 && i === 0) type = 'repair';
       if (type === 'carrier' && i % 7 !== 4) type = 'raider';
       if (type === 'sentinel' && i % 6 !== 3) type = 'major';
+      if (type === 'repair' && i % 7 !== 2 && !(wave === 3 && formation === 1 && i === 0)) type = 'raider';
+      if (type === 'gravity' && i % 6 !== 1 && !(wave === 2 && formation === 1 && i === 0)) type = 'scout';
       const pathId = (i + wave + formation) % level.paths.length;
       let entryProgress = 0;
       let fromWormhole = false;
-      if (level.wormholes.length && wave >= 3 && i > 2 && i % 5 === 0) {
-        const wormhole = level.wormholes[(i + wave + formation) % level.wormholes.length];
+      const activeWormholes = level.wormholes.filter((wormhole) => wave >= (wormhole.minWave || 3));
+      if (activeWormholes.length && wave >= 3 && i > 2 && i % 5 === 0) {
+        const wormhole = activeWormholes[(i + wave + formation) % activeWormholes.length];
         entryProgress = level.paths[wormhole.pathId].length * wormhole.progress;
         fromWormhole = true;
         spawnQueue.push({ type, pathId: wormhole.pathId, entryProgress, fromWormhole });
@@ -114,10 +126,13 @@
     interceptor: { nameKey: 'enemy.interceptor.name', roleKey: 'enemy.interceptor.role', descriptionKey: 'enemy.interceptor.description', radius: 10, hp: 34, speed: 148, score: 80, xp: 7, color: '#ff9f88', interceptor: true },
     carrier: { nameKey: 'enemy.carrier.name', roleKey: 'enemy.carrier.role', descriptionKey: 'enemy.carrier.description', radius: 37, hp: 520, speed: 49, score: 920, xp: 60, color: '#f071c8', major: true, carrier: true },
     sentinel: { nameKey: 'enemy.sentinel.name', roleKey: 'enemy.sentinel.role', descriptionKey: 'enemy.sentinel.description', radius: 29, hp: 310, shield: 0, shieldCharges: 2, speed: 62, score: 840, xp: 58, color: '#aeb8c0', major: true, shielded: true },
+    gravity: { nameKey: 'enemy.gravity.name', roleKey: 'enemy.gravity.role', descriptionKey: 'enemy.gravity.description', radius: 25, hp: 210, speed: 68, score: 620, xp: 42, color: '#ad91ff' },
+    repair: { nameKey: 'enemy.repair.name', roleKey: 'enemy.repair.role', descriptionKey: 'enemy.repair.description', radius: 27, hp: 190, speed: 66, score: 660, xp: 44, color: '#71efb1' },
     bossOmega: { nameKey: 'enemy.bossOmega.name', roleKey: 'enemy.bossOmega.role', descriptionKey: 'enemy.bossOmega.description', radius: 66, hp: 2280, speed: 34, score: 5400, xp: 260, color: '#ff506b', major: true, boss: true, bossSkill: 'rockets' },
     // Offset Sector Two's 20% enemy durability bonus so this boss keeps its existing effective HP.
     bossCarrier: { nameKey: 'enemy.bossCarrier.name', roleKey: 'enemy.bossCarrier.role', descriptionKey: 'enemy.bossCarrier.description', radius: 74, hp: 4600 / 1.2, speed: 29, score: 7600, xp: 340, color: '#ef67d1', major: true, boss: true, carrier: true, bossSkill: 'swarm', emergencyHeal: .15 },
     bossTitan: { nameKey: 'enemy.bossTitan.name', roleKey: 'enemy.bossTitan.role', descriptionKey: 'enemy.bossTitan.description', radius: 82, hp: 2520, shield: 330, speed: 26, score: 12000, xp: 500, color: '#aeb8c0', major: true, boss: true, shielded: true, bossSkill: 'titan' },
+    bossWarden: { nameKey: 'enemy.bossWarden.name', roleKey: 'enemy.bossWarden.role', descriptionKey: 'enemy.bossWarden.description', radius: 86, hp: 3100, speed: 28, score: 15000, xp: 600, color: '#b18bff', major: true, boss: true, bossSkill: 'gravity' },
   };
 
   function activateWave() {
@@ -128,7 +143,7 @@
     announcementTimer = 2.2;
     spawnTimer = .55;
     formationStartedAt = gameClock;
-    const sectorThreeSpacing = currentLevel === 2 ? 1.08 : 1;
+    const sectorThreeSpacing = currentLevel === 3 ? 1.3 : currentLevel === 2 ? 1.08 : 1;
     formationParTime = (18 + spawnQueue.length * 1.45 + currentLevel * 2.5) * sectorThreeSpacing;
     formationGateShields = gateShields;
     waveReady = false;
@@ -221,6 +236,7 @@
       emergencyHeal: blueprint.emergencyHeal || 0,
       emergencyHealUsed: false,
       bossSkill: blueprint.bossSkill || '',
+      supportTimer: rand(2, 3),
       rocketTimer: rand(1.3, 3),
       spawnTimer: blueprint.carrier ? rand(3.55, 5.95) : rand(3.2, 5.4),
       shieldHitTimer: 0,

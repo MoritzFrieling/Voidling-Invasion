@@ -31,6 +31,7 @@
     if (event.code === 'Escape') {
       if (ui.authOverlay.classList.contains('active')) closeAdminAccess();
       else if (ui.leaderboardOverlay.classList.contains('active')) closeLeaderboard();
+      else if (mode === 'stationChoice') closeStationChoices();
       else if (mode === 'levelSelect') closeLevelSelect();
       else togglePause();
     }
@@ -41,11 +42,15 @@
       else if (mode === 'briefing') showNextIntel();
       else if (mode === 'cutscene') activateWave();
       else if (mode === 'sector') enterNextSector();
+      else if (mode === 'construction') launchConstructionDefense();
     }
     if (event.code === 'KeyT' && mode === 'menu') requirePilot(() => startGame(true));
     if (event.code === 'KeyL' && mode === 'menu') requirePilot(openLevelSelect);
     if (mode === 'upgrade' && ['Digit1', 'Digit2', 'Digit3'].includes(event.code)) {
       ui.upgradeChoices.children[Number(event.code.at(-1)) - 1]?.click();
+    }
+    if (mode === 'stationChoice' && ['Digit1', 'Digit2', 'Digit3'].includes(event.code)) {
+      ui.stationChoices.children[Number(event.code.at(-1)) - 1]?.click();
     }
   }
 
@@ -105,6 +110,12 @@
     document.getElementById('intelContinue').addEventListener('click', showNextIntel);
     document.getElementById('skipBossIntro').addEventListener('click', activateWave);
     document.getElementById('nextSectorButton').addEventListener('click', enterNextSector);
+    document.getElementById('beginConstructionButton').addEventListener('click', launchConstructionDefense);
+    ui.stationChoiceClose.addEventListener('click', closeStationChoices);
+    ui.stationChoices.addEventListener('click', (event) => {
+      const choice = event.target.closest('[data-type]');
+      if (choice) selectStationChoice(choice.dataset.type);
+    });
     document.getElementById('stationButton').addEventListener('click', useStation);
     document.getElementById('waveCallButton').addEventListener('click', callNextWave);
     document.getElementById('adminButton').addEventListener('click', openAdminAccess);

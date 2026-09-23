@@ -56,6 +56,8 @@
       const completedLevel = translateLevel(LEVELS[currentLevel]);
       ui.sectorTitle.textContent = completedLevel.name;
       ui.sectorCopy.textContent = completedLevel.next;
+      ui.sectorRewardLabel.textContent = t(currentLevel === 2 ? 'sector.constructionSupply' : 'sector.gateSupport');
+      ui.sectorRewardValue.textContent = t(currentLevel === 2 ? 'sector.constructionCredits' : 'sector.shieldReward');
     }
     if (tutorialMode) updateTutorialCard();
   }

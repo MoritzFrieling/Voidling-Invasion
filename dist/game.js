@@ -15,7 +15,7 @@
       'hud.callNextWave': 'CALL NEXT WAVE', 'hud.shipModules': 'SHIP MODULES',
       'ability.blaster': 'BLASTER', 'ability.ready': 'READY', 'ability.heavyRocket': 'HEAVY ROCKET', 'ability.voidJump': 'VOID JUMP', 'ability.station': 'DEFENSE STATION',
       'menu.beginDefense': 'BEGIN DEFENSE', 'menu.beginNewDefense': 'BEGIN NEW DEFENSE', 'menu.playCheckpointTop': 'PLAY FROM', 'menu.playCheckpointBottom': 'LAST CHECK-POINT', 'menu.checkpointSector': 'SECTOR {level}', 'menu.checkpointStage': 'STAGE {stage}', 'menu.trainingRun': 'TRAINING RUN', 'menu.levelSelect': 'LEVEL SELECT', 'menu.topPilots': 'LEADERBOARD', 'menu.ranksShortcut': 'RANKS',
-      'menu.intro': "Three sectors stand between the invasion fleet and Earth. Intercept every formation, salvage void ore, and protect Earth's last stronghold.",
+      'menu.intro': 'Defend Earth, then secure construction of an outer-space station. Intercept every formation and salvage void ore to strengthen your ship and defenses.',
       'menu.callsignAria': 'Callsign', 'menu.callsignTitle': '3–20 characters, or 2–20 when using Korean or German letters. Used for saves and the highscore board.',
       'menu.flightBriefing': 'FLIGHT BRIEFING', 'menu.flyFreely': 'Fly freely', 'menu.fireBlaster': 'Fire blaster', 'menu.chargeRocket': 'Charge heavy rocket',
       'menu.placeJump': 'Place jump destination', 'menu.voidJumpRecharge': 'Void jump — recharges', 'menu.buildStation': 'Build / upgrade station', 'menu.precisionFlight': 'Precision flight',
@@ -91,6 +91,25 @@
       'account.recordsEmpty': 'NO COMBAT RECORDS YET · SET THE FIRST SCORE', 'account.leaderboardUnavailable': 'LEADERBOARD UNAVAILABLE', 'account.cloudUnavailable': 'CLOUD SAVE UNAVAILABLE · LOCAL FLIGHT READY', 'account.cloudSetup': 'CLOUD SETUP REQUIRED',
       'level.oneApproach': '1 APPROACH', 'level.approaches': '{count} APPROACHES', 'level.adminAccess': 'ADMIN ACCESS', 'level.cleared': 'CLEARED', 'level.unlocked': 'UNLOCKED', 'level.locked': 'LOCKED', 'level.stagesApproaches': '{stages} STAGES · {paths}', 'level.checkpoint': 'SHIP LVL {level} · {credits} ◈', 'level.oneDescription': 'Single-route frontier defense.', 'level.twoDescription': 'Twin routes and unstable rift entries.', 'level.threeDescription': 'Three converging lanes and deep wormholes.',
       'leaderboard.detail': '{guest}SECTOR {level} · STAGE {stage} · {kills} KILLS', 'leaderboard.guest': 'GUEST · ',
+      'sector.three.next': 'Earth is secure. Your next assignment is to protect construction of a large station in the outer void.',
+      'sector.four.name': 'GRAVITATIONAL DIVIDE', 'sector.four.short': 'SECTOR 04', 'level.fourDescription': 'Defend a station construction site against three distant approaches.',
+      'construction.kicker': 'SECTOR 04 // CONSTRUCTION SITE', 'construction.title': 'DEFEND THE NEW STATION',
+      'construction.copy': "Earth is safe, for now... A new space station is being built in this outer sector, and it's this station that you are tasked to protect. You need your towers to defend with you. Good luck!",
+      'construction.begin': 'DEFEND THE CONSTRUCTION SITE',
+      'sector.constructionSupply': 'CONSTRUCTION SUPPLY', 'sector.constructionCredits': 'DEFENSE STARTER KIT',
+      'hud.stationSite': 'STATION CONSTRUCTION', 'hud.site': 'SITE', 'hud.siteProximity': 'CONSTRUCTION SITE UNDER THREAT', 'status.siteIntegrity': 'Construction integrity {count}',
+      'render.stationSite': 'STATION CONSTRUCTION', 'toast.siteHit': 'CONSTRUCTION SITE HIT // {count} INTEGRITY LEFT', 'toast.siteBreached': 'CONSTRUCTION SITE DESTROYED',
+      'end.stationLostTitle': 'STATION LOST', 'end.stationLostCopy': 'The invasion fleet destroyed the station before construction was complete.', 'end.stationVictoryCopy': 'The station construction site is secure. The outer defense network can be completed.',
+      'end.stationOffline': 'CONSTRUCTION DEFENSE OFFLINE', 'label.siteIntegrity': 'Site integrity', 'upgrade.site.name': 'Construction Capacitor', 'upgrade.site.description': 'Send a recovered charge to the station construction core.',
+      'toast.wardenAnchors': 'LAGRANGE WARDEN // GRAVITY ANCHORS DEPLOYED', 'toast.siteRecovered': 'CONSTRUCTION CORE STABILIZED // INTEGRITY +1', 'floater.siteIntegrity': '+1 SITE INTEGRITY',
+      'enemy.gravity.name': 'GRAVITY ANCHOR', 'enemy.gravity.role': 'TRACTOR BEAM // JUMP LOCK', 'enemy.gravity.description': 'Its beam slowly pulls nearby pilots and blocks void jump while tethered. Destroy the ship to break free.',
+      'enemy.repair.name': 'REPAIR VESSEL', 'enemy.repair.role': 'SUPPORT // REPAIR PULSES', 'enemy.repair.description': 'Restores nearby allied hulls in visible pulses. Destroy it before its escorts become a lasting threat.',
+      'enemy.bossWarden.name': 'LAGRANGE WARDEN', 'enemy.bossWarden.role': 'GRAVITY COMMAND // ANCHOR DEPLOYMENT', 'enemy.bossWarden.description': 'A command ship that deploys gravity anchors into the outer lanes. Destroy its anchors to free your jump routes.',
+      'status.gravityLocked': 'GRAVITY LOCK // DESTROY THE ANCHOR', 'toast.gravityLocked': 'TRACTOR BEAM ACTIVE // VOID JUMP BLOCKED',
+      'stationChoice.kicker': 'FIRST STATION UPGRADE', 'stationChoice.title': 'CHOOSE A SPECIALIZATION', 'stationChoice.copy': 'This station keeps its chosen role for later upgrades. Each design answers a different threat.', 'stationChoice.later': 'DECIDE LATER',
+      'station.interceptor.name': 'INTERCEPTOR ARRAY', 'station.interceptor.description': 'Rapid fire against light ships.', 'station.interceptor.point1': 'Targets scouts and interceptors first', 'station.interceptor.point2': 'Strongest at wormhole exits',
+      'station.siege.name': 'SIEGE CANNON', 'station.siege.description': 'Heavy shots against large and support ships.', 'station.siege.point1': 'Targets repair ships and heavy hulls first', 'station.siege.point2': 'Slow firing, long reach',
+      'station.network.name': 'DEFENSE NETWORK', 'station.network.description': 'A slowing field with light fire support.', 'station.network.point1': 'Slows ships in its coverage area', 'station.network.point2': 'Bosses resist part of the slowdown',
     },
     ko: {
       'language.label': '언어', 'brand.network': '지구 방어 네트워크 - 프론티어 루나', 'aria.gameWorld': '보이드라인 인베이전 게임 화면', 'aria.gameStatus': '게임 상태', 'aria.shipStatus': '함선 상태', 'aria.sectorMinimap': '구역 미니맵', 'aria.abilities': '무기 및 능력', 'aria.upgradeTiers': '설치된 함선 업그레이드 단계',
@@ -102,7 +121,7 @@
       'hud.gateProximity': '관문 근접 경보', 'hud.targetLocked': '표적 고정', 'hud.staticDrain': '정지 신호 // 선체 손상', 'hud.callNextWave': '다음 웨이브 호출', 'hud.shipModules': '함선 모듈',
       'ability.blaster': '블래스터', 'ability.ready': '준비', 'ability.heavyRocket': '중로켓', 'ability.voidJump': '보이드 점프', 'ability.station': '방어 기지',
       'menu.beginDefense': '방어 시작', 'menu.beginNewDefense': '새 방어 시작', 'menu.playCheckpointTop': '마지막', 'menu.playCheckpointBottom': '저장 지점부터 시작', 'menu.checkpointSector': '구역 {level}', 'menu.checkpointStage': '스테이지 {stage}', 'menu.trainingRun': '훈련 시작', 'menu.levelSelect': '구역 선택', 'menu.topPilots': '리더보드', 'menu.ranksShortcut': '순위',
-      'menu.intro': '침공 함대와 지구 사이에는 세 개의 구역이 있습니다. 모든 편대를 요격하고, 보이드 광물을 회수하여 지구 최후의 거점을 지키세요.',
+      'menu.intro': '지구를 지킨 뒤 외우주 정거장 건설을 방어하세요. 모든 적 편대를 요격하고 보이드 광물을 회수해 함선과 방어 시설을 강화하세요.',
       'menu.callsignAria': '호출부호', 'menu.callsignTitle': '3~20자이며, 한글 또는 독일어 문자를 사용하면 2~20자까지 가능합니다. 저장과 최고 점수판에 사용됩니다.',
       'menu.flightBriefing': '비행 브리핑', 'menu.flyFreely': '자유 비행', 'menu.fireBlaster': '블래스터 발사', 'menu.chargeRocket': '중로켓 충전',
       'menu.placeJump': '점프 목적지 설정', 'menu.voidJumpRecharge': '보이드 점프 — 재충전', 'menu.buildStation': '방어 기지 건설 / 업그레이드', 'menu.precisionFlight': '정밀 비행',
@@ -172,6 +191,25 @@
       'account.recordsEmpty': '전투 기록 없음 · 첫 기록을 세우세요', 'account.leaderboardUnavailable': '순위표를 사용할 수 없습니다', 'account.cloudUnavailable': '클라우드 저장 불가 · 로컬 비행 준비됨', 'account.cloudSetup': '클라우드 설정 필요',
       'level.oneApproach': '접근로 1개', 'level.approaches': '접근로 {count}개', 'level.adminAccess': '관리자 접근', 'level.cleared': '완료', 'level.unlocked': '해금됨', 'level.locked': '잠김', 'level.stagesApproaches': '{stages} 스테이지 · {paths}', 'level.checkpoint': '함선 레벨 {level} · {credits} ◈', 'level.oneDescription': '하나의 경로를 지키는 외곽 방어전입니다.', 'level.twoDescription': '쌍둥이 경로와 불안정한 균열 진입점이 있습니다.', 'level.threeDescription': '세 개의 수렴 항로와 깊은 웜홀이 있습니다.',
       'leaderboard.detail': '{guest}구역 {level} · 스테이지 {stage} · 처치 {kills}', 'leaderboard.guest': '게스트 · ',
+      'sector.three.next': '지구는 안전합니다. 다음 임무는 외우주 대형 정거장 건설 현장을 지키는 것입니다.',
+      'sector.four.name': '중력 분기점', 'sector.four.short': '구역 04', 'level.fourDescription': '멀리 떨어진 세 경로에서 우주 정거장 건설 현장을 방어합니다.',
+      'construction.kicker': '구역 04 // 건설 현장', 'construction.title': '새 정거장을 방어하세요',
+      'construction.copy': '지구는 지금은 안전합니다... 이 외우주 구역에 새로운 우주 정거장이 건설 중이며, 당신의 임무는 이 정거장을 지키는 것입니다. 방어탑의 도움을 받아 함께 방어하세요. 행운을 빕니다!',
+      'construction.begin': '건설 현장 방어 시작',
+      'sector.constructionSupply': '건설 보급', 'sector.constructionCredits': '방어 준비 물자',
+      'hud.stationSite': '정거장 건설 현장', 'hud.site': '현장', 'hud.siteProximity': '건설 현장 위협', 'status.siteIntegrity': '건설 현장 내구도 {count}',
+      'render.stationSite': '정거장 건설', 'toast.siteHit': '건설 현장 피격 // 내구도 {count} 남음', 'toast.siteBreached': '건설 현장 파괴',
+      'end.stationLostTitle': '정거장 손실', 'end.stationLostCopy': '건설이 끝나기 전에 침공 함대가 정거장을 파괴했습니다.', 'end.stationVictoryCopy': '정거장 건설 현장이 안전합니다. 외우주 방어망을 완성할 수 있습니다.',
+      'end.stationOffline': '건설 현장 방어 중단', 'label.siteIntegrity': '현장 내구도', 'upgrade.site.name': '건설 축전기', 'upgrade.site.description': '회수한 전하를 정거장 건설 핵심부로 전송합니다.',
+      'toast.wardenAnchors': '라그랑주 워든 // 중력 앵커 전개', 'toast.siteRecovered': '건설 핵심부 안정화 // 내구도 +1', 'floater.siteIntegrity': '현장 내구도 +1',
+      'enemy.gravity.name': '중력 앵커', 'enemy.gravity.role': '견인 광선 // 점프 봉쇄', 'enemy.gravity.description': '가까운 조종사를 천천히 끌어당기고 연결 중 보이드 점프를 막습니다. 함선을 파괴하면 풀립니다.',
+      'enemy.repair.name': '수리함', 'enemy.repair.role': '지원 // 수리 파동', 'enemy.repair.description': '주변 아군 함선의 선체를 주기적으로 수리합니다. 호위대가 버티기 전에 파괴하세요.',
+      'enemy.bossWarden.name': '라그랑주 워든', 'enemy.bossWarden.role': '중력 지휘 // 앵커 전개', 'enemy.bossWarden.description': '바깥 항로에 중력 앵커를 전개하는 지휘함입니다. 앵커를 파괴해 점프 경로를 되찾으세요.',
+      'status.gravityLocked': '중력 봉쇄 // 앵커를 파괴하세요', 'toast.gravityLocked': '견인 광선 작동 // 보이드 점프 봉쇄',
+      'stationChoice.kicker': '첫 기지 업그레이드', 'stationChoice.title': '특화 유형 선택', 'stationChoice.copy': '선택한 역할은 이후 업그레이드에도 유지됩니다. 각 설계는 서로 다른 위협에 대응합니다.', 'stationChoice.later': '나중에 결정',
+      'station.interceptor.name': '요격 배열', 'station.interceptor.description': '경량 함선을 향한 빠른 연사.', 'station.interceptor.point1': '정찰기와 요격기를 우선 공격', 'station.interceptor.point2': '웜홀 출구에 효과적',
+      'station.siege.name': '공성포', 'station.siege.description': '대형 및 지원 함선에 강한 중포.', 'station.siege.point1': '수리함과 중장갑 함선을 우선 공격', 'station.siege.point2': '느린 연사, 긴 사거리',
+      'station.network.name': '방어망', 'station.network.description': '감속장과 보조 사격.', 'station.network.point1': '범위 안의 적 함선 감속', 'station.network.point2': '보스는 감속 효과 일부 저항',
     },
   };
 
@@ -215,8 +253,19 @@
 
   const WORLD = { width: 3400, height: 2100 };
   const PORTAL = { x: 3080, y: 1010, radius: 112 };
+  const STATION_SITE = { x: 2250, y: 1600, radius: 112 };
+
+  function setLevelGeometry(index) {
+    const construction = index >= 3;
+    WORLD.width = construction ? 4600 : 3400;
+    WORLD.height = construction ? 3200 : 2100;
+    PORTAL.x = construction ? STATION_SITE.x : 3080;
+    PORTAL.y = construction ? STATION_SITE.y : 1010;
+  }
 
   function createPath(points) {
+    // Keep each route's endpoint independent of the level-specific objective position.
+    points = points.map((point) => ({ ...point }));
     const segments = [];
     let length = 0;
     for (let i = 0; i < points.length - 1; i += 1) {
@@ -228,6 +277,18 @@
     }
     return { points, segments, length };
   }
+
+  function wormholeOnPath(paths, pathId, pointIndex, minWave = 3) {
+    const path = paths[pathId];
+    const segment = path.segments[pointIndex - 1];
+    return { ...path.points[pointIndex], pathId, progress: (segment.start + segment.length) / path.length, minWave };
+  }
+
+  const SECTOR_FOUR_PATHS = [
+    createPath([{ x: 1650, y: -120 }, { x: 1300, y: 500 }, { x: 1950, y: 780 }, { x: 1480, y: 1000 }, { x: 1980, y: 1170 }, { x: 1620, y: 1390 }, { x: STATION_SITE.x, y: STATION_SITE.y }]),
+    createPath([{ x: 1200, y: 3320 }, { x: 1570, y: 2720 }, { x: 1050, y: 2450 }, { x: 1680, y: 2200 }, { x: 1230, y: 1980 }, { x: 1800, y: 1770 }, { x: STATION_SITE.x, y: STATION_SITE.y }]),
+    createPath([{ x: 4720, y: 1000 }, { x: 4100, y: 1200 }, { x: 3800, y: 780 }, { x: 3400, y: 1300 }, { x: 3000, y: 950 }, { x: 2600, y: 1500 }, { x: STATION_SITE.x, y: STATION_SITE.y }]),
+  ];
 
   const LEVELS = [
     {
@@ -248,13 +309,18 @@
       wormholes: [{ x: 1820, y: 820, pathId: 0, progress: .58 }, { x: 1710, y: 1220, pathId: 1, progress: .54 }],
     },
     {
-      nameKey: 'sector.three.name', shortKey: 'sector.three.short', stages: 8, boss: 'bossTitan',
+      nameKey: 'sector.three.name', shortKey: 'sector.three.short', nextKey: 'sector.three.next', stages: 8, boss: 'bossTitan',
       paths: [
         createPath([{ x: -120, y: 220 }, { x: 510, y: 280 }, { x: 980, y: 520 }, { x: 1500, y: 410 }, { x: 1990, y: 660 }, { x: 2510, y: 720 }, { x: PORTAL.x, y: PORTAL.y }]),
         createPath([{ x: -120, y: 1030 }, { x: 490, y: 940 }, { x: 960, y: 1120 }, { x: 1440, y: 920 }, { x: 1940, y: 1080 }, { x: 2470, y: 930 }, { x: PORTAL.x, y: PORTAL.y }]),
         createPath([{ x: -120, y: 1900 }, { x: 500, y: 1780 }, { x: 930, y: 1510 }, { x: 1490, y: 1640 }, { x: 1980, y: 1370 }, { x: 2510, y: 1260 }, { x: PORTAL.x, y: PORTAL.y }]),
       ],
       wormholes: [{ x: 1500, y: 410, pathId: 0, progress: .48 }, { x: 1440, y: 920, pathId: 1, progress: .47 }, { x: 1490, y: 1640, pathId: 2, progress: .49 }],
+    },
+    {
+      nameKey: 'sector.four.name', shortKey: 'sector.four.short', stages: 8, boss: 'bossWarden',
+      paths: SECTOR_FOUR_PATHS,
+      wormholes: [wormholeOnPath(SECTOR_FOUR_PATHS, 0, 3), wormholeOnPath(SECTOR_FOUR_PATHS, 1, 3), wormholeOnPath(SECTOR_FOUR_PATHS, 2, 3, 6)],
     },
   ];
   let currentLevel = 0;
@@ -287,10 +353,10 @@
     'toast', 'checkpointNotice', 'checkpointButton', 'checkpointDetails', 'startButton', 'endKicker', 'endTitle', 'endCopy', 'finalScore', 'finalWave', 'finalKills', 'playAgainLabel', 'retryStageButton', 'retryStageLabel', 'sectorText',
     'creditText', 'portalWarning', 'lockReadout', 'stationState', 'stationButton', 'intelOverlay', 'intelKicker', 'intelTitle',
     'intelRole', 'intelText', 'intelShip', 'bossOverlay', 'bossKicker', 'bossTitle', 'bossText',
-    'sectorOverlay', 'sectorTitle', 'sectorCopy',
+    'sectorOverlay', 'sectorTitle', 'sectorCopy', 'sectorRewardLabel', 'sectorRewardValue',
     'levelSelectOverlay', 'levelChoices',
     'speedTierText', 'damageTierText', 'rateTierText', 'hullTierText', 'rocketTierText', 'coolingTierText',
-    'staticWarning', 'waveCallButton',
+    'staticWarning', 'waveCallButton', 'objectiveLabel', 'mapObjectiveLabel', 'stationChoiceOverlay', 'stationChoices', 'stationChoiceClose', 'constructionOverlay',
     'authOverlay', 'authTitle', 'authCopy', 'authForm', 'authUsername', 'authPassword',
     'authMessage',
     'pilotSummary', 'pilotType', 'pilotName', 'pilotSyncState', 'adminButton', 'languageSelect', 'menuLanguageSelect',
@@ -341,6 +407,7 @@
   let formationGateShields = 3;
   let waveReady = false;
   let waveCallEligible = false;
+  let openingWaveTimer = 0;
   let stationaryTime = 0;
   let staticDamageTimer = 0;
   let jumpDestinationHold = 0;
@@ -466,6 +533,7 @@
   let resources = [];
   let pickups = [];
   let stations = [];
+  let pendingStationChoice = null;
   let particles = [];
   let floaters = [];
 
@@ -633,8 +701,10 @@
     return checkpoint;
   }
 
-  function expectedCheckpoint() {
-    return captureProgress(resetPlayer(), 3);
+  function expectedCheckpoint(levelIndex = 0) {
+    const checkpoint = captureProgress(resetPlayer(), 3);
+    if (levelIndex === 3) checkpoint.credits = 340;
+    return checkpoint;
   }
 
   function applyCheckpoint(checkpoint) {
@@ -760,6 +830,7 @@
     if (!isStageCheckpointValid(stageCheckpoint)) return false;
     const checkpoint = stageCheckpoint;
     currentLevel = checkpoint.level;
+    setLevelGeometry(currentLevel);
     activePaths = LEVELS[currentLevel].paths;
     player = { ...checkpoint.player, rocketTarget: null, invulnerable: 0, collisionTimer: 0, jumpFlash: 0 };
     gateShields = checkpoint.gateShields;
@@ -780,6 +851,7 @@
     waveClearTimer = 0;
     waveReady = false;
     waveCallEligible = false;
+    openingWaveTimer = 0;
     resourceTimer = checkpoint.resourceTimer;
     repairTimer = checkpoint.repairTimer;
     spawnTimer = 0;
@@ -837,18 +909,22 @@
     formationsInStage = 1;
     const highestSelectable = isAdminPilot() ? LEVELS.length - 1 : campaignState.highestUnlocked;
     currentLevel = clamp(levelIndex, 0, highestSelectable);
+    setLevelGeometry(currentLevel);
     activePaths = LEVELS[currentLevel].paths;
     score = 0;
     kills = 0;
     gateShields = 3;
     ensureCampaignCheckpoints();
     applyCheckpoint(campaignState.checkpoints[currentLevel] || expectedCheckpoint(currentLevel));
+    if (currentLevel === 3) player.credits = Math.max(player.credits, 340);
+    if (currentLevel === 3) { player.x = 2050; player.y = 1600; }
     waveClearTimer = 0;
     formationStartedAt = 0;
     formationParTime = 0;
     formationGateShields = gateShields;
     waveReady = false;
     waveCallEligible = false;
+    openingWaveTimer = 0;
     stationaryTime = 0;
     staticDamageTimer = 0;
     jumpDestinationHold = 0;
@@ -896,7 +972,8 @@
       showToast(t('toast.trainingLink'));
     } else {
       ui.tutorialCard.classList.remove('active');
-      beginWave();
+      if (currentLevel === 3) showConstructionBriefing();
+      else beginWave();
     }
     syncUi();
   }
@@ -1236,7 +1313,7 @@
       const checkpoint = campaignState.checkpoints[index] || expectedCheckpoint(index);
       const localizedLevel = translateLevel(level);
       const paths = level.paths.length === 1 ? t('level.oneApproach') : t('level.approaches', { count: level.paths.length });
-      const descriptionKey = index === 0 ? 'level.oneDescription' : index === 1 ? 'level.twoDescription' : 'level.threeDescription';
+      const descriptionKey = ['level.oneDescription', 'level.twoDescription', 'level.threeDescription', 'level.fourDescription'][index];
       const card = document.createElement('button');
       card.type = 'button';
       card.className = `level-card${unlocked ? '' : ' locked'}`;
@@ -1270,6 +1347,8 @@
     ui.waveCallButton.classList.toggle('active', available);
     ui.waveCallButton.disabled = !available;
     ui.waveCallButton.setAttribute('aria-hidden', String(!available));
+    ui.waveCallButton.querySelector('span').textContent = t('hud.callNextWave');
+    ui.waveCallButton.querySelector('b').hidden = openingWaveTimer > 0;
   }
 
   function togglePause(forcePause = null) {
@@ -1317,23 +1396,33 @@
   function prepareFormation() {
     const level = LEVELS[currentLevel];
     spawnQueue = [];
-    const regularCount = 4 + Math.ceil(wave * 1.15) + currentLevel * 2 + formation;
+    const regularCount = currentLevel === 3
+      ? Math.min(20, (wave === 1 ? 3 : 5 + wave * 2) + formation)
+      : 4 + Math.ceil(wave * 1.15) + currentLevel * 2 + formation;
     const available = ['scout', 'raider'];
     if (wave >= 2) available.push('striker');
     if (wave >= 3) available.push('major');
     if (currentLevel >= 1 && wave >= 2) available.push('carrier');
     if (currentLevel >= 2 && wave >= 2) available.push('sentinel');
+    if (currentLevel >= 3 && wave >= 2) available.push('gravity');
+    if (currentLevel >= 3 && wave >= 3) available.push('repair');
     for (let i = 0; i < regularCount; i += 1) {
       let type = available[(i * 7 + wave * 3 + formation * 2) % available.length];
+      if (currentLevel === 3 && wave === 1) type = i % 3 === 0 ? 'raider' : 'scout';
       if (wave === 1 && formation === 1 && i === 0) type = 'scout';
       if (wave === 1 && formation === 1 && i === 1) type = 'raider';
+      if (currentLevel === 3 && wave === 2 && formation === 1 && i === 0) type = 'gravity';
+      if (currentLevel === 3 && wave === 3 && formation === 1 && i === 0) type = 'repair';
       if (type === 'carrier' && i % 7 !== 4) type = 'raider';
       if (type === 'sentinel' && i % 6 !== 3) type = 'major';
+      if (type === 'repair' && i % 7 !== 2 && !(wave === 3 && formation === 1 && i === 0)) type = 'raider';
+      if (type === 'gravity' && i % 6 !== 1 && !(wave === 2 && formation === 1 && i === 0)) type = 'scout';
       const pathId = (i + wave + formation) % level.paths.length;
       let entryProgress = 0;
       let fromWormhole = false;
-      if (level.wormholes.length && wave >= 3 && i > 2 && i % 5 === 0) {
-        const wormhole = level.wormholes[(i + wave + formation) % level.wormholes.length];
+      const activeWormholes = level.wormholes.filter((wormhole) => wave >= (wormhole.minWave || 3));
+      if (activeWormholes.length && wave >= 3 && i > 2 && i % 5 === 0) {
+        const wormhole = activeWormholes[(i + wave + formation) % activeWormholes.length];
         entryProgress = level.paths[wormhole.pathId].length * wormhole.progress;
         fromWormhole = true;
         spawnQueue.push({ type, pathId: wormhole.pathId, entryProgress, fromWormhole });
@@ -1381,10 +1470,13 @@
     interceptor: { nameKey: 'enemy.interceptor.name', roleKey: 'enemy.interceptor.role', descriptionKey: 'enemy.interceptor.description', radius: 10, hp: 34, speed: 148, score: 80, xp: 7, color: '#ff9f88', interceptor: true },
     carrier: { nameKey: 'enemy.carrier.name', roleKey: 'enemy.carrier.role', descriptionKey: 'enemy.carrier.description', radius: 37, hp: 520, speed: 49, score: 920, xp: 60, color: '#f071c8', major: true, carrier: true },
     sentinel: { nameKey: 'enemy.sentinel.name', roleKey: 'enemy.sentinel.role', descriptionKey: 'enemy.sentinel.description', radius: 29, hp: 310, shield: 0, shieldCharges: 2, speed: 62, score: 840, xp: 58, color: '#aeb8c0', major: true, shielded: true },
+    gravity: { nameKey: 'enemy.gravity.name', roleKey: 'enemy.gravity.role', descriptionKey: 'enemy.gravity.description', radius: 25, hp: 210, speed: 68, score: 620, xp: 42, color: '#ad91ff' },
+    repair: { nameKey: 'enemy.repair.name', roleKey: 'enemy.repair.role', descriptionKey: 'enemy.repair.description', radius: 27, hp: 190, speed: 66, score: 660, xp: 44, color: '#71efb1' },
     bossOmega: { nameKey: 'enemy.bossOmega.name', roleKey: 'enemy.bossOmega.role', descriptionKey: 'enemy.bossOmega.description', radius: 66, hp: 2280, speed: 34, score: 5400, xp: 260, color: '#ff506b', major: true, boss: true, bossSkill: 'rockets' },
     // Offset Sector Two's 20% enemy durability bonus so this boss keeps its existing effective HP.
     bossCarrier: { nameKey: 'enemy.bossCarrier.name', roleKey: 'enemy.bossCarrier.role', descriptionKey: 'enemy.bossCarrier.description', radius: 74, hp: 4600 / 1.2, speed: 29, score: 7600, xp: 340, color: '#ef67d1', major: true, boss: true, carrier: true, bossSkill: 'swarm', emergencyHeal: .15 },
     bossTitan: { nameKey: 'enemy.bossTitan.name', roleKey: 'enemy.bossTitan.role', descriptionKey: 'enemy.bossTitan.description', radius: 82, hp: 2520, shield: 330, speed: 26, score: 12000, xp: 500, color: '#aeb8c0', major: true, boss: true, shielded: true, bossSkill: 'titan' },
+    bossWarden: { nameKey: 'enemy.bossWarden.name', roleKey: 'enemy.bossWarden.role', descriptionKey: 'enemy.bossWarden.description', radius: 86, hp: 3100, speed: 28, score: 15000, xp: 600, color: '#b18bff', major: true, boss: true, bossSkill: 'gravity' },
   };
 
   function activateWave() {
@@ -1395,7 +1487,7 @@
     announcementTimer = 2.2;
     spawnTimer = .55;
     formationStartedAt = gameClock;
-    const sectorThreeSpacing = currentLevel === 2 ? 1.08 : 1;
+    const sectorThreeSpacing = currentLevel === 3 ? 1.3 : currentLevel === 2 ? 1.08 : 1;
     formationParTime = (18 + spawnQueue.length * 1.45 + currentLevel * 2.5) * sectorThreeSpacing;
     formationGateShields = gateShields;
     waveReady = false;
@@ -1488,6 +1580,7 @@
       emergencyHeal: blueprint.emergencyHeal || 0,
       emergencyHealUsed: false,
       bossSkill: blueprint.bossSkill || '',
+      supportTimer: rand(2, 3),
       rocketTimer: rand(1.3, 3),
       spawnTimer: blueprint.carrier ? rand(3.55, 5.95) : rand(3.2, 5.4),
       shieldHitTimer: 0,
@@ -1602,6 +1695,24 @@
     player.jumpBrake = Math.max(0, player.jumpBrake - dt);
     player.jumpFlash = Math.max(0, player.jumpFlash - dt);
 
+    const wasGravityLocked = Boolean(player.gravityLocked);
+    player.gravityLocked = false;
+    let pullX = 0;
+    let pullY = 0;
+    for (const enemy of enemies) {
+      if (enemy.dead || (enemy.type !== 'gravity' && enemy.bossSkill !== 'gravity')) continue;
+      const deltaX = enemy.x - player.x;
+      const deltaY = enemy.y - player.y;
+      const distance = Math.hypot(deltaX, deltaY);
+      const range = enemy.boss ? 390 : 310;
+      if (distance >= range || distance < 1) continue;
+      player.gravityLocked = true;
+      const force = enemy.boss ? 140 : 105;
+      pullX += deltaX / distance * force;
+      pullY += deltaY / distance * force;
+    }
+    if (player.gravityLocked && !wasGravityLocked) showToast(t('toast.gravityLocked'));
+
     let dx = 0;
     let dy = 0;
     if (input.keys.has('KeyA')) dx -= 1;
@@ -1621,6 +1732,8 @@
     const acceleration = player.acceleration * (precision ? .52 : player.jumpBrake > 0 ? .62 : 1);
     player.vx += dx * acceleration * dt;
     player.vy += dy * acceleration * dt;
+    player.vx += clamp(pullX, -190, 190) * dt;
+    player.vy += clamp(pullY, -190, 190) * dt;
     const drag = Math.pow(magnitude ? player.jumpBrake > 0 ? .08 : .12 : player.jumpBrake > 0 ? .02 : .035, dt);
     player.vx *= drag;
     player.vy *= drag;
@@ -1638,7 +1751,10 @@
       stationaryTime = 0;
       staticDamageTimer = 0;
     }
-    const staticDamageActive = stationaryTime >= 1.25 && (enemies.length > 0 || spawnQueue.length > 0);
+    const nearbyThreat = currentLevel === 3
+      ? enemies.some((enemy) => !enemy.dead && distanceSq(enemy, player) < 900 ** 2)
+      : enemies.length > 0 || spawnQueue.length > 0;
+    const staticDamageActive = stationaryTime >= 1.25 && nearbyThreat;
     ui.staticWarning.classList.toggle('active', staticDamageActive);
     if (staticDamageActive) {
       staticDamageTimer += dt;
@@ -1696,12 +1812,20 @@
       return;
     }
 
+    if (currentLevel === 3 && wave === 0 && openingWaveTimer > 0) {
+      openingWaveTimer = Math.max(0, openingWaveTimer - dt);
+      if (openingWaveTimer === 0) {
+        setWaveCallAvailable(false);
+        beginWave();
+      }
+    }
+
     if (spawnQueue.length) {
       spawnTimer -= dt;
       if (spawnTimer <= 0) {
         spawnEnemy(spawnQueue.shift());
         const openingBuffer = wave <= 2 ? .12 : 0;
-        const sectorThreeSpacing = currentLevel === 2 ? 1.08 : 1;
+        const sectorThreeSpacing = currentLevel === 3 ? 1.3 : currentLevel === 2 ? 1.08 : 1;
         spawnTimer = Math.max(.34, (.78 + currentLevel * .12 - wave * .018 + openingBuffer) * sectorThreeSpacing);
       }
     } else if (!enemies.length && wave > 0) {
@@ -1756,6 +1880,12 @@
   }
 
   function callNextWave() {
+    if (mode === 'playing' && currentLevel === 3 && wave === 0 && openingWaveTimer > 0) {
+      openingWaveTimer = 0;
+      setWaveCallAvailable(false);
+      beginWave();
+      return;
+    }
     if (mode !== 'playing' || !waveReady || !waveCallEligible) return;
     const bonus = Math.round((6 + wave * 2 + currentLevel * 3) * (1 + formation * .15));
     const earnedXp = grantXp(bonus, true);
@@ -1926,6 +2056,7 @@
 
   function triggerBoost() {
     if (mode !== 'playing' || player.boostCooldown > 0) return;
+    if (player.gravityLocked) { showToast(t('toast.gravityLocked')); return; }
     const startX = player.x;
     const startY = player.y;
     let targetX = player.jumpDestinationX;
@@ -2031,7 +2162,8 @@
 
   function updateEnemies(dt) {
     enemies.forEach((enemy) => {
-      enemy.progress += enemy.speed * dt;
+      const slowingStation = stations.find((station) => station.type === 'network' && distanceSq(station, enemy) < station.range ** 2);
+      enemy.progress += enemy.speed * (slowingStation ? (enemy.boss ? .84 : .62) : 1) * dt;
       enemy.wobble += dt * (enemy.type === 'striker' ? 1.15 : 1.7);
       enemy.hitFlash = Math.max(0, enemy.hitFlash - dt);
       enemy.shieldHitTimer = Math.max(0, enemy.shieldHitTimer - dt);
@@ -2041,6 +2173,33 @@
       enemy.x = point.x + point.nx * sway;
       enemy.y = point.y + point.ny * sway;
       enemy.angle = point.angle + Math.cos(enemy.wobble * .8) * .08;
+
+      if (enemy.type === 'repair' && !enemy.dead) {
+        enemy.supportTimer -= dt;
+        if (enemy.supportTimer <= 0) {
+          for (const ally of enemies) {
+            if (ally === enemy || ally.dead || distanceSq(ally, enemy) > 280 ** 2) continue;
+            const healed = Math.min(ally.maxHp - ally.hp, Math.min(ally.maxHp * .07, 42));
+            if (healed > 1) {
+              ally.hp += healed;
+              addFloater(ally.x, ally.y - ally.radius, `+${Math.ceil(healed)}`, enemy.color);
+            }
+          }
+          enemy.supportTimer = 2.8;
+          burst(enemy.x, enemy.y, enemy.color, 10, 120);
+        }
+      }
+      if (enemy.bossSkill === 'gravity' && !enemy.dead) {
+        enemy.supportTimer -= dt;
+        if (enemy.supportTimer <= 0 && enemies.length < 65) {
+          for (const pathId of [0, 2]) {
+            const hole = LEVELS[currentLevel].wormholes.find((entry) => entry.pathId === pathId);
+            spawnEnemy({ type: 'gravity', pathId, entryProgress: LEVELS[currentLevel].paths[pathId].length * hole.progress, fromWormhole: true });
+          }
+          enemy.supportTimer = 13;
+          showToast(t('toast.wardenAnchors'));
+        }
+      }
 
       if (enemy.major) {
         enemy.rocketTimer -= dt;
@@ -2079,7 +2238,7 @@
         camera.shake = Math.max(camera.shake, 16);
         burst(PORTAL.x, PORTAL.y, COLORS.coral, 30, 320);
         audio.tone(58, .5, 'sawtooth', .11, -28);
-        showToast(gateShields > 0 ? t('toast.gateHit', { count: gateShields }) : t('toast.gateBreached'));
+        showToast(gateShields > 0 ? t(currentLevel === 3 ? 'toast.siteHit' : 'toast.gateHit', { count: gateShields }) : t(currentLevel === 3 ? 'toast.siteBreached' : 'toast.gateBreached'));
         if (gateShields <= 0) finishRun(false, 'gate');
       }
     });
@@ -2109,6 +2268,71 @@
     return 120 + stations.length * 35;
   }
 
+  const STATION_BRANCHES = {
+    interceptor: { cost: 170, range: 510, damage: 15, fireRate: .28, color: '#69dfff' },
+    siege: { cost: 220, range: 670, damage: 78, fireRate: 1.7, color: '#ff9b6a' },
+    network: { cost: 190, range: 520, damage: 12, fireRate: .95, color: '#a88cff' },
+  };
+
+  function stationUpgradeCost(station) {
+    return station.level === 1 ? null : 90 + station.level * 80;
+  }
+
+  function upgradeStation(station, type = null) {
+    const cost = type ? STATION_BRANCHES[type].cost : stationUpgradeCost(station);
+    if (player.credits < cost) { showToast(t('toast.upgradeRequires', { cost })); return false; }
+    player.credits -= cost;
+    station.level += 1;
+    if (type) {
+      const branch = STATION_BRANCHES[type];
+      station.type = type;
+      station.range = branch.range;
+      station.damage = branch.damage;
+      station.fireRate = branch.fireRate;
+    } else {
+      station.range += station.type === 'network' ? 45 : 72;
+      station.damage *= station.type === 'siege' ? 1.35 : 1.3;
+      station.fireRate *= station.type === 'interceptor' ? .92 : .88;
+    }
+    player.hp = Math.min(player.maxHp, player.hp + 12);
+    burst(station.x, station.y, STATION_BRANCHES[station.type]?.color || COLORS.amber, 24, 180);
+    showToast(t('toast.stationUpgraded', { level: station.level }));
+    audio.tone(420, .36, 'sine', .07, 280);
+    if (tutorialMode && tutorialIndex === TUTORIAL_STEP.station) queueTutorialAdvance();
+    return true;
+  }
+
+  function showStationChoices(station) {
+    pendingStationChoice = station;
+    mode = 'stationChoice';
+    ui.crosshair.style.opacity = '0';
+    ui.stationChoices.innerHTML = Object.entries(STATION_BRANCHES).map(([type, branch]) => `
+      <button class="station-choice ${type}" type="button" data-type="${type}" ${player.credits < branch.cost ? 'disabled' : ''}>
+        <svg class="station-preview" viewBox="0 0 160 110" aria-hidden="true"><circle cx="80" cy="55" r="36" fill="#09161d" stroke="${branch.color}" stroke-width="3"/>
+        ${type === 'interceptor' ? '<path d="M36 34 L53 42 L70 25 L80 35 L90 25 L107 42 L124 34 M36 76 L53 68 L70 85 L80 75 L90 85 L107 68 L124 76" fill="none" stroke="#69dfff" stroke-width="6"/><path d="M80 22 V88" stroke="#69dfff" stroke-width="7"/>' : ''}
+        ${type === 'siege' ? '<path d="M48 43 H118 V67 H48 Z" fill="#ff9b6a"/><path d="M37 38 L58 25 L76 38 M37 72 L58 85 L76 72" fill="none" stroke="#ff9b6a" stroke-width="6"/>' : ''}
+        ${type === 'network' ? '<circle cx="80" cy="55" r="49" fill="none" stroke="#a88cff" stroke-width="2" stroke-dasharray="7 5"/><path d="M80 17 L113 55 L80 93 L47 55 Z" fill="none" stroke="#a88cff" stroke-width="5"/>' : ''}
+        <circle cx="80" cy="55" r="12" fill="${branch.color}"/></svg>
+        <strong>${t(`station.${type}.name`)}</strong><p>${t(`station.${type}.description`)}</p>
+        <ul><li>${t(`station.${type}.point1`)}</li><li>${t(`station.${type}.point2`)}</li></ul>
+        <span class="station-choice-cost">${branch.cost} ◈</span>
+      </button>`).join('');
+    ui.stationChoiceOverlay.classList.add('active');
+  }
+
+  function closeStationChoices() {
+    if (mode !== 'stationChoice') return;
+    pendingStationChoice = null;
+    ui.stationChoiceOverlay.classList.remove('active');
+    mode = 'playing';
+    ui.crosshair.style.opacity = '1';
+  }
+
+  function selectStationChoice(type) {
+    if (mode !== 'stationChoice' || !pendingStationChoice || !STATION_BRANCHES[type]) return;
+    if (upgradeStation(pendingStationChoice, type)) closeStationChoices();
+  }
+
   function nearestStation(range = Infinity) {
     let nearest = null;
     let best = range * range;
@@ -2125,25 +2349,15 @@
     if (docked) {
       if (Math.hypot(player.vx, player.vy) > 150) { showToast(t('toast.slowDock')); return; }
       if (docked.level >= 4) { showToast(t('toast.stationMax')); return; }
-      const cost = 90 + docked.level * 80;
-      if (player.credits < cost) { showToast(t('toast.upgradeRequires', { cost })); return; }
-      player.credits -= cost;
-      docked.level += 1;
-      docked.range += 72;
-      docked.damage *= 1.42;
-      docked.fireRate *= .86;
-      player.hp = Math.min(player.maxHp, player.hp + 12);
-      burst(docked.x, docked.y, COLORS.amber, 24, 180);
-      showToast(t('toast.stationUpgraded', { level: docked.level }));
-      audio.tone(420, .36, 'sine', .07, 280);
-      if (tutorialMode && tutorialIndex === TUTORIAL_STEP.station) queueTutorialAdvance();
+      if (docked.level === 1) showStationChoices(docked);
+      else upgradeStation(docked);
       return;
     }
     if (stations.length >= 3) { showToast(t('toast.stationLimit')); return; }
     const cost = stationBuildCost();
     if (player.credits < cost) { showToast(t('toast.needCredits', { cost })); return; }
     player.credits -= cost;
-    stations.push({ x: player.x, y: player.y, radius: 30, level: 1, range: 470, damage: 17, fireRate: .8, fireTimer: .25, angle: 0, target: null });
+    stations.push({ x: player.x, y: player.y, radius: 30, level: 1, type: null, range: 470, damage: 17, fireRate: .8, fireTimer: .25, angle: 0, target: null });
     burst(player.x, player.y, COLORS.amber, 28, 210);
     showToast(t('toast.stationDeployed'));
     audio.tone(230, .5, 'triangle', .075, 310);
@@ -2161,7 +2375,10 @@
       for (const enemy of enemies) {
         const d = distanceSq(station, enemy);
         if (enemy.dead || d >= station.range ** 2) continue;
-        const targetScore = d * (enemy.interceptor ? .45 : 1);
+        const priority = station.type === 'interceptor' ? (enemy.radius <= 14 ? .28 : 1.5)
+          : station.type === 'siege' ? (enemy.type === 'repair' ? .18 : enemy.major ? .35 : 2)
+            : enemy.interceptor ? .45 : 1;
+        const targetScore = d * priority;
         if (targetScore < bestScore) { bestScore = targetScore; station.target = enemy; }
       }
       if (station.target) {
@@ -2171,11 +2388,13 @@
           const interceptorAssist = station.target.interceptor;
           const lightShip = station.target.radius <= 14;
           const shotSpeed = interceptorAssist ? 790 : 720;
-          const damageMultiplier = interceptorAssist ? 2.8 : lightShip ? 1.8 : 1;
+          const damageMultiplier = station.type === 'siege' ? (station.target.major || station.target.type === 'repair' ? 1.45 : .65)
+            : station.type === 'interceptor' ? (lightShip || interceptorAssist ? 2.2 : .65)
+              : interceptorAssist ? 2.8 : lightShip ? 1.8 : 1;
           bullets.push({
             x: station.x + Math.cos(station.angle) * 28, y: station.y + Math.sin(station.angle) * 28,
             vx: Math.cos(station.angle) * shotSpeed, vy: Math.sin(station.angle) * shotSpeed, radius: 3.8,
-            damage: station.damage * damageMultiplier, target: station.target, turnRate: interceptorAssist ? 7.2 : 2.3, source: 'station', life: 1.5, dead: false,
+            damage: station.damage * damageMultiplier, target: station.target, turnRate: interceptorAssist ? 7.2 : 2.3, source: 'station', color: STATION_BRANCHES[station.type]?.color || COLORS.cyan, life: 1.5, dead: false,
           });
           audio.tone(250 + station.level * 40, .045, 'square', .018, 90);
         }
@@ -2445,8 +2664,8 @@
       addFloater(item.x, item.y, t('floater.hull', { amount: `+${Math.round(healed)}` }), COLORS.cyan);
     } else {
       gateShields = Math.min(5, gateShields + 1);
-      showToast(t('toast.aegisRecovered'));
-      addFloater(item.x, item.y, t('floater.gateShield'), COLORS.amber);
+      showToast(t(currentLevel === 3 ? 'toast.siteRecovered' : 'toast.aegisRecovered'));
+      addFloater(item.x, item.y, t(currentLevel === 3 ? 'floater.siteIntegrity' : 'floater.gateShield'), COLORS.amber);
     }
     burst(item.x, item.y, item.kind === 'repair' ? COLORS.cyan : COLORS.amber, 20, 170);
     audio.tone(item.kind === 'repair' ? 660 : 420, .35, 'sine', .065, 240);
@@ -2492,7 +2711,7 @@
       case 'cooling': return { current: `${t('label.rocket')} ${player.rocketMax.toFixed(1)}S · ${t('label.jump')} ${player.boostMax.toFixed(1)}S`, effect: `→ ${(player.rocketMax * .9).toFixed(1)}S · ${(player.boostMax * .9).toFixed(1)}S · -10%` };
       case 'salvage': return { current: `${t('label.resourceXp')} ×${player.salvage.toFixed(2)}`, effect: `→ ×${(player.salvage * 1.18).toFixed(2)} · +18%` };
       case 'multi': return { current: `${t('label.shots')} ${player.multiShot}`, effect: `→ ${player.multiShot + 1} · +1` };
-      case 'gate': return { current: `${t('label.gateShields')} ${gateShields}/5`, effect: `→ ${Math.min(5, gateShields + 1)}/5 · +1` };
+      case 'gate': return { current: `${t(currentLevel === 3 ? 'label.siteIntegrity' : 'label.gateShields')} ${gateShields}/5`, effect: `→ ${Math.min(5, gateShields + 1)}/5 · +1` };
       default: return { current: '', effect: t(upgrade.detailKey) };
     }
   }
@@ -2521,7 +2740,7 @@
       const summary = upgradeSummary(upgrade);
       button.className = 'upgrade-choice';
       button.type = 'button';
-      button.innerHTML = `<span class="upgrade-icon">${upgrade.icon}</span><strong>${t(upgrade.nameKey)}</strong><p>${t(upgrade.descriptionKey)}</p><small><span>${t('label.current')} // ${summary.current}</span><b>${t('label.upgrade')} // ${summary.effect}</b></small>`;
+      button.innerHTML = `<span class="upgrade-icon">${upgrade.icon}</span><strong>${t(upgrade.id === 'gate' && currentLevel === 3 ? 'upgrade.site.name' : upgrade.nameKey)}</strong><p>${t(upgrade.id === 'gate' && currentLevel === 3 ? 'upgrade.site.description' : upgrade.descriptionKey)}</p><small><span>${t('label.current')} // ${summary.current}</span><b>${t('label.upgrade')} // ${summary.effect}</b></small>`;
       button.addEventListener('click', () => selectUpgrade(upgrade));
       ui.upgradeChoices.append(button);
     });
@@ -2536,7 +2755,7 @@
     pendingLevelUps -= 1;
     ui.upgradeOverlay.classList.remove('active');
     ui.tutorialUpgradeTip.hidden = true;
-    showToast(t('toast.upgradeInstalled', { upgrade: t(upgrade.nameKey) }));
+    showToast(t('toast.upgradeInstalled', { upgrade: t(upgrade.id === 'gate' && currentLevel === 3 ? 'upgrade.site.name' : upgrade.nameKey) }));
     if (pendingLevelUps > 0) {
       setTimeout(showUpgradeChoices, 80);
     } else {
@@ -2571,6 +2790,7 @@
     }
     const nextLevel = currentLevel + 1;
     player = resetPlayer();
+    if (nextLevel === 3) player.credits = 340;
     gateShields = 3;
     pendingLevelUps = 0;
     campaignState.highestUnlocked = Math.max(campaignState.highestUnlocked, nextLevel);
@@ -2581,6 +2801,8 @@
     const completedLevel = translateLevel(LEVELS[currentLevel]);
     ui.sectorTitle.textContent = completedLevel.name;
     ui.sectorCopy.textContent = completedLevel.next;
+    ui.sectorRewardLabel.textContent = t(currentLevel === 2 ? 'sector.constructionSupply' : 'sector.gateSupport');
+    ui.sectorRewardValue.textContent = t(currentLevel === 2 ? 'sector.constructionCredits' : 'sector.shieldReward');
     ui.sectorOverlay.classList.add('active');
     audio.tone(220, .7, 'sine', .09, 440);
   }
@@ -2588,6 +2810,7 @@
   function enterNextSector() {
     ui.sectorOverlay.classList.remove('active');
     currentLevel += 1;
+    setLevelGeometry(currentLevel);
     activePaths = LEVELS[currentLevel].paths;
     wave = 0;
     formation = 0;
@@ -2600,8 +2823,10 @@
     stations = [];
     resources = [];
     pickups = [];
-    player.x = 760;
-    player.y = 1030;
+    player.x = currentLevel === 3 ? 2050 : 760;
+    player.y = currentLevel === 3 ? 1600 : 1030;
+    if (currentLevel === 3) player.credits = Math.max(player.credits, 340);
+    openingWaveTimer = 0;
     player.vx = 0;
     player.vy = 0;
     for (let i = 0; i < 9; i += 1) spawnResource(true);
@@ -2609,7 +2834,22 @@
     camera.y = clamp(player.y - screenHeight / 2, 0, WORLD.height - screenHeight);
     mode = 'playing';
     showToast(t('toast.multipleApproaches', { sector: translateLevel(LEVELS[currentLevel]).name }));
-    beginWave();
+    if (currentLevel === 3) showConstructionBriefing();
+    else beginWave();
+  }
+
+  function showConstructionBriefing() {
+    mode = 'construction';
+    ui.crosshair.style.opacity = '0';
+    ui.constructionOverlay.classList.add('active');
+  }
+
+  function launchConstructionDefense() {
+    if (mode !== 'construction') return;
+    ui.constructionOverlay.classList.remove('active');
+    mode = 'playing';
+    openingWaveTimer = 10;
+    setWaveCallAvailable(true);
   }
 
   function finishRun(victory, reason = '') {
@@ -2627,13 +2867,13 @@
     ui.portalWarning.classList.remove('active');
     ui.lockReadout.classList.remove('active');
     ui.tutorialCard.classList.remove('active');
-    ui.endKicker.textContent = victory ? t('end.secured') : reason === 'ship' ? t('end.pilotLost') : t('end.defenseOffline');
-    ui.endTitle.textContent = victory ? t('end.victoryTitle') : reason === 'ship' ? t('end.shipLostTitle') : t('end.gateLostTitle');
+    ui.endKicker.textContent = victory ? t('end.secured') : reason === 'ship' ? t('end.pilotLost') : t(currentLevel === 3 ? 'end.stationOffline' : 'end.defenseOffline');
+    ui.endTitle.textContent = victory ? t('end.victoryTitle') : reason === 'ship' ? t('end.shipLostTitle') : t(currentLevel === 3 ? 'end.stationLostTitle' : 'end.gateLostTitle');
     ui.endCopy.textContent = victory
-      ? t('end.victoryCopy')
+      ? t(currentLevel === 3 ? 'end.stationVictoryCopy' : 'end.victoryCopy')
       : reason === 'ship'
         ? t('end.shipLostCopy')
-        : t('end.gateLostCopy');
+        : t(currentLevel === 3 ? 'end.stationLostCopy' : 'end.gateLostCopy');
     ui.finalScore.textContent = formatScore(score);
     ui.finalWave.textContent = `${translateLevel(LEVELS[currentLevel]).short} · ${wave}`;
     ui.finalKills.textContent = String(kills);
@@ -2964,7 +3204,9 @@
       ctx.stroke();
     }
     ctx.setLineDash([]);
-    for (const wormhole of LEVELS[currentLevel].wormholes) drawWormhole(wormhole);
+    for (const wormhole of LEVELS[currentLevel].wormholes) {
+      if (!wormhole.minWave || wave >= wormhole.minWave) drawWormhole(wormhole);
+    }
     ctx.restore();
   }
 
@@ -2983,6 +3225,7 @@
 
   function drawPortal() {
     if (!isVisible(PORTAL, 180)) return;
+    if (currentLevel === 3) { drawConstructionSite(); return; }
     ctx.save();
     ctx.translate(PORTAL.x, PORTAL.y);
     const pulse = 1 + Math.sin(elapsed * 2.2) * .025;
@@ -3039,6 +3282,40 @@
     ctx.font = '700 10px "Space Mono", monospace';
     ctx.textAlign = 'center';
     ctx.fillText(t('render.earthGate'), 0, 57);
+    ctx.restore();
+  }
+
+  function drawConstructionSite() {
+    ctx.save();
+    ctx.translate(PORTAL.x, PORTAL.y);
+    ctx.rotate(elapsed * .08);
+    ctx.shadowColor = COLORS.cyan;
+    ctx.shadowBlur = 18;
+    ctx.strokeStyle = COLORS.cyan;
+    ctx.lineWidth = 4;
+    ctx.setLineDash([27, 11]);
+    ctx.beginPath(); ctx.arc(0, 0, 76, 0, Math.PI * 2); ctx.stroke();
+    ctx.setLineDash([]);
+    for (let arm = 0; arm < 4; arm += 1) {
+      ctx.rotate(Math.PI / 2);
+      ctx.fillStyle = '#102c37';
+      ctx.strokeStyle = COLORS.amber;
+      ctx.fillRect(25, -11, 55, 22);
+      ctx.strokeRect(25, -11, 55, 22);
+      ctx.beginPath(); ctx.moveTo(43, -11); ctx.lineTo(59, 11); ctx.stroke();
+    }
+    ctx.fillStyle = '#09242c';
+    ctx.strokeStyle = COLORS.cyanSoft;
+    ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.moveTo(0, -36); ctx.lineTo(36, 0); ctx.lineTo(0, 36); ctx.lineTo(-36, 0); ctx.closePath(); ctx.fill(); ctx.stroke();
+    ctx.fillStyle = COLORS.amber;
+    ctx.beginPath(); ctx.arc(0, 0, 12 + Math.sin(elapsed * 2) * 2, 0, Math.PI * 2); ctx.fill();
+    ctx.restore();
+    ctx.save();
+    ctx.fillStyle = COLORS.pale;
+    ctx.font = '700 10px "Space Mono", monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText(t('render.stationSite'), PORTAL.x, PORTAL.y + 104);
     ctx.restore();
   }
 
@@ -3106,35 +3383,54 @@
     if (!isVisible(station, station.range)) return;
     ctx.save();
     ctx.translate(station.x, station.y);
-    ctx.strokeStyle = 'rgba(255,179,92,.12)';
+    const branchColor = station.type === 'interceptor' ? '#69dfff' : station.type === 'siege' ? '#ff9b6a' : station.type === 'network' ? COLORS.purple : COLORS.amber;
+    ctx.strokeStyle = station.type === 'network' ? 'rgba(168,140,255,.22)' : 'rgba(255,179,92,.12)';
     ctx.setLineDash([7, 13]);
     ctx.beginPath(); ctx.arc(0, 0, station.range, 0, Math.PI * 2); ctx.stroke();
     ctx.setLineDash([]);
     ctx.rotate(elapsed * .22);
-    ctx.strokeStyle = COLORS.amber;
+    ctx.strokeStyle = branchColor;
     ctx.fillStyle = 'rgba(17,28,31,.95)';
     ctx.shadowBlur = 14;
     ctx.shadowColor = COLORS.amber;
     ctx.lineWidth = 2;
-    for (let arm = 0; arm < 4; arm += 1) {
-      ctx.rotate(Math.PI / 2);
-      ctx.fillRect(12, -5, 23 + station.level * 2, 10);
-      ctx.strokeRect(12, -5, 23 + station.level * 2, 10);
+    if (station.type === 'siege') {
+      ctx.rotate(station.angle);
+      ctx.fillRect(-14, -15, 34, 30); ctx.strokeRect(-14, -15, 34, 30);
+      ctx.fillRect(12, -9, 40, 18); ctx.strokeRect(12, -9, 40, 18);
+      ctx.rotate(-station.angle);
+    } else if (station.type === 'interceptor') {
+      for (let arm = 0; arm < 6; arm += 1) {
+        ctx.rotate(Math.PI / 3);
+        ctx.fillRect(13, -3, 26, 6); ctx.strokeRect(13, -3, 26, 6);
+      }
+    } else if (station.type === 'network') {
+      ctx.beginPath(); ctx.moveTo(0, -40); ctx.lineTo(40, 0); ctx.lineTo(0, 40); ctx.lineTo(-40, 0); ctx.closePath(); ctx.stroke();
+      for (let arm = 0; arm < 4; arm += 1) {
+        ctx.rotate(Math.PI / 2);
+        ctx.fillRect(16, -4, 17, 8);
+      }
+    } else {
+      for (let arm = 0; arm < 4; arm += 1) {
+        ctx.rotate(Math.PI / 2);
+        ctx.fillRect(12, -5, 23 + station.level * 2, 10);
+        ctx.strokeRect(12, -5, 23 + station.level * 2, 10);
+      }
     }
     ctx.rotate(-elapsed * .22);
     ctx.fillStyle = '#09161d';
     ctx.beginPath(); ctx.arc(0, 0, 18 + station.level * 2, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
     ctx.rotate(station.angle);
-    ctx.fillStyle = COLORS.cyan;
-    ctx.fillRect(4, -3, 26, 6);
+    ctx.fillStyle = branchColor;
+    if (station.type !== 'siege') ctx.fillRect(4, -3, station.type === 'interceptor' ? 20 : 26, 6);
     ctx.restore();
     ctx.save();
-    ctx.fillStyle = COLORS.amber;
+    ctx.fillStyle = branchColor;
     ctx.font = '700 9px "Space Mono", monospace';
     ctx.textAlign = 'center';
-    ctx.fillText(t('render.station', { level: station.level }), station.x, station.y - 46);
+    ctx.fillText(station.type ? `${t(`station.${station.type}.name`)} // MK ${station.level}` : t('render.station', { level: station.level }), station.x, station.y - 46);
     ctx.restore();
-    const upgradeCost = 90 + station.level * 80;
+    const upgradeCost = station.level === 1 ? Math.min(...Object.values(STATION_BRANCHES).map((branch) => branch.cost)) : stationUpgradeCost(station);
     if (station.level < 4 && player.credits >= upgradeCost) {
       const pulse = .72 + Math.sin(elapsed * 4.5) * .22;
       ctx.save();
@@ -3179,6 +3475,13 @@
       target.moveTo(r, 0); target.lineTo(0, -r * .62); target.lineTo(-r, 0); target.lineTo(0, r * .62);
     } else if (type === 'raider') {
       target.moveTo(r, 0); target.lineTo(r * .2, -r * .7); target.lineTo(-r, -r * .48); target.lineTo(-r * .62, 0); target.lineTo(-r, r * .48); target.lineTo(r * .2, r * .7);
+    } else if (type === 'gravity' || type === 'bossWarden') {
+      target.moveTo(r, 0); target.lineTo(r * .25, -r * .72); target.lineTo(-r * .55, -r * .95);
+      target.lineTo(-r * .22, -r * .34); target.lineTo(-r, 0); target.lineTo(-r * .22, r * .34);
+      target.lineTo(-r * .55, r * .95); target.lineTo(r * .25, r * .72);
+    } else if (type === 'repair') {
+      target.moveTo(r * .85, 0); target.lineTo(r * .25, -r * .72); target.lineTo(-r * .7, -r * .52);
+      target.lineTo(-r * .95, 0); target.lineTo(-r * .7, r * .52); target.lineTo(r * .25, r * .72);
     } else if (type === 'carrier' || type === 'bossCarrier') {
       target.moveTo(r, 0); target.lineTo(r * .35, -r * .6); target.lineTo(-r * .45, -r); target.lineTo(-r, -r * .3); target.lineTo(-r * .72, 0); target.lineTo(-r, r * .3); target.lineTo(-r * .45, r); target.lineTo(r * .35, r * .6);
     } else if (type === 'sentinel' || type === 'bossTitan') {
@@ -3258,6 +3561,28 @@
       ctx.beginPath(); ctx.arc(0, 0, r + (enemy.boss ? 9 : 6), 0, Math.PI * 2); ctx.stroke();
     }
     ctx.restore();
+    if (enemy.type === 'gravity' || enemy.bossSkill === 'gravity') {
+      const radius = enemy.boss ? 390 : 310;
+      ctx.save();
+      ctx.strokeStyle = enemy.color;
+      ctx.globalAlpha = .24 + Math.sin(elapsed * 3) * .08;
+      ctx.setLineDash([9, 12]);
+      ctx.beginPath(); ctx.arc(enemy.x, enemy.y, radius, 0, Math.PI * 2); ctx.stroke();
+      ctx.setLineDash([]);
+      if (Math.hypot(player.x - enemy.x, player.y - enemy.y) < radius) {
+        ctx.globalAlpha = .58;
+        ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.moveTo(enemy.x, enemy.y); ctx.lineTo(player.x, player.y); ctx.stroke();
+      }
+      ctx.restore();
+    }
+    if (enemy.type === 'repair') {
+      ctx.save();
+      ctx.strokeStyle = enemy.color;
+      ctx.globalAlpha = .25 + (1 - enemy.supportTimer / 2.8) * .3;
+      ctx.beginPath(); ctx.arc(enemy.x, enemy.y, 280, 0, Math.PI * 2); ctx.stroke();
+      ctx.restore();
+    }
     if (enemy.shieldCharges > 0 || enemy.shieldHp > 0) {
       const shieldBarY = enemy.y - enemy.radius - (enemy.boss ? 34 : 24);
       const shieldBarWidth = enemy.boss ? 110 : 72;
@@ -3340,10 +3665,10 @@
 
   function drawBullet(bullet) {
     ctx.save();
-    ctx.strokeStyle = COLORS.cyanSoft;
+    ctx.strokeStyle = bullet.color || COLORS.cyanSoft;
     ctx.lineWidth = 2.2;
     ctx.shadowBlur = 9;
-    ctx.shadowColor = COLORS.cyan;
+    ctx.shadowColor = bullet.color || COLORS.cyan;
     ctx.beginPath(); ctx.moveTo(bullet.x, bullet.y); ctx.lineTo(bullet.x - bullet.vx * .018, bullet.y - bullet.vy * .018); ctx.stroke();
     ctx.restore();
   }
@@ -3476,6 +3801,7 @@
       mctx.fillRect(station.x * sx - 2, station.y * sy - 2, 4, 4);
     }
     for (const wormhole of LEVELS[currentLevel].wormholes) {
+      if (wormhole.minWave && wave < wormhole.minWave) continue;
       mctx.strokeStyle = COLORS.purple;
       mctx.beginPath(); mctx.arc(wormhole.x * sx, wormhole.y * sy, 3, 0, Math.PI * 2); mctx.stroke();
     }
@@ -3494,6 +3820,9 @@
     const level = LEVELS[currentLevel];
     const localizedLevel = translateLevel(level);
     ui.sectorText.textContent = `${localizedLevel.short} // ${localizedLevel.name}`;
+    ui.objectiveLabel.textContent = t(currentLevel === 3 ? 'hud.stationSite' : 'hud.earthGate');
+    ui.mapObjectiveLabel.textContent = t(currentLevel === 3 ? 'hud.site' : 'hud.gate');
+    ui.portalWarning.querySelector('span').textContent = t(currentLevel === 3 ? 'hud.siteProximity' : 'hud.gateProximity');
     ui.waveText.textContent = t('status.stage', { stage: wave ? String(wave).padStart(2, '0') : '—', total: level.stages });
     ui.waveState.textContent = spawnQueue.length || enemies.length
       ? t('status.waveActive', { current: formation, total: formationsInStage, hostiles: spawnQueue.length + enemies.length })
@@ -3515,7 +3844,7 @@
     ui.rocketTierText.textContent = `${player.rocketTier}/7`;
     ui.coolingTierText.textContent = `${player.coolingTier}/7`;
     ui.shieldPips.innerHTML = Array.from({ length: 5 }, (_, index) => `<i class="${index >= gateShields ? 'empty' : ''}"></i>`).join('');
-    ui.shieldPips.setAttribute('aria-label', t('status.portalShields', { count: gateShields }));
+    ui.shieldPips.setAttribute('aria-label', t(currentLevel === 3 ? 'status.siteIntegrity' : 'status.portalShields', { count: gateShields }));
 
     const rocketProgress = player.rocketCharge > 0 ? 1 - player.rocketCharge / .62 : 1 - player.rocketCooldown / player.rocketMax;
     ui.rocketCooldown.style.width = `${clamp(rocketProgress, 0, 1) * 100}%`;
@@ -3524,7 +3853,8 @@
 
     const boostProgress = 1 - player.boostCooldown / player.boostMax;
     ui.boostCooldown.style.width = `${clamp(boostProgress, 0, 1) * 100}%`;
-    if (player.boostCooldown > 0) ui.boostState.textContent = `${player.boostCooldown.toFixed(1)}S`;
+    if (player.gravityLocked) ui.boostState.textContent = t('status.gravityLocked');
+    else if (player.boostCooldown > 0) ui.boostState.textContent = `${player.boostCooldown.toFixed(1)}S`;
     else if (player.jumpDestinationCooldown > 0) ui.boostState.textContent = t('status.jumpReady', { seconds: player.jumpDestinationCooldown.toFixed(1) });
     else ui.boostState.textContent = Number.isFinite(player.jumpDestinationX) ? t('status.replaceClear') : t('status.placeDestination');
     ui.boostCooldown.closest('.ability-card').classList.toggle('cooling', player.boostCooldown > 0);
@@ -3533,7 +3863,7 @@
     const buildCost = stationBuildCost();
     let stationAffordable = false;
     if (docked) {
-      const upgradeCost = 90 + docked.level * 80;
+      const upgradeCost = docked.level === 1 ? Math.min(...Object.values(STATION_BRANCHES).map((branch) => branch.cost)) : stationUpgradeCost(docked);
       ui.stationState.textContent = docked.level >= 4 ? t('status.maximumPower') : t('status.toUpgrade', { cost: upgradeCost });
       stationAffordable = docked.level < 4 && player.credits >= upgradeCost;
     } else {
@@ -3576,6 +3906,7 @@
     if (event.code === 'Escape') {
       if (ui.authOverlay.classList.contains('active')) closeAdminAccess();
       else if (ui.leaderboardOverlay.classList.contains('active')) closeLeaderboard();
+      else if (mode === 'stationChoice') closeStationChoices();
       else if (mode === 'levelSelect') closeLevelSelect();
       else togglePause();
     }
@@ -3586,11 +3917,15 @@
       else if (mode === 'briefing') showNextIntel();
       else if (mode === 'cutscene') activateWave();
       else if (mode === 'sector') enterNextSector();
+      else if (mode === 'construction') launchConstructionDefense();
     }
     if (event.code === 'KeyT' && mode === 'menu') requirePilot(() => startGame(true));
     if (event.code === 'KeyL' && mode === 'menu') requirePilot(openLevelSelect);
     if (mode === 'upgrade' && ['Digit1', 'Digit2', 'Digit3'].includes(event.code)) {
       ui.upgradeChoices.children[Number(event.code.at(-1)) - 1]?.click();
+    }
+    if (mode === 'stationChoice' && ['Digit1', 'Digit2', 'Digit3'].includes(event.code)) {
+      ui.stationChoices.children[Number(event.code.at(-1)) - 1]?.click();
     }
   }
 
@@ -3650,6 +3985,12 @@
     document.getElementById('intelContinue').addEventListener('click', showNextIntel);
     document.getElementById('skipBossIntro').addEventListener('click', activateWave);
     document.getElementById('nextSectorButton').addEventListener('click', enterNextSector);
+    document.getElementById('beginConstructionButton').addEventListener('click', launchConstructionDefense);
+    ui.stationChoiceClose.addEventListener('click', closeStationChoices);
+    ui.stationChoices.addEventListener('click', (event) => {
+      const choice = event.target.closest('[data-type]');
+      if (choice) selectStationChoice(choice.dataset.type);
+    });
     document.getElementById('stationButton').addEventListener('click', useStation);
     document.getElementById('waveCallButton').addEventListener('click', callNextWave);
     document.getElementById('adminButton').addEventListener('click', openAdminAccess);
@@ -3753,6 +4094,8 @@
       const completedLevel = translateLevel(LEVELS[currentLevel]);
       ui.sectorTitle.textContent = completedLevel.name;
       ui.sectorCopy.textContent = completedLevel.next;
+      ui.sectorRewardLabel.textContent = t(currentLevel === 2 ? 'sector.constructionSupply' : 'sector.gateSupport');
+      ui.sectorRewardValue.textContent = t(currentLevel === 2 ? 'sector.constructionCredits' : 'sector.shieldReward');
     }
     if (tutorialMode) updateTutorialCard();
   }

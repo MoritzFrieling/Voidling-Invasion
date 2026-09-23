@@ -171,7 +171,9 @@
       ctx.stroke();
     }
     ctx.setLineDash([]);
-    for (const wormhole of LEVELS[currentLevel].wormholes) drawWormhole(wormhole);
+    for (const wormhole of LEVELS[currentLevel].wormholes) {
+      if (!wormhole.minWave || wave >= wormhole.minWave) drawWormhole(wormhole);
+    }
     ctx.restore();
   }
 
@@ -190,6 +192,7 @@
 
   function drawPortal() {
     if (!isVisible(PORTAL, 180)) return;
+    if (currentLevel === 3) { drawConstructionSite(); return; }
     ctx.save();
     ctx.translate(PORTAL.x, PORTAL.y);
     const pulse = 1 + Math.sin(elapsed * 2.2) * .025;
@@ -246,6 +249,40 @@
     ctx.font = '700 10px "Space Mono", monospace';
     ctx.textAlign = 'center';
     ctx.fillText(t('render.earthGate'), 0, 57);
+    ctx.restore();
+  }
+
+  function drawConstructionSite() {
+    ctx.save();
+    ctx.translate(PORTAL.x, PORTAL.y);
+    ctx.rotate(elapsed * .08);
+    ctx.shadowColor = COLORS.cyan;
+    ctx.shadowBlur = 18;
+    ctx.strokeStyle = COLORS.cyan;
+    ctx.lineWidth = 4;
+    ctx.setLineDash([27, 11]);
+    ctx.beginPath(); ctx.arc(0, 0, 76, 0, Math.PI * 2); ctx.stroke();
+    ctx.setLineDash([]);
+    for (let arm = 0; arm < 4; arm += 1) {
+      ctx.rotate(Math.PI / 2);
+      ctx.fillStyle = '#102c37';
+      ctx.strokeStyle = COLORS.amber;
+      ctx.fillRect(25, -11, 55, 22);
+      ctx.strokeRect(25, -11, 55, 22);
+      ctx.beginPath(); ctx.moveTo(43, -11); ctx.lineTo(59, 11); ctx.stroke();
+    }
+    ctx.fillStyle = '#09242c';
+    ctx.strokeStyle = COLORS.cyanSoft;
+    ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.moveTo(0, -36); ctx.lineTo(36, 0); ctx.lineTo(0, 36); ctx.lineTo(-36, 0); ctx.closePath(); ctx.fill(); ctx.stroke();
+    ctx.fillStyle = COLORS.amber;
+    ctx.beginPath(); ctx.arc(0, 0, 12 + Math.sin(elapsed * 2) * 2, 0, Math.PI * 2); ctx.fill();
+    ctx.restore();
+    ctx.save();
+    ctx.fillStyle = COLORS.pale;
+    ctx.font = '700 10px "Space Mono", monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText(t('render.stationSite'), PORTAL.x, PORTAL.y + 104);
     ctx.restore();
   }
 
@@ -313,35 +350,54 @@
     if (!isVisible(station, station.range)) return;
     ctx.save();
     ctx.translate(station.x, station.y);
-    ctx.strokeStyle = 'rgba(255,179,92,.12)';
+    const branchColor = station.type === 'interceptor' ? '#69dfff' : station.type === 'siege' ? '#ff9b6a' : station.type === 'network' ? COLORS.purple : COLORS.amber;
+    ctx.strokeStyle = station.type === 'network' ? 'rgba(168,140,255,.22)' : 'rgba(255,179,92,.12)';
     ctx.setLineDash([7, 13]);
     ctx.beginPath(); ctx.arc(0, 0, station.range, 0, Math.PI * 2); ctx.stroke();
     ctx.setLineDash([]);
     ctx.rotate(elapsed * .22);
-    ctx.strokeStyle = COLORS.amber;
+    ctx.strokeStyle = branchColor;
     ctx.fillStyle = 'rgba(17,28,31,.95)';
     ctx.shadowBlur = 14;
     ctx.shadowColor = COLORS.amber;
     ctx.lineWidth = 2;
-    for (let arm = 0; arm < 4; arm += 1) {
-      ctx.rotate(Math.PI / 2);
-      ctx.fillRect(12, -5, 23 + station.level * 2, 10);
-      ctx.strokeRect(12, -5, 23 + station.level * 2, 10);
+    if (station.type === 'siege') {
+      ctx.rotate(station.angle);
+      ctx.fillRect(-14, -15, 34, 30); ctx.strokeRect(-14, -15, 34, 30);
+      ctx.fillRect(12, -9, 40, 18); ctx.strokeRect(12, -9, 40, 18);
+      ctx.rotate(-station.angle);
+    } else if (station.type === 'interceptor') {
+      for (let arm = 0; arm < 6; arm += 1) {
+        ctx.rotate(Math.PI / 3);
+        ctx.fillRect(13, -3, 26, 6); ctx.strokeRect(13, -3, 26, 6);
+      }
+    } else if (station.type === 'network') {
+      ctx.beginPath(); ctx.moveTo(0, -40); ctx.lineTo(40, 0); ctx.lineTo(0, 40); ctx.lineTo(-40, 0); ctx.closePath(); ctx.stroke();
+      for (let arm = 0; arm < 4; arm += 1) {
+        ctx.rotate(Math.PI / 2);
+        ctx.fillRect(16, -4, 17, 8);
+      }
+    } else {
+      for (let arm = 0; arm < 4; arm += 1) {
+        ctx.rotate(Math.PI / 2);
+        ctx.fillRect(12, -5, 23 + station.level * 2, 10);
+        ctx.strokeRect(12, -5, 23 + station.level * 2, 10);
+      }
     }
     ctx.rotate(-elapsed * .22);
     ctx.fillStyle = '#09161d';
     ctx.beginPath(); ctx.arc(0, 0, 18 + station.level * 2, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
     ctx.rotate(station.angle);
-    ctx.fillStyle = COLORS.cyan;
-    ctx.fillRect(4, -3, 26, 6);
+    ctx.fillStyle = branchColor;
+    if (station.type !== 'siege') ctx.fillRect(4, -3, station.type === 'interceptor' ? 20 : 26, 6);
     ctx.restore();
     ctx.save();
-    ctx.fillStyle = COLORS.amber;
+    ctx.fillStyle = branchColor;
     ctx.font = '700 9px "Space Mono", monospace';
     ctx.textAlign = 'center';
-    ctx.fillText(t('render.station', { level: station.level }), station.x, station.y - 46);
+    ctx.fillText(station.type ? `${t(`station.${station.type}.name`)} // MK ${station.level}` : t('render.station', { level: station.level }), station.x, station.y - 46);
     ctx.restore();
-    const upgradeCost = 90 + station.level * 80;
+    const upgradeCost = station.level === 1 ? Math.min(...Object.values(STATION_BRANCHES).map((branch) => branch.cost)) : stationUpgradeCost(station);
     if (station.level < 4 && player.credits >= upgradeCost) {
       const pulse = .72 + Math.sin(elapsed * 4.5) * .22;
       ctx.save();
@@ -386,6 +442,13 @@
       target.moveTo(r, 0); target.lineTo(0, -r * .62); target.lineTo(-r, 0); target.lineTo(0, r * .62);
     } else if (type === 'raider') {
       target.moveTo(r, 0); target.lineTo(r * .2, -r * .7); target.lineTo(-r, -r * .48); target.lineTo(-r * .62, 0); target.lineTo(-r, r * .48); target.lineTo(r * .2, r * .7);
+    } else if (type === 'gravity' || type === 'bossWarden') {
+      target.moveTo(r, 0); target.lineTo(r * .25, -r * .72); target.lineTo(-r * .55, -r * .95);
+      target.lineTo(-r * .22, -r * .34); target.lineTo(-r, 0); target.lineTo(-r * .22, r * .34);
+      target.lineTo(-r * .55, r * .95); target.lineTo(r * .25, r * .72);
+    } else if (type === 'repair') {
+      target.moveTo(r * .85, 0); target.lineTo(r * .25, -r * .72); target.lineTo(-r * .7, -r * .52);
+      target.lineTo(-r * .95, 0); target.lineTo(-r * .7, r * .52); target.lineTo(r * .25, r * .72);
     } else if (type === 'carrier' || type === 'bossCarrier') {
       target.moveTo(r, 0); target.lineTo(r * .35, -r * .6); target.lineTo(-r * .45, -r); target.lineTo(-r, -r * .3); target.lineTo(-r * .72, 0); target.lineTo(-r, r * .3); target.lineTo(-r * .45, r); target.lineTo(r * .35, r * .6);
     } else if (type === 'sentinel' || type === 'bossTitan') {
@@ -465,6 +528,28 @@
       ctx.beginPath(); ctx.arc(0, 0, r + (enemy.boss ? 9 : 6), 0, Math.PI * 2); ctx.stroke();
     }
     ctx.restore();
+    if (enemy.type === 'gravity' || enemy.bossSkill === 'gravity') {
+      const radius = enemy.boss ? 390 : 310;
+      ctx.save();
+      ctx.strokeStyle = enemy.color;
+      ctx.globalAlpha = .24 + Math.sin(elapsed * 3) * .08;
+      ctx.setLineDash([9, 12]);
+      ctx.beginPath(); ctx.arc(enemy.x, enemy.y, radius, 0, Math.PI * 2); ctx.stroke();
+      ctx.setLineDash([]);
+      if (Math.hypot(player.x - enemy.x, player.y - enemy.y) < radius) {
+        ctx.globalAlpha = .58;
+        ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.moveTo(enemy.x, enemy.y); ctx.lineTo(player.x, player.y); ctx.stroke();
+      }
+      ctx.restore();
+    }
+    if (enemy.type === 'repair') {
+      ctx.save();
+      ctx.strokeStyle = enemy.color;
+      ctx.globalAlpha = .25 + (1 - enemy.supportTimer / 2.8) * .3;
+      ctx.beginPath(); ctx.arc(enemy.x, enemy.y, 280, 0, Math.PI * 2); ctx.stroke();
+      ctx.restore();
+    }
     if (enemy.shieldCharges > 0 || enemy.shieldHp > 0) {
       const shieldBarY = enemy.y - enemy.radius - (enemy.boss ? 34 : 24);
       const shieldBarWidth = enemy.boss ? 110 : 72;
@@ -547,10 +632,10 @@
 
   function drawBullet(bullet) {
     ctx.save();
-    ctx.strokeStyle = COLORS.cyanSoft;
+    ctx.strokeStyle = bullet.color || COLORS.cyanSoft;
     ctx.lineWidth = 2.2;
     ctx.shadowBlur = 9;
-    ctx.shadowColor = COLORS.cyan;
+    ctx.shadowColor = bullet.color || COLORS.cyan;
     ctx.beginPath(); ctx.moveTo(bullet.x, bullet.y); ctx.lineTo(bullet.x - bullet.vx * .018, bullet.y - bullet.vy * .018); ctx.stroke();
     ctx.restore();
   }
@@ -683,6 +768,7 @@
       mctx.fillRect(station.x * sx - 2, station.y * sy - 2, 4, 4);
     }
     for (const wormhole of LEVELS[currentLevel].wormholes) {
+      if (wormhole.minWave && wave < wormhole.minWave) continue;
       mctx.strokeStyle = COLORS.purple;
       mctx.beginPath(); mctx.arc(wormhole.x * sx, wormhole.y * sy, 3, 0, Math.PI * 2); mctx.stroke();
     }
@@ -701,6 +787,9 @@
     const level = LEVELS[currentLevel];
     const localizedLevel = translateLevel(level);
     ui.sectorText.textContent = `${localizedLevel.short} // ${localizedLevel.name}`;
+    ui.objectiveLabel.textContent = t(currentLevel === 3 ? 'hud.stationSite' : 'hud.earthGate');
+    ui.mapObjectiveLabel.textContent = t(currentLevel === 3 ? 'hud.site' : 'hud.gate');
+    ui.portalWarning.querySelector('span').textContent = t(currentLevel === 3 ? 'hud.siteProximity' : 'hud.gateProximity');
     ui.waveText.textContent = t('status.stage', { stage: wave ? String(wave).padStart(2, '0') : '—', total: level.stages });
     ui.waveState.textContent = spawnQueue.length || enemies.length
       ? t('status.waveActive', { current: formation, total: formationsInStage, hostiles: spawnQueue.length + enemies.length })
@@ -722,7 +811,7 @@
     ui.rocketTierText.textContent = `${player.rocketTier}/7`;
     ui.coolingTierText.textContent = `${player.coolingTier}/7`;
     ui.shieldPips.innerHTML = Array.from({ length: 5 }, (_, index) => `<i class="${index >= gateShields ? 'empty' : ''}"></i>`).join('');
-    ui.shieldPips.setAttribute('aria-label', t('status.portalShields', { count: gateShields }));
+    ui.shieldPips.setAttribute('aria-label', t(currentLevel === 3 ? 'status.siteIntegrity' : 'status.portalShields', { count: gateShields }));
 
     const rocketProgress = player.rocketCharge > 0 ? 1 - player.rocketCharge / .62 : 1 - player.rocketCooldown / player.rocketMax;
     ui.rocketCooldown.style.width = `${clamp(rocketProgress, 0, 1) * 100}%`;
@@ -731,7 +820,8 @@
 
     const boostProgress = 1 - player.boostCooldown / player.boostMax;
     ui.boostCooldown.style.width = `${clamp(boostProgress, 0, 1) * 100}%`;
-    if (player.boostCooldown > 0) ui.boostState.textContent = `${player.boostCooldown.toFixed(1)}S`;
+    if (player.gravityLocked) ui.boostState.textContent = t('status.gravityLocked');
+    else if (player.boostCooldown > 0) ui.boostState.textContent = `${player.boostCooldown.toFixed(1)}S`;
     else if (player.jumpDestinationCooldown > 0) ui.boostState.textContent = t('status.jumpReady', { seconds: player.jumpDestinationCooldown.toFixed(1) });
     else ui.boostState.textContent = Number.isFinite(player.jumpDestinationX) ? t('status.replaceClear') : t('status.placeDestination');
     ui.boostCooldown.closest('.ability-card').classList.toggle('cooling', player.boostCooldown > 0);
@@ -740,7 +830,7 @@
     const buildCost = stationBuildCost();
     let stationAffordable = false;
     if (docked) {
-      const upgradeCost = 90 + docked.level * 80;
+      const upgradeCost = docked.level === 1 ? Math.min(...Object.values(STATION_BRANCHES).map((branch) => branch.cost)) : stationUpgradeCost(docked);
       ui.stationState.textContent = docked.level >= 4 ? t('status.maximumPower') : t('status.toUpgrade', { cost: upgradeCost });
       stationAffordable = docked.level < 4 && player.credits >= upgradeCost;
     } else {

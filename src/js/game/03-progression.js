@@ -63,8 +63,10 @@
     return checkpoint;
   }
 
-  function expectedCheckpoint() {
-    return captureProgress(resetPlayer(), 3);
+  function expectedCheckpoint(levelIndex = 0) {
+    const checkpoint = captureProgress(resetPlayer(), 3);
+    if (levelIndex === 3) checkpoint.credits = 340;
+    return checkpoint;
   }
 
   function applyCheckpoint(checkpoint) {
@@ -190,6 +192,7 @@
     if (!isStageCheckpointValid(stageCheckpoint)) return false;
     const checkpoint = stageCheckpoint;
     currentLevel = checkpoint.level;
+    setLevelGeometry(currentLevel);
     activePaths = LEVELS[currentLevel].paths;
     player = { ...checkpoint.player, rocketTarget: null, invulnerable: 0, collisionTimer: 0, jumpFlash: 0 };
     gateShields = checkpoint.gateShields;
@@ -210,6 +213,7 @@
     waveClearTimer = 0;
     waveReady = false;
     waveCallEligible = false;
+    openingWaveTimer = 0;
     resourceTimer = checkpoint.resourceTimer;
     repairTimer = checkpoint.repairTimer;
     spawnTimer = 0;
@@ -267,18 +271,22 @@
     formationsInStage = 1;
     const highestSelectable = isAdminPilot() ? LEVELS.length - 1 : campaignState.highestUnlocked;
     currentLevel = clamp(levelIndex, 0, highestSelectable);
+    setLevelGeometry(currentLevel);
     activePaths = LEVELS[currentLevel].paths;
     score = 0;
     kills = 0;
     gateShields = 3;
     ensureCampaignCheckpoints();
     applyCheckpoint(campaignState.checkpoints[currentLevel] || expectedCheckpoint(currentLevel));
+    if (currentLevel === 3) player.credits = Math.max(player.credits, 340);
+    if (currentLevel === 3) { player.x = 2050; player.y = 1600; }
     waveClearTimer = 0;
     formationStartedAt = 0;
     formationParTime = 0;
     formationGateShields = gateShields;
     waveReady = false;
     waveCallEligible = false;
+    openingWaveTimer = 0;
     stationaryTime = 0;
     staticDamageTimer = 0;
     jumpDestinationHold = 0;
@@ -326,7 +334,8 @@
       showToast(t('toast.trainingLink'));
     } else {
       ui.tutorialCard.classList.remove('active');
-      beginWave();
+      if (currentLevel === 3) showConstructionBriefing();
+      else beginWave();
     }
     syncUi();
   }

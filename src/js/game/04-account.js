@@ -245,7 +245,7 @@
       const checkpoint = campaignState.checkpoints[index] || expectedCheckpoint(index);
       const localizedLevel = translateLevel(level);
       const paths = level.paths.length === 1 ? t('level.oneApproach') : t('level.approaches', { count: level.paths.length });
-      const descriptionKey = index === 0 ? 'level.oneDescription' : index === 1 ? 'level.twoDescription' : 'level.threeDescription';
+      const descriptionKey = ['level.oneDescription', 'level.twoDescription', 'level.threeDescription', 'level.fourDescription'][index];
       const card = document.createElement('button');
       card.type = 'button';
       card.className = `level-card${unlocked ? '' : ' locked'}`;

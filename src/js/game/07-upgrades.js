@@ -21,7 +21,7 @@
       case 'cooling': return { current: `${t('label.rocket')} ${player.rocketMax.toFixed(1)}S · ${t('label.jump')} ${player.boostMax.toFixed(1)}S`, effect: `→ ${(player.rocketMax * .9).toFixed(1)}S · ${(player.boostMax * .9).toFixed(1)}S · -10%` };
       case 'salvage': return { current: `${t('label.resourceXp')} ×${player.salvage.toFixed(2)}`, effect: `→ ×${(player.salvage * 1.18).toFixed(2)} · +18%` };
       case 'multi': return { current: `${t('label.shots')} ${player.multiShot}`, effect: `→ ${player.multiShot + 1} · +1` };
-      case 'gate': return { current: `${t('label.gateShields')} ${gateShields}/5`, effect: `→ ${Math.min(5, gateShields + 1)}/5 · +1` };
+      case 'gate': return { current: `${t(currentLevel === 3 ? 'label.siteIntegrity' : 'label.gateShields')} ${gateShields}/5`, effect: `→ ${Math.min(5, gateShields + 1)}/5 · +1` };
       default: return { current: '', effect: t(upgrade.detailKey) };
     }
   }
@@ -50,7 +50,7 @@
       const summary = upgradeSummary(upgrade);
       button.className = 'upgrade-choice';
       button.type = 'button';
-      button.innerHTML = `<span class="upgrade-icon">${upgrade.icon}</span><strong>${t(upgrade.nameKey)}</strong><p>${t(upgrade.descriptionKey)}</p><small><span>${t('label.current')} // ${summary.current}</span><b>${t('label.upgrade')} // ${summary.effect}</b></small>`;
+      button.innerHTML = `<span class="upgrade-icon">${upgrade.icon}</span><strong>${t(upgrade.id === 'gate' && currentLevel === 3 ? 'upgrade.site.name' : upgrade.nameKey)}</strong><p>${t(upgrade.id === 'gate' && currentLevel === 3 ? 'upgrade.site.description' : upgrade.descriptionKey)}</p><small><span>${t('label.current')} // ${summary.current}</span><b>${t('label.upgrade')} // ${summary.effect}</b></small>`;
       button.addEventListener('click', () => selectUpgrade(upgrade));
       ui.upgradeChoices.append(button);
     });
@@ -65,7 +65,7 @@
     pendingLevelUps -= 1;
     ui.upgradeOverlay.classList.remove('active');
     ui.tutorialUpgradeTip.hidden = true;
-    showToast(t('toast.upgradeInstalled', { upgrade: t(upgrade.nameKey) }));
+    showToast(t('toast.upgradeInstalled', { upgrade: t(upgrade.id === 'gate' && currentLevel === 3 ? 'upgrade.site.name' : upgrade.nameKey) }));
     if (pendingLevelUps > 0) {
       setTimeout(showUpgradeChoices, 80);
     } else {
@@ -100,6 +100,7 @@
     }
     const nextLevel = currentLevel + 1;
     player = resetPlayer();
+    if (nextLevel === 3) player.credits = 340;
     gateShields = 3;
     pendingLevelUps = 0;
     campaignState.highestUnlocked = Math.max(campaignState.highestUnlocked, nextLevel);
@@ -110,6 +111,8 @@
     const completedLevel = translateLevel(LEVELS[currentLevel]);
     ui.sectorTitle.textContent = completedLevel.name;
     ui.sectorCopy.textContent = completedLevel.next;
+    ui.sectorRewardLabel.textContent = t(currentLevel === 2 ? 'sector.constructionSupply' : 'sector.gateSupport');
+    ui.sectorRewardValue.textContent = t(currentLevel === 2 ? 'sector.constructionCredits' : 'sector.shieldReward');
     ui.sectorOverlay.classList.add('active');
     audio.tone(220, .7, 'sine', .09, 440);
   }
@@ -117,6 +120,7 @@
   function enterNextSector() {
     ui.sectorOverlay.classList.remove('active');
     currentLevel += 1;
+    setLevelGeometry(currentLevel);
     activePaths = LEVELS[currentLevel].paths;
     wave = 0;
     formation = 0;
@@ -129,8 +133,10 @@
     stations = [];
     resources = [];
     pickups = [];
-    player.x = 760;
-    player.y = 1030;
+    player.x = currentLevel === 3 ? 2050 : 760;
+    player.y = currentLevel === 3 ? 1600 : 1030;
+    if (currentLevel === 3) player.credits = Math.max(player.credits, 340);
+    openingWaveTimer = 0;
     player.vx = 0;
     player.vy = 0;
     for (let i = 0; i < 9; i += 1) spawnResource(true);
@@ -138,7 +144,22 @@
     camera.y = clamp(player.y - screenHeight / 2, 0, WORLD.height - screenHeight);
     mode = 'playing';
     showToast(t('toast.multipleApproaches', { sector: translateLevel(LEVELS[currentLevel]).name }));
-    beginWave();
+    if (currentLevel === 3) showConstructionBriefing();
+    else beginWave();
+  }
+
+  function showConstructionBriefing() {
+    mode = 'construction';
+    ui.crosshair.style.opacity = '0';
+    ui.constructionOverlay.classList.add('active');
+  }
+
+  function launchConstructionDefense() {
+    if (mode !== 'construction') return;
+    ui.constructionOverlay.classList.remove('active');
+    mode = 'playing';
+    openingWaveTimer = 10;
+    setWaveCallAvailable(true);
   }
 
   function finishRun(victory, reason = '') {
@@ -156,13 +177,13 @@
     ui.portalWarning.classList.remove('active');
     ui.lockReadout.classList.remove('active');
     ui.tutorialCard.classList.remove('active');
-    ui.endKicker.textContent = victory ? t('end.secured') : reason === 'ship' ? t('end.pilotLost') : t('end.defenseOffline');
-    ui.endTitle.textContent = victory ? t('end.victoryTitle') : reason === 'ship' ? t('end.shipLostTitle') : t('end.gateLostTitle');
+    ui.endKicker.textContent = victory ? t('end.secured') : reason === 'ship' ? t('end.pilotLost') : t(currentLevel === 3 ? 'end.stationOffline' : 'end.defenseOffline');
+    ui.endTitle.textContent = victory ? t('end.victoryTitle') : reason === 'ship' ? t('end.shipLostTitle') : t(currentLevel === 3 ? 'end.stationLostTitle' : 'end.gateLostTitle');
     ui.endCopy.textContent = victory
-      ? t('end.victoryCopy')
+      ? t(currentLevel === 3 ? 'end.stationVictoryCopy' : 'end.victoryCopy')
       : reason === 'ship'
         ? t('end.shipLostCopy')
-        : t('end.gateLostCopy');
+        : t(currentLevel === 3 ? 'end.stationLostCopy' : 'end.gateLostCopy');
     ui.finalScore.textContent = formatScore(score);
     ui.finalWave.textContent = `${translateLevel(LEVELS[currentLevel]).short} · ${wave}`;
     ui.finalKills.textContent = String(kills);

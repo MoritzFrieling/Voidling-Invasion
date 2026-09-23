@@ -41,6 +41,24 @@
     player.jumpBrake = Math.max(0, player.jumpBrake - dt);
     player.jumpFlash = Math.max(0, player.jumpFlash - dt);
 
+    const wasGravityLocked = Boolean(player.gravityLocked);
+    player.gravityLocked = false;
+    let pullX = 0;
+    let pullY = 0;
+    for (const enemy of enemies) {
+      if (enemy.dead || (enemy.type !== 'gravity' && enemy.bossSkill !== 'gravity')) continue;
+      const deltaX = enemy.x - player.x;
+      const deltaY = enemy.y - player.y;
+      const distance = Math.hypot(deltaX, deltaY);
+      const range = enemy.boss ? 390 : 310;
+      if (distance >= range || distance < 1) continue;
+      player.gravityLocked = true;
+      const force = enemy.boss ? 140 : 105;
+      pullX += deltaX / distance * force;
+      pullY += deltaY / distance * force;
+    }
+    if (player.gravityLocked && !wasGravityLocked) showToast(t('toast.gravityLocked'));
+
     let dx = 0;
     let dy = 0;
     if (input.keys.has('KeyA')) dx -= 1;
@@ -60,6 +78,8 @@
     const acceleration = player.acceleration * (precision ? .52 : player.jumpBrake > 0 ? .62 : 1);
     player.vx += dx * acceleration * dt;
     player.vy += dy * acceleration * dt;
+    player.vx += clamp(pullX, -190, 190) * dt;
+    player.vy += clamp(pullY, -190, 190) * dt;
     const drag = Math.pow(magnitude ? player.jumpBrake > 0 ? .08 : .12 : player.jumpBrake > 0 ? .02 : .035, dt);
     player.vx *= drag;
     player.vy *= drag;
@@ -77,7 +97,10 @@
       stationaryTime = 0;
       staticDamageTimer = 0;
     }
-    const staticDamageActive = stationaryTime >= 1.25 && (enemies.length > 0 || spawnQueue.length > 0);
+    const nearbyThreat = currentLevel === 3
+      ? enemies.some((enemy) => !enemy.dead && distanceSq(enemy, player) < 900 ** 2)
+      : enemies.length > 0 || spawnQueue.length > 0;
+    const staticDamageActive = stationaryTime >= 1.25 && nearbyThreat;
     ui.staticWarning.classList.toggle('active', staticDamageActive);
     if (staticDamageActive) {
       staticDamageTimer += dt;
@@ -135,12 +158,20 @@
       return;
     }
 
+    if (currentLevel === 3 && wave === 0 && openingWaveTimer > 0) {
+      openingWaveTimer = Math.max(0, openingWaveTimer - dt);
+      if (openingWaveTimer === 0) {
+        setWaveCallAvailable(false);
+        beginWave();
+      }
+    }
+
     if (spawnQueue.length) {
       spawnTimer -= dt;
       if (spawnTimer <= 0) {
         spawnEnemy(spawnQueue.shift());
         const openingBuffer = wave <= 2 ? .12 : 0;
-        const sectorThreeSpacing = currentLevel === 2 ? 1.08 : 1;
+        const sectorThreeSpacing = currentLevel === 3 ? 1.3 : currentLevel === 2 ? 1.08 : 1;
         spawnTimer = Math.max(.34, (.78 + currentLevel * .12 - wave * .018 + openingBuffer) * sectorThreeSpacing);
       }
     } else if (!enemies.length && wave > 0) {
@@ -195,6 +226,12 @@
   }
 
   function callNextWave() {
+    if (mode === 'playing' && currentLevel === 3 && wave === 0 && openingWaveTimer > 0) {
+      openingWaveTimer = 0;
+      setWaveCallAvailable(false);
+      beginWave();
+      return;
+    }
     if (mode !== 'playing' || !waveReady || !waveCallEligible) return;
     const bonus = Math.round((6 + wave * 2 + currentLevel * 3) * (1 + formation * .15));
     const earnedXp = grantXp(bonus, true);
@@ -365,6 +402,7 @@
 
   function triggerBoost() {
     if (mode !== 'playing' || player.boostCooldown > 0) return;
+    if (player.gravityLocked) { showToast(t('toast.gravityLocked')); return; }
     const startX = player.x;
     const startY = player.y;
     let targetX = player.jumpDestinationX;
@@ -470,7 +508,8 @@
 
   function updateEnemies(dt) {
     enemies.forEach((enemy) => {
-      enemy.progress += enemy.speed * dt;
+      const slowingStation = stations.find((station) => station.type === 'network' && distanceSq(station, enemy) < station.range ** 2);
+      enemy.progress += enemy.speed * (slowingStation ? (enemy.boss ? .84 : .62) : 1) * dt;
       enemy.wobble += dt * (enemy.type === 'striker' ? 1.15 : 1.7);
       enemy.hitFlash = Math.max(0, enemy.hitFlash - dt);
       enemy.shieldHitTimer = Math.max(0, enemy.shieldHitTimer - dt);
@@ -480,6 +519,33 @@
       enemy.x = point.x + point.nx * sway;
       enemy.y = point.y + point.ny * sway;
       enemy.angle = point.angle + Math.cos(enemy.wobble * .8) * .08;
+
+      if (enemy.type === 'repair' && !enemy.dead) {
+        enemy.supportTimer -= dt;
+        if (enemy.supportTimer <= 0) {
+          for (const ally of enemies) {
+            if (ally === enemy || ally.dead || distanceSq(ally, enemy) > 280 ** 2) continue;
+            const healed = Math.min(ally.maxHp - ally.hp, Math.min(ally.maxHp * .07, 42));
+            if (healed > 1) {
+              ally.hp += healed;
+              addFloater(ally.x, ally.y - ally.radius, `+${Math.ceil(healed)}`, enemy.color);
+            }
+          }
+          enemy.supportTimer = 2.8;
+          burst(enemy.x, enemy.y, enemy.color, 10, 120);
+        }
+      }
+      if (enemy.bossSkill === 'gravity' && !enemy.dead) {
+        enemy.supportTimer -= dt;
+        if (enemy.supportTimer <= 0 && enemies.length < 65) {
+          for (const pathId of [0, 2]) {
+            const hole = LEVELS[currentLevel].wormholes.find((entry) => entry.pathId === pathId);
+            spawnEnemy({ type: 'gravity', pathId, entryProgress: LEVELS[currentLevel].paths[pathId].length * hole.progress, fromWormhole: true });
+          }
+          enemy.supportTimer = 13;
+          showToast(t('toast.wardenAnchors'));
+        }
+      }
 
       if (enemy.major) {
         enemy.rocketTimer -= dt;
@@ -518,7 +584,7 @@
         camera.shake = Math.max(camera.shake, 16);
         burst(PORTAL.x, PORTAL.y, COLORS.coral, 30, 320);
         audio.tone(58, .5, 'sawtooth', .11, -28);
-        showToast(gateShields > 0 ? t('toast.gateHit', { count: gateShields }) : t('toast.gateBreached'));
+        showToast(gateShields > 0 ? t(currentLevel === 3 ? 'toast.siteHit' : 'toast.gateHit', { count: gateShields }) : t(currentLevel === 3 ? 'toast.siteBreached' : 'toast.gateBreached'));
         if (gateShields <= 0) finishRun(false, 'gate');
       }
     });
@@ -548,6 +614,71 @@
     return 120 + stations.length * 35;
   }
 
+  const STATION_BRANCHES = {
+    interceptor: { cost: 170, range: 510, damage: 15, fireRate: .28, color: '#69dfff' },
+    siege: { cost: 220, range: 670, damage: 78, fireRate: 1.7, color: '#ff9b6a' },
+    network: { cost: 190, range: 520, damage: 12, fireRate: .95, color: '#a88cff' },
+  };
+
+  function stationUpgradeCost(station) {
+    return station.level === 1 ? null : 90 + station.level * 80;
+  }
+
+  function upgradeStation(station, type = null) {
+    const cost = type ? STATION_BRANCHES[type].cost : stationUpgradeCost(station);
+    if (player.credits < cost) { showToast(t('toast.upgradeRequires', { cost })); return false; }
+    player.credits -= cost;
+    station.level += 1;
+    if (type) {
+      const branch = STATION_BRANCHES[type];
+      station.type = type;
+      station.range = branch.range;
+      station.damage = branch.damage;
+      station.fireRate = branch.fireRate;
+    } else {
+      station.range += station.type === 'network' ? 45 : 72;
+      station.damage *= station.type === 'siege' ? 1.35 : 1.3;
+      station.fireRate *= station.type === 'interceptor' ? .92 : .88;
+    }
+    player.hp = Math.min(player.maxHp, player.hp + 12);
+    burst(station.x, station.y, STATION_BRANCHES[station.type]?.color || COLORS.amber, 24, 180);
+    showToast(t('toast.stationUpgraded', { level: station.level }));
+    audio.tone(420, .36, 'sine', .07, 280);
+    if (tutorialMode && tutorialIndex === TUTORIAL_STEP.station) queueTutorialAdvance();
+    return true;
+  }
+
+  function showStationChoices(station) {
+    pendingStationChoice = station;
+    mode = 'stationChoice';
+    ui.crosshair.style.opacity = '0';
+    ui.stationChoices.innerHTML = Object.entries(STATION_BRANCHES).map(([type, branch]) => `
+      <button class="station-choice ${type}" type="button" data-type="${type}" ${player.credits < branch.cost ? 'disabled' : ''}>
+        <svg class="station-preview" viewBox="0 0 160 110" aria-hidden="true"><circle cx="80" cy="55" r="36" fill="#09161d" stroke="${branch.color}" stroke-width="3"/>
+        ${type === 'interceptor' ? '<path d="M36 34 L53 42 L70 25 L80 35 L90 25 L107 42 L124 34 M36 76 L53 68 L70 85 L80 75 L90 85 L107 68 L124 76" fill="none" stroke="#69dfff" stroke-width="6"/><path d="M80 22 V88" stroke="#69dfff" stroke-width="7"/>' : ''}
+        ${type === 'siege' ? '<path d="M48 43 H118 V67 H48 Z" fill="#ff9b6a"/><path d="M37 38 L58 25 L76 38 M37 72 L58 85 L76 72" fill="none" stroke="#ff9b6a" stroke-width="6"/>' : ''}
+        ${type === 'network' ? '<circle cx="80" cy="55" r="49" fill="none" stroke="#a88cff" stroke-width="2" stroke-dasharray="7 5"/><path d="M80 17 L113 55 L80 93 L47 55 Z" fill="none" stroke="#a88cff" stroke-width="5"/>' : ''}
+        <circle cx="80" cy="55" r="12" fill="${branch.color}"/></svg>
+        <strong>${t(`station.${type}.name`)}</strong><p>${t(`station.${type}.description`)}</p>
+        <ul><li>${t(`station.${type}.point1`)}</li><li>${t(`station.${type}.point2`)}</li></ul>
+        <span class="station-choice-cost">${branch.cost} ◈</span>
+      </button>`).join('');
+    ui.stationChoiceOverlay.classList.add('active');
+  }
+
+  function closeStationChoices() {
+    if (mode !== 'stationChoice') return;
+    pendingStationChoice = null;
+    ui.stationChoiceOverlay.classList.remove('active');
+    mode = 'playing';
+    ui.crosshair.style.opacity = '1';
+  }
+
+  function selectStationChoice(type) {
+    if (mode !== 'stationChoice' || !pendingStationChoice || !STATION_BRANCHES[type]) return;
+    if (upgradeStation(pendingStationChoice, type)) closeStationChoices();
+  }
+
   function nearestStation(range = Infinity) {
     let nearest = null;
     let best = range * range;
@@ -564,25 +695,15 @@
     if (docked) {
       if (Math.hypot(player.vx, player.vy) > 150) { showToast(t('toast.slowDock')); return; }
       if (docked.level >= 4) { showToast(t('toast.stationMax')); return; }
-      const cost = 90 + docked.level * 80;
-      if (player.credits < cost) { showToast(t('toast.upgradeRequires', { cost })); return; }
-      player.credits -= cost;
-      docked.level += 1;
-      docked.range += 72;
-      docked.damage *= 1.42;
-      docked.fireRate *= .86;
-      player.hp = Math.min(player.maxHp, player.hp + 12);
-      burst(docked.x, docked.y, COLORS.amber, 24, 180);
-      showToast(t('toast.stationUpgraded', { level: docked.level }));
-      audio.tone(420, .36, 'sine', .07, 280);
-      if (tutorialMode && tutorialIndex === TUTORIAL_STEP.station) queueTutorialAdvance();
+      if (docked.level === 1) showStationChoices(docked);
+      else upgradeStation(docked);
       return;
     }
     if (stations.length >= 3) { showToast(t('toast.stationLimit')); return; }
     const cost = stationBuildCost();
     if (player.credits < cost) { showToast(t('toast.needCredits', { cost })); return; }
     player.credits -= cost;
-    stations.push({ x: player.x, y: player.y, radius: 30, level: 1, range: 470, damage: 17, fireRate: .8, fireTimer: .25, angle: 0, target: null });
+    stations.push({ x: player.x, y: player.y, radius: 30, level: 1, type: null, range: 470, damage: 17, fireRate: .8, fireTimer: .25, angle: 0, target: null });
     burst(player.x, player.y, COLORS.amber, 28, 210);
     showToast(t('toast.stationDeployed'));
     audio.tone(230, .5, 'triangle', .075, 310);
@@ -600,7 +721,10 @@
       for (const enemy of enemies) {
         const d = distanceSq(station, enemy);
         if (enemy.dead || d >= station.range ** 2) continue;
-        const targetScore = d * (enemy.interceptor ? .45 : 1);
+        const priority = station.type === 'interceptor' ? (enemy.radius <= 14 ? .28 : 1.5)
+          : station.type === 'siege' ? (enemy.type === 'repair' ? .18 : enemy.major ? .35 : 2)
+            : enemy.interceptor ? .45 : 1;
+        const targetScore = d * priority;
         if (targetScore < bestScore) { bestScore = targetScore; station.target = enemy; }
       }
       if (station.target) {
@@ -610,11 +734,13 @@
           const interceptorAssist = station.target.interceptor;
           const lightShip = station.target.radius <= 14;
           const shotSpeed = interceptorAssist ? 790 : 720;
-          const damageMultiplier = interceptorAssist ? 2.8 : lightShip ? 1.8 : 1;
+          const damageMultiplier = station.type === 'siege' ? (station.target.major || station.target.type === 'repair' ? 1.45 : .65)
+            : station.type === 'interceptor' ? (lightShip || interceptorAssist ? 2.2 : .65)
+              : interceptorAssist ? 2.8 : lightShip ? 1.8 : 1;
           bullets.push({
             x: station.x + Math.cos(station.angle) * 28, y: station.y + Math.sin(station.angle) * 28,
             vx: Math.cos(station.angle) * shotSpeed, vy: Math.sin(station.angle) * shotSpeed, radius: 3.8,
-            damage: station.damage * damageMultiplier, target: station.target, turnRate: interceptorAssist ? 7.2 : 2.3, source: 'station', life: 1.5, dead: false,
+            damage: station.damage * damageMultiplier, target: station.target, turnRate: interceptorAssist ? 7.2 : 2.3, source: 'station', color: STATION_BRANCHES[station.type]?.color || COLORS.cyan, life: 1.5, dead: false,
           });
           audio.tone(250 + station.level * 40, .045, 'square', .018, 90);
         }
@@ -884,8 +1010,8 @@
       addFloater(item.x, item.y, t('floater.hull', { amount: `+${Math.round(healed)}` }), COLORS.cyan);
     } else {
       gateShields = Math.min(5, gateShields + 1);
-      showToast(t('toast.aegisRecovered'));
-      addFloater(item.x, item.y, t('floater.gateShield'), COLORS.amber);
+      showToast(t(currentLevel === 3 ? 'toast.siteRecovered' : 'toast.aegisRecovered'));
+      addFloater(item.x, item.y, t(currentLevel === 3 ? 'floater.siteIntegrity' : 'floater.gateShield'), COLORS.amber);
     }
     burst(item.x, item.y, item.kind === 'repair' ? COLORS.cyan : COLORS.amber, 20, 170);
     audio.tone(item.kind === 'repair' ? 660 : 420, .35, 'sine', .065, 240);

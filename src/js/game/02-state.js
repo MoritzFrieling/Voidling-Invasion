@@ -43,6 +43,7 @@
   let formationGateShields = 3;
   let waveReady = false;
   let waveCallEligible = false;
+  let openingWaveTimer = 0;
   let stationaryTime = 0;
   let staticDamageTimer = 0;
   let jumpDestinationHold = 0;
@@ -168,6 +169,7 @@
   let resources = [];
   let pickups = [];
   let stations = [];
+  let pendingStationChoice = null;
   let particles = [];
   let floaters = [];
 

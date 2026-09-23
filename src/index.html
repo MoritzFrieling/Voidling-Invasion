@@ -40,7 +40,7 @@
           <strong id="xpText">0 / 60</strong>
         </div>
         <div class="gate-row">
-          <span data-i18n="hud.earthGate">EARTH GATE</span>
+          <span id="objectiveLabel" data-i18n="hud.earthGate">EARTH GATE</span>
           <div id="shieldPips" class="shield-pips" aria-label="3 portal shields"></div>
         </div>
         <div class="credit-row"><span data-i18n="hud.salvageCredits">SALVAGE CREDITS</span><strong id="creditText">000</strong></div>
@@ -68,7 +68,7 @@
       <div class="minimap-head"><span data-i18n="hud.tacticalMap">TACTICAL MAP</span><i data-i18n="hud.live">LIVE</i></div>
       <canvas id="minimap" width="240" height="144"></canvas>
       <div class="map-legend"><span><i class="you"></i><b data-i18n="hud.you">YOU</b></span><span><i class="hostile"></i><b data-i18n="hud.hostile">HOSTILE</b></span><span><i
-            class="gate"></i><b data-i18n="hud.gate">GATE</b></span></div>
+            class="gate"></i><b id="mapObjectiveLabel" data-i18n="hud.gate">GATE</b></span></div>
     </aside>
 
     <div class="crosshair" id="crosshair" aria-hidden="true"><i></i></div>
@@ -267,10 +267,29 @@
         <h2 id="sectorTitle">OUTER PERIMETER</h2>
         <p class="panel-copy" id="sectorCopy">The route ahead has split. Hostiles are regrouping around twin approach
           corridors.</p>
-        <div class="sector-reward"><span data-i18n="sector.fieldRepair">FIELD REPAIR</span><strong data-i18n="sector.hullReward">+35% HULL</strong><span data-i18n="sector.gateSupport">GATE
-            SUPPORT</span><strong data-i18n="sector.shieldReward">+1 SHIELD</strong></div>
+        <div class="sector-reward"><span data-i18n="sector.fieldRepair">FIELD REPAIR</span><strong data-i18n="sector.hullReward">+35% HULL</strong><span id="sectorRewardLabel" data-i18n="sector.gateSupport">GATE
+            SUPPORT</span><strong id="sectorRewardValue" data-i18n="sector.shieldReward">+1 SHIELD</strong></div>
         <button class="main-button" id="nextSectorButton" type="button"><span data-i18n="sector.next">ENTER NEXT
             SECTOR</span><b>ENTER</b></button>
+      </div>
+    </section>
+
+    <section class="overlay panel-overlay" id="constructionOverlay" aria-labelledby="constructionTitle">
+      <div class="panel construction-panel">
+        <p class="kicker" data-i18n="construction.kicker">SECTOR 04 // CONSTRUCTION SITE</p>
+        <h2 id="constructionTitle" data-i18n="construction.title">DEFEND THE NEW STATION</h2>
+        <p class="panel-copy" data-i18n="construction.copy">Earth is safe, for now... A new space station is being built in this outer sector, and it's this station that you are tasked to protect. You need your towers to defend with you. Good luck!</p>
+        <button class="main-button" id="beginConstructionButton" type="button" data-i18n="construction.begin">DEFEND THE CONSTRUCTION SITE</button>
+      </div>
+    </section>
+
+    <section class="overlay panel-overlay" id="stationChoiceOverlay" aria-labelledby="stationChoiceTitle">
+      <div class="panel station-choice-panel">
+        <p class="kicker" data-i18n="stationChoice.kicker">FIRST STATION UPGRADE</p>
+        <h2 id="stationChoiceTitle" data-i18n="stationChoice.title">CHOOSE A SPECIALIZATION</h2>
+        <p class="panel-copy" data-i18n="stationChoice.copy">This station keeps its chosen role for later upgrades. Each design answers a different threat.</p>
+        <div class="station-choice-grid" id="stationChoices"></div>
+        <button class="ghost-button" id="stationChoiceClose" type="button" data-i18n="stationChoice.later">DECIDE LATER</button>
       </div>
     </section>
 
