@@ -132,7 +132,7 @@
     // Offset Sector Two's 20% enemy durability bonus so this boss keeps its existing effective HP.
     bossCarrier: { nameKey: 'enemy.bossCarrier.name', roleKey: 'enemy.bossCarrier.role', descriptionKey: 'enemy.bossCarrier.description', radius: 74, hp: 4600 / 1.2, speed: 29, score: 7600, xp: 340, color: '#ef67d1', major: true, boss: true, carrier: true, bossSkill: 'swarm', emergencyHeal: .15 },
     bossTitan: { nameKey: 'enemy.bossTitan.name', roleKey: 'enemy.bossTitan.role', descriptionKey: 'enemy.bossTitan.description', radius: 82, hp: 2520, shield: 330, speed: 26, score: 12000, xp: 500, color: '#aeb8c0', major: true, boss: true, shielded: true, bossSkill: 'titan' },
-    bossWarden: { nameKey: 'enemy.bossWarden.name', roleKey: 'enemy.bossWarden.role', descriptionKey: 'enemy.bossWarden.description', radius: 86, hp: 3100, speed: 28, score: 15000, xp: 600, color: '#b18bff', major: true, boss: true, bossSkill: 'gravity' },
+    bossWarden: { nameKey: 'enemy.bossWarden.name', roleKey: 'enemy.bossWarden.role', descriptionKey: 'enemy.bossWarden.description', radius: 86, hp: 3410, speed: 28, score: 15000, xp: 600, color: '#b18bff', major: true, boss: true, bossSkill: 'gravity' },
   };
 
   function activateWave() {
@@ -249,7 +249,7 @@
       emergencyHeal: blueprint.emergencyHeal || 0,
       emergencyHealUsed: false,
       bossSkill: blueprint.bossSkill || '',
-      supportTimer: rand(2, 3),
+      supportTimer: type === 'repair' ? rand(.35, .75) : rand(2, 3),
       rocketTimer: rand(1.3, 3),
       spawnTimer: blueprint.carrier ? rand(3.55, 5.95) : rand(3.2, 5.4),
       shieldHitTimer: 0,

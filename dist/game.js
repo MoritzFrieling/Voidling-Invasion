@@ -102,8 +102,8 @@
       'end.stationLostTitle': 'STATION LOST', 'end.stationLostCopy': 'The invasion fleet destroyed the station before construction was complete.', 'end.stationVictoryCopy': 'The station construction site is secure. The outer defense network can be completed.',
       'end.stationOffline': 'CONSTRUCTION DEFENSE OFFLINE', 'label.siteIntegrity': 'Site integrity', 'upgrade.site.name': 'Construction Capacitor', 'upgrade.site.description': 'Send a recovered charge to the station construction core.',
       'toast.wardenAnchors': 'LAGRANGE WARDEN // GRAVITY ANCHORS DEPLOYED', 'toast.siteRecovered': 'CONSTRUCTION CORE STABILIZED // INTEGRITY +1', 'floater.siteIntegrity': '+1 SITE INTEGRITY',
-      'enemy.gravity.name': 'GRAVITY ANCHOR', 'enemy.gravity.role': 'TRACTOR BEAM // JUMP LOCK', 'enemy.gravity.description': 'Its beam slowly pulls nearby pilots and blocks void jump while tethered. Destroy the ship to break free.',
-      'enemy.repair.name': 'REPAIR VESSEL', 'enemy.repair.role': 'SUPPORT // REPAIR PULSES', 'enemy.repair.description': 'Restores nearby allied hulls in visible pulses. Destroy it before its escorts become a lasting threat.',
+      'enemy.gravity.name': 'GRAVITY ANCHOR', 'enemy.gravity.role': 'TRACTOR BEAM // JUMP LOCK', 'enemy.gravity.description': 'Its beam strongly pulls nearby pilots and blocks void jump while tethered. Destroy the ship to break free.',
+      'enemy.repair.name': 'REPAIR VESSEL', 'enemy.repair.role': 'SUPPORT // REPAIR PULSES', 'enemy.repair.description': 'Rapidly restores nearby allied hulls. Destroy it first or its escorts will keep recovering.',
       'enemy.bossWarden.name': 'LAGRANGE WARDEN', 'enemy.bossWarden.role': 'GRAVITY COMMAND // ANCHOR DEPLOYMENT', 'enemy.bossWarden.description': 'A command ship that deploys gravity anchors into the outer lanes. Destroy its anchors to free your jump routes.',
       'status.gravityLocked': 'GRAVITY LOCK // DESTROY THE ANCHOR', 'toast.gravityLocked': 'TRACTOR BEAM ACTIVE // VOID JUMP BLOCKED',
       'stationChoice.kicker': 'FIRST STATION UPGRADE', 'stationChoice.title': 'CHOOSE A SPECIALIZATION', 'stationChoice.copy': 'This station keeps its chosen role for later upgrades. Each design answers a different threat.', 'stationChoice.later': 'DECIDE LATER',
@@ -202,8 +202,8 @@
       'end.stationLostTitle': '정거장 손실', 'end.stationLostCopy': '건설이 끝나기 전에 침공 함대가 정거장을 파괴했습니다.', 'end.stationVictoryCopy': '정거장 건설 현장이 안전합니다. 외우주 방어망을 완성할 수 있습니다.',
       'end.stationOffline': '건설 현장 방어 중단', 'label.siteIntegrity': '현장 내구도', 'upgrade.site.name': '건설 축전기', 'upgrade.site.description': '회수한 전하를 정거장 건설 핵심부로 전송합니다.',
       'toast.wardenAnchors': '라그랑주 워든 // 중력 앵커 전개', 'toast.siteRecovered': '건설 핵심부 안정화 // 내구도 +1', 'floater.siteIntegrity': '현장 내구도 +1',
-      'enemy.gravity.name': '중력 앵커', 'enemy.gravity.role': '견인 광선 // 점프 봉쇄', 'enemy.gravity.description': '가까운 조종사를 천천히 끌어당기고 연결 중 보이드 점프를 막습니다. 함선을 파괴하면 풀립니다.',
-      'enemy.repair.name': '수리함', 'enemy.repair.role': '지원 // 수리 파동', 'enemy.repair.description': '주변 아군 함선의 선체를 주기적으로 수리합니다. 호위대가 버티기 전에 파괴하세요.',
+      'enemy.gravity.name': '중력 앵커', 'enemy.gravity.role': '견인 광선 // 점프 봉쇄', 'enemy.gravity.description': '가까운 조종사를 강하게 끌어당기고 연결 중 보이드 점프를 막습니다. 함선을 파괴하면 풀립니다.',
+      'enemy.repair.name': '수리함', 'enemy.repair.role': '지원 // 수리 파동', 'enemy.repair.description': '주변 아군 함선의 선체를 빠르게 수리합니다. 먼저 파괴하지 않으면 호위대가 계속 회복합니다.',
       'enemy.bossWarden.name': '라그랑주 워든', 'enemy.bossWarden.role': '중력 지휘 // 앵커 전개', 'enemy.bossWarden.description': '바깥 항로에 중력 앵커를 전개하는 지휘함입니다. 앵커를 파괴해 점프 경로를 되찾으세요.',
       'status.gravityLocked': '중력 봉쇄 // 앵커를 파괴하세요', 'toast.gravityLocked': '견인 광선 작동 // 보이드 점프 봉쇄',
       'stationChoice.kicker': '첫 기지 업그레이드', 'stationChoice.title': '특화 유형 선택', 'stationChoice.copy': '선택한 역할은 이후 업그레이드에도 유지됩니다. 각 설계는 서로 다른 위협에 대응합니다.', 'stationChoice.later': '나중에 결정',
@@ -359,6 +359,8 @@
     pale: '#e8f8f5',
     void: '#03070c',
   };
+  const GRAVITY_RANGES = { anchor: 370, warden: 390 };
+  const REPAIR_AURA = { radius: 360, interval: 1.15 };
 
   const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
   const lerp = (a, b, t) => a + (b - a) * t;
@@ -1521,7 +1523,7 @@
     // Offset Sector Two's 20% enemy durability bonus so this boss keeps its existing effective HP.
     bossCarrier: { nameKey: 'enemy.bossCarrier.name', roleKey: 'enemy.bossCarrier.role', descriptionKey: 'enemy.bossCarrier.description', radius: 74, hp: 4600 / 1.2, speed: 29, score: 7600, xp: 340, color: '#ef67d1', major: true, boss: true, carrier: true, bossSkill: 'swarm', emergencyHeal: .15 },
     bossTitan: { nameKey: 'enemy.bossTitan.name', roleKey: 'enemy.bossTitan.role', descriptionKey: 'enemy.bossTitan.description', radius: 82, hp: 2520, shield: 330, speed: 26, score: 12000, xp: 500, color: '#aeb8c0', major: true, boss: true, shielded: true, bossSkill: 'titan' },
-    bossWarden: { nameKey: 'enemy.bossWarden.name', roleKey: 'enemy.bossWarden.role', descriptionKey: 'enemy.bossWarden.description', radius: 86, hp: 3100, speed: 28, score: 15000, xp: 600, color: '#b18bff', major: true, boss: true, bossSkill: 'gravity' },
+    bossWarden: { nameKey: 'enemy.bossWarden.name', roleKey: 'enemy.bossWarden.role', descriptionKey: 'enemy.bossWarden.description', radius: 86, hp: 3410, speed: 28, score: 15000, xp: 600, color: '#b18bff', major: true, boss: true, bossSkill: 'gravity' },
   };
 
   function activateWave() {
@@ -1638,7 +1640,7 @@
       emergencyHeal: blueprint.emergencyHeal || 0,
       emergencyHealUsed: false,
       bossSkill: blueprint.bossSkill || '',
-      supportTimer: rand(2, 3),
+      supportTimer: type === 'repair' ? rand(.35, .75) : rand(2, 3),
       rocketTimer: rand(1.3, 3),
       spawnTimer: blueprint.carrier ? rand(3.55, 5.95) : rand(3.2, 5.4),
       shieldHitTimer: 0,
@@ -1762,7 +1764,7 @@
       const deltaX = enemy.x - player.x;
       const deltaY = enemy.y - player.y;
       const distance = Math.hypot(deltaX, deltaY);
-      const range = enemy.boss ? 390 : 310;
+      const range = enemy.boss ? GRAVITY_RANGES.warden : GRAVITY_RANGES.anchor;
       if (distance >= range || distance < 1) continue;
       player.gravityLocked = true;
       const force = enemy.boss ? 430 : 320;
@@ -2236,14 +2238,14 @@
         enemy.supportTimer -= dt;
         if (enemy.supportTimer <= 0) {
           for (const ally of enemies) {
-            if (ally === enemy || ally.dead || distanceSq(ally, enemy) > 280 ** 2) continue;
-            const healed = Math.min(ally.maxHp - ally.hp, Math.min(ally.maxHp * .07, 42));
+            if (ally === enemy || ally.dead || ally.type === 'repair' || distanceSq(ally, enemy) > REPAIR_AURA.radius ** 2) continue;
+            const healed = Math.min(ally.maxHp - ally.hp, Math.max(90, ally.maxHp * .22));
             if (healed > 1) {
               ally.hp += healed;
               addFloater(ally.x, ally.y - ally.radius, `+${Math.ceil(healed)}`, enemy.color);
             }
           }
-          enemy.supportTimer = 2.8;
+          enemy.supportTimer = REPAIR_AURA.interval;
           burst(enemy.x, enemy.y, enemy.color, 10, 120);
         }
       }
@@ -3621,7 +3623,7 @@
     }
     ctx.restore();
     if (enemy.type === 'gravity' || enemy.bossSkill === 'gravity') {
-      const radius = enemy.boss ? 390 : 310;
+      const radius = enemy.boss ? GRAVITY_RANGES.warden : GRAVITY_RANGES.anchor;
       ctx.save();
       ctx.strokeStyle = enemy.color;
       ctx.globalAlpha = .24 + Math.sin(elapsed * 3) * .08;
@@ -3638,8 +3640,8 @@
     if (enemy.type === 'repair') {
       ctx.save();
       ctx.strokeStyle = enemy.color;
-      ctx.globalAlpha = .25 + (1 - enemy.supportTimer / 2.8) * .3;
-      ctx.beginPath(); ctx.arc(enemy.x, enemy.y, 280, 0, Math.PI * 2); ctx.stroke();
+      ctx.globalAlpha = .25 + (1 - clamp(enemy.supportTimer / REPAIR_AURA.interval, 0, 1)) * .3;
+      ctx.beginPath(); ctx.arc(enemy.x, enemy.y, REPAIR_AURA.radius, 0, Math.PI * 2); ctx.stroke();
       ctx.restore();
     }
     if (enemy.shieldCharges > 0 || enemy.shieldHp > 0) {

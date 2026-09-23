@@ -530,7 +530,7 @@
     }
     ctx.restore();
     if (enemy.type === 'gravity' || enemy.bossSkill === 'gravity') {
-      const radius = enemy.boss ? 390 : 310;
+      const radius = enemy.boss ? GRAVITY_RANGES.warden : GRAVITY_RANGES.anchor;
       ctx.save();
       ctx.strokeStyle = enemy.color;
       ctx.globalAlpha = .24 + Math.sin(elapsed * 3) * .08;
@@ -547,8 +547,8 @@
     if (enemy.type === 'repair') {
       ctx.save();
       ctx.strokeStyle = enemy.color;
-      ctx.globalAlpha = .25 + (1 - enemy.supportTimer / 2.8) * .3;
-      ctx.beginPath(); ctx.arc(enemy.x, enemy.y, 280, 0, Math.PI * 2); ctx.stroke();
+      ctx.globalAlpha = .25 + (1 - clamp(enemy.supportTimer / REPAIR_AURA.interval, 0, 1)) * .3;
+      ctx.beginPath(); ctx.arc(enemy.x, enemy.y, REPAIR_AURA.radius, 0, Math.PI * 2); ctx.stroke();
       ctx.restore();
     }
     if (enemy.shieldCharges > 0 || enemy.shieldHp > 0) {

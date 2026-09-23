@@ -112,6 +112,8 @@
     pale: '#e8f8f5',
     void: '#03070c',
   };
+  const GRAVITY_RANGES = { anchor: 370, warden: 390 };
+  const REPAIR_AURA = { radius: 360, interval: 1.15 };
 
   const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
   const lerp = (a, b, t) => a + (b - a) * t;

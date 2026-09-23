@@ -50,7 +50,7 @@
       const deltaX = enemy.x - player.x;
       const deltaY = enemy.y - player.y;
       const distance = Math.hypot(deltaX, deltaY);
-      const range = enemy.boss ? 390 : 310;
+      const range = enemy.boss ? GRAVITY_RANGES.warden : GRAVITY_RANGES.anchor;
       if (distance >= range || distance < 1) continue;
       player.gravityLocked = true;
       const force = enemy.boss ? 430 : 320;
@@ -524,14 +524,14 @@
         enemy.supportTimer -= dt;
         if (enemy.supportTimer <= 0) {
           for (const ally of enemies) {
-            if (ally === enemy || ally.dead || distanceSq(ally, enemy) > 280 ** 2) continue;
-            const healed = Math.min(ally.maxHp - ally.hp, Math.min(ally.maxHp * .07, 42));
+            if (ally === enemy || ally.dead || ally.type === 'repair' || distanceSq(ally, enemy) > REPAIR_AURA.radius ** 2) continue;
+            const healed = Math.min(ally.maxHp - ally.hp, Math.max(90, ally.maxHp * .22));
             if (healed > 1) {
               ally.hp += healed;
               addFloater(ally.x, ally.y - ally.radius, `+${Math.ceil(healed)}`, enemy.color);
             }
           }
-          enemy.supportTimer = 2.8;
+          enemy.supportTimer = REPAIR_AURA.interval;
           burst(enemy.x, enemy.y, enemy.color, 10, 120);
         }
       }
