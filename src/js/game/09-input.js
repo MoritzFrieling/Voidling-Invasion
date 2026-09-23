@@ -97,7 +97,50 @@
     document.getElementById('tutorialButton').addEventListener('click', () => requirePilot(() => startGame(true)));
     document.getElementById('levelSelectButton').addEventListener('click', () => requirePilot(openLevelSelect));
     document.getElementById('closeLevelSelect').addEventListener('click', closeLevelSelect);
-    ui.levelSlider.addEventListener('input', () => { ui.levelChoices.scrollLeft = Number(ui.levelSlider.value); });
+    const levelSliderThumb = ui.levelSlider.firstElementChild;
+    let levelSliderDrag = null;
+    ui.levelSlider.addEventListener('pointerdown', (event) => {
+      if (event.target !== levelSliderThumb) {
+        const thumbBounds = levelSliderThumb.getBoundingClientRect();
+        const direction = event.clientX < thumbBounds.left ? -1 : 1;
+        ui.levelChoices.scrollBy({ left: direction * ui.levelChoices.clientWidth * .8, behavior: 'smooth' });
+        return;
+      }
+      event.preventDefault();
+      levelSliderDrag = { pointerId: event.pointerId, startX: event.clientX, startScroll: ui.levelChoices.scrollLeft };
+      ui.levelSlider.setPointerCapture(event.pointerId);
+      ui.levelSlider.classList.add('dragging');
+    });
+    ui.levelSlider.addEventListener('pointermove', (event) => {
+      if (!levelSliderDrag || event.pointerId !== levelSliderDrag.pointerId) return;
+      const maxScroll = Math.max(0, ui.levelChoices.scrollWidth - ui.levelChoices.clientWidth);
+      const thumbTravel = ui.levelSlider.clientWidth - levelSliderThumb.getBoundingClientRect().width;
+      if (thumbTravel <= 0) return;
+      ui.levelChoices.scrollLeft = clamp(levelSliderDrag.startScroll + (event.clientX - levelSliderDrag.startX) * maxScroll / thumbTravel, 0, maxScroll);
+      updateLevelSlider();
+    });
+    const stopLevelSliderDrag = (event) => {
+      if (!levelSliderDrag || event.pointerId !== levelSliderDrag.pointerId) return;
+      levelSliderDrag = null;
+      ui.levelSlider.classList.remove('dragging');
+    };
+    ui.levelSlider.addEventListener('pointerup', stopLevelSliderDrag);
+    ui.levelSlider.addEventListener('pointercancel', stopLevelSliderDrag);
+    ui.levelSlider.addEventListener('lostpointercapture', stopLevelSliderDrag);
+    ui.levelSlider.addEventListener('keydown', (event) => {
+      const visibleWidth = ui.levelChoices.clientWidth;
+      const maxScroll = Math.max(0, ui.levelChoices.scrollWidth - visibleWidth);
+      let destination;
+      if (event.key === 'ArrowRight') destination = ui.levelChoices.scrollLeft + 60;
+      else if (event.key === 'ArrowLeft') destination = ui.levelChoices.scrollLeft - 60;
+      else if (event.key === 'PageDown') destination = ui.levelChoices.scrollLeft + visibleWidth * .8;
+      else if (event.key === 'PageUp') destination = ui.levelChoices.scrollLeft - visibleWidth * .8;
+      else if (event.key === 'Home') destination = 0;
+      else if (event.key === 'End') destination = maxScroll;
+      else return;
+      event.preventDefault();
+      ui.levelChoices.scrollTo({ left: clamp(destination, 0, maxScroll), behavior: 'smooth' });
+    });
     ui.levelChoices.addEventListener('scroll', updateLevelSlider, { passive: true });
     document.getElementById('controlsButton').addEventListener('click', () => openSettings('menu'));
     document.getElementById('settingsButton').addEventListener('click', () => openSettings('menu'));

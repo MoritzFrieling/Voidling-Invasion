@@ -263,9 +263,16 @@
   }
 
   function updateLevelSlider() {
-    const maxScroll = Math.max(0, ui.levelChoices.scrollWidth - ui.levelChoices.clientWidth);
-    ui.levelSlider.max = String(Math.max(1, Math.ceil(maxScroll)));
-    ui.levelSlider.value = String(Math.round(Math.min(maxScroll, ui.levelChoices.scrollLeft)));
+    const visibleWidth = ui.levelChoices.clientWidth;
+    const totalWidth = ui.levelChoices.scrollWidth;
+    const maxScroll = Math.max(0, totalWidth - visibleWidth);
+    const visibleFraction = totalWidth ? Math.min(1, visibleWidth / totalWidth) : 1;
+    const progress = maxScroll ? clamp(ui.levelChoices.scrollLeft / maxScroll, 0, 1) : 0;
+    const thumb = ui.levelSlider.firstElementChild;
+    thumb.style.width = `${visibleFraction * 100}%`;
+    thumb.style.left = `${progress * (1 - visibleFraction) * 100}%`;
+    ui.levelSlider.setAttribute('aria-valuemax', String(Math.ceil(maxScroll)));
+    ui.levelSlider.setAttribute('aria-valuenow', String(Math.round(Math.min(maxScroll, ui.levelChoices.scrollLeft))));
     ui.levelSlider.parentElement.hidden = maxScroll < 1;
   }
 
