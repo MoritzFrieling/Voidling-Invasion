@@ -299,8 +299,8 @@ button { border: 0; }
 .result-grid { display: grid; grid-template-columns: repeat(3, 1fr); margin-top: 28px; border: 1px solid var(--line); }.result-grid span { display: grid; padding: 16px; }.result-grid span + span { border-left: 1px solid var(--line); }.result-grid small { color: var(--muted); font: 700 .58rem var(--mono); letter-spacing: .12em; }.result-grid strong { margin-top: 4px; font: 700 1.2rem var(--mono); }
 
 .level-select-button { min-width: 190px; }
-.level-select-panel { width: min(1040px, calc(100vw - 34px)); }
-.level-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 28px; }
+.level-select-panel { width: min(1180px, calc(100vw - 34px)); max-height: calc(100dvh - 32px); overflow-y: auto; }
+.level-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin-top: 28px; }
 .level-card { position: relative; min-height: 285px; display: flex; flex-direction: column; padding: 24px; text-align: left; overflow: hidden; border: 1px solid var(--line); background: linear-gradient(155deg, rgba(18,48,58,.48), rgba(3,12,18,.9)); cursor: pointer; transition: .18s ease; }
 .level-card::before { content: attr(data-index); position: absolute; right: 10px; top: -24px; color: rgba(109,247,232,.045); font: 700 9rem/1 var(--display); }
 .level-card:hover:not(:disabled) { translate: 0 -3px; border-color: var(--cyan); box-shadow: 0 18px 36px rgba(0,0,0,.3); }
@@ -398,7 +398,7 @@ button { border: 0; }
   .start-grid { grid-template-columns: 1fr; }.start-side { display: none; }.intro { max-width: 560px; }
   .settings-grid { grid-template-columns: 1fr; gap: 28px; max-height: 70vh; overflow-y: auto; }
   .intel-panel { grid-template-columns: 1fr; }.intel-ship { width: 190px; }.intel-copy { text-align: center; }.intel-copy .main-button { margin-inline: auto; }
-  .level-grid { grid-template-columns: 1fr; max-height: 64vh; overflow-y: auto; }.level-card { min-height: 165px; }
+  .level-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }.level-card { min-height: 200px; }
   .acknowledgements { font-size: .5rem; }.acknowledgements span { display: none; }
 }
 
@@ -410,6 +410,7 @@ button { border: 0; }
   .upgrade-readout { display: none; }
   .static-warning { right: 12px; bottom: 72px; }.wave-call { bottom: 76px; }
   .upgrade-grid { grid-template-columns: 1fr; max-height: 58vh; overflow-y: auto; }.upgrade-choice { min-height: 130px; }.upgrade-choice .upgrade-icon { margin-bottom: 14px; }
+  .level-grid { grid-template-columns: 1fr; }.level-card { min-height: 165px; }
   .start-overlay { padding-inline: 24px; }.intro { margin: 28px 0 24px; }.menu-actions { display: grid; }.menu-actions.primary-actions { display: flex; }.main-button, .secondary-button { width: 100%; }.primary-actions .main-button { width: 220px; }.primary-actions .checkpoint-button { width: calc(100vw - 278px); flex-basis: calc(100vw - 278px); }
 }
 
